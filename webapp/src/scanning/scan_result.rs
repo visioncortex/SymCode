@@ -1,6 +1,6 @@
 use std::iter::Scan;
 
-use crate::symbol::{Symbol, SymbolCategory};
+use super::{Symbol, SymbolCategory};
 
 pub struct ScanResult {
     /// What look like the Finder patterns

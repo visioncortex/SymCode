@@ -4,7 +4,6 @@ mod canvas;
 mod common;
 //mod math;
 mod scanning;
-mod symbol;
 mod utils;
 
 #[wasm_bindgen(start)]

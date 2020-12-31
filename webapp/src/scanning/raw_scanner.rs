@@ -2,9 +2,9 @@ use visioncortex::{ColorImage, PointI32, color_clusters::Runner};
 use wasm_bindgen::prelude::*;
 use web_sys::{CanvasRenderingContext2d, console};
 
-use crate::{canvas::Canvas, symbol::Symbol};
+use crate::canvas::Canvas;
 
-use super::ScanResult;
+use super::{ScanResult, Symbol};
 
 #[wasm_bindgen]
 pub struct RawScanner {}
