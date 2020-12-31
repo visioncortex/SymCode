@@ -1,5 +1,3 @@
-use std::iter::Scan;
-
 use super::{Symbol, SymbolCategory};
 
 pub struct ScanResult {

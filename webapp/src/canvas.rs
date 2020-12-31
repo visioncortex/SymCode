@@ -57,8 +57,4 @@ impl Canvas {
             height: height as usize,
         }
     }
-
-    pub fn log(&self, string: &str) {
-        console::log_1(&wasm_bindgen::JsValue::from_str(string));
-    }
 }

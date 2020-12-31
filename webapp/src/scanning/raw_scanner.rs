@@ -1,6 +1,5 @@
-use visioncortex::{ColorImage, PointI32, color_clusters::Runner};
+use visioncortex::{ColorImage, color_clusters::Runner};
 use wasm_bindgen::prelude::*;
-use web_sys::{CanvasRenderingContext2d, console};
 
 use crate::canvas::Canvas;
 
@@ -46,7 +45,7 @@ impl RawScanner {
     ///
     /// Decision is made based on the colors and shapes of each candidate.
     fn categorize_symbols(candidates: Vec<Symbol>, canvas: &Canvas) -> ScanResult {
-        let mut result = ScanResult::from_vec_of_symbol(candidates);
+        let result = ScanResult::from_vec_of_symbol(candidates);
         Self::render_symbols(canvas, &result);
         result
     }

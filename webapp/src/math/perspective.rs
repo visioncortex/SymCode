@@ -12,7 +12,7 @@ pub(crate) struct PerspectiveTransform {
 impl PerspectiveTransform {
     // adapted from https://github.com/jlouthan/perspective-transform
 
-    fn new(src_pts: Vec<f64>, dst_pts: Vec<f64>) -> PerspectiveTransform {
+    pub(crate) fn new(src_pts: Vec<f64>, dst_pts: Vec<f64>) -> PerspectiveTransform {
         let coeffs = Self::get_normalization_coefficients(&src_pts, &dst_pts, false);
         let coeffs_inv = Self::get_normalization_coefficients(&src_pts, &dst_pts, true);
         PerspectiveTransform {

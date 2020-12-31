@@ -1,6 +1,6 @@
-use visioncortex::{BoundingRect, ColorHsv, PointI32, Shape, color_clusters::{Cluster, ClustersView}};
+use visioncortex::{BoundingRect, ColorHsv, Shape, color_clusters::{Cluster, ClustersView}};
 
-use crate::utils::{is_black, make_shape_square};
+use crate::utils::is_black;
 
 /// Actual Symbol or Candidate
 pub(crate) struct Symbol {
