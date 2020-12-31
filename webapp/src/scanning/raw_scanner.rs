@@ -2,7 +2,7 @@ use visioncortex::{ColorImage, PointI32, color_clusters::Runner};
 use wasm_bindgen::prelude::*;
 use web_sys::{CanvasRenderingContext2d, console};
 
-use crate::{canvas::Canvas, symbol::{Symbol, SymbolType}};
+use crate::{canvas::Canvas, symbol::Symbol};
 
 use super::ScanResult;
 
@@ -17,7 +17,7 @@ impl RawScanner {
         let clusters = Self::extract_symbol_candidates(
             canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
         );
-        let symbols = Self::filter_and_categorize_symbols(clusters, canvas);
+        let symbols = Self::categorize_symbols(clusters, canvas);
 
         "Finished".into()
     }
@@ -37,12 +37,7 @@ impl RawScanner {
             .map(|&cluster_index| view.get_cluster(cluster_index))
             .map(|cluster| {
                 //console::log_2(&cluster.rect.center().x.into(), &cluster.rect.center().y.into());
-                Symbol {
-                    color: cluster.color().to_hsv(),
-                    shape: cluster.to_shape(&view),
-                    top_left: PointI32 {x: cluster.rect.left, y: cluster.rect.top},
-                    bot_right: PointI32 {x: cluster.rect.right, y: cluster.rect.bottom},
-                }
+                Symbol::from_cluster_and_view(cluster, &view)
             })
             .collect()
     }
@@ -50,19 +45,9 @@ impl RawScanner {
     /// Keep only those which look like a symbol.
     ///
     /// Locate the Finder patterns and seperate them from the data-carrying glyphs.
-    fn filter_and_categorize_symbols(candidates: Vec<Symbol>, canvas: &Canvas) -> ScanResult {
-        let mut result = ScanResult { finders: vec![], glyphs: vec![] };
-
-        for candidate in candidates.into_iter() {
-            match candidate.categorize() {
-                SymbolType::Finder => result.finders.push(candidate),
-                SymbolType::Glyph => result.glyphs.push(candidate),
-                SymbolType::Invalid => {}, // Thrown away
-            }
-        }
-
+    fn categorize_symbols(candidates: Vec<Symbol>, canvas: &Canvas) -> ScanResult {
+        let mut result = ScanResult::from_vec_of_symbol(candidates);
         Self::render_symbols(canvas, &result);
-
         result
     }
 
@@ -72,10 +57,11 @@ impl RawScanner {
             ctx.set_stroke_style(JsValue::from_str(
                 "rgb(255, 0, 0)"
             ).as_ref());
-            let x1 = finder.top_left.x as f64;
-            let y1 = finder.top_left.y as f64;
-            let x2 = finder.bot_right.x as f64;
-            let y2 = finder.bot_right.y as f64;
+            let rect = &finder.rect;
+            let x1 = rect.left as f64;
+            let y1 = rect.top as f64;
+            let x2 = rect.right as f64;
+            let y2 = rect.bottom as f64;
             ctx.begin_path();
             ctx.move_to(x1, y1);
             ctx.line_to(x1, y2);

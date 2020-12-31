@@ -1,4 +1,4 @@
-use visioncortex::{ColorHsv, PointI32, Shape};
+use visioncortex::{BoundingRect, ColorHsv, PointI32, Shape, color_clusters::{Cluster, ClustersView}};
 
 use crate::utils::{is_black, make_shape_square};
 
@@ -8,36 +8,49 @@ pub(crate) struct Symbol {
     pub(crate) color: ColorHsv,
     pub(crate) shape: Shape,
     /// absolute coordinates
-    pub(crate) top_left: PointI32,
-    pub(crate) bot_right: PointI32,
+    pub(crate) rect: BoundingRect,
+    pub(crate) category: SymbolCategory,
 }
 
-pub(crate) enum SymbolType {
+pub(crate) enum SymbolCategory {
     Finder,
     Glyph,
     Invalid,
 }
 
 impl Symbol {
-    /// Compare this symbol with each template
-    pub(crate) fn categorize(&self) -> SymbolType {
-        if !is_black(&self.color) {
-            SymbolType::Invalid
-        } else if self.is_finder() {
-            SymbolType::Finder
-        } else if self.is_glyph() {
-            SymbolType::Glyph
-        } else {
-            SymbolType::Invalid
+    pub(crate) fn from_cluster_and_view(cluster: &Cluster, view: &ClustersView) -> Self {
+        let color = cluster.color().to_hsv();
+        let shape = cluster.to_shape(view);
+        let category = Self::categorize(&color, &shape);
+        Symbol {
+            color,
+            shape,
+            rect: cluster.rect.clone(),
+            category,
         }
     }
 
-    fn is_finder(&self) -> bool {
-        //make_shape_square(&self.shape).is_circle()
-        self.shape.is_circle()
+
+    /// Compare this symbol with each template
+    pub(crate) fn categorize(color: &ColorHsv, shape: &Shape) -> SymbolCategory {
+        if !is_black(color) {
+            SymbolCategory::Invalid
+        } else if Self::shape_is_finder(shape) {
+            SymbolCategory::Finder
+        } else if Self::shape_is_glyph(shape) {
+            SymbolCategory::Glyph
+        } else {
+            SymbolCategory::Invalid
+        }
     }
 
-    fn is_glyph(&self) -> bool {
+    fn shape_is_finder(shape: &Shape) -> bool {
+        //make_shape_square(&self.shape).is_circle()
+        shape.is_circle()
+    }
+
+    fn shape_is_glyph(shape: &Shape) -> bool {
         true // All black symbols are glyphs for now
     }
 }
