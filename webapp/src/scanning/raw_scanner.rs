@@ -42,9 +42,7 @@ impl RawScanner {
             .collect()
     }
 
-    /// Keep only those which look like a symbol.
-    ///
-    /// Locate the Finder patterns and seperate them from the data-carrying glyphs.
+    /// Detect the Finder patterns and seperate them from the data-carrying glyphs
     fn categorize_symbols(candidates: Vec<Symbol>, canvas: &Canvas) -> ScanResult {
         let mut result = ScanResult::from_vec_of_symbol(candidates);
         Self::render_symbols(canvas, &result);

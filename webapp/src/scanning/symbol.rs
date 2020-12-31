@@ -4,8 +4,6 @@ use crate::utils::{is_black, make_shape_square};
 
 /// Actual Symbol or Candidate
 pub(crate) struct Symbol {
-    /// Average color in HSV
-    pub(crate) color: ColorHsv,
     pub(crate) shape: Shape,
     /// absolute coordinates
     pub(crate) rect: BoundingRect,
@@ -24,13 +22,11 @@ impl Symbol {
         let shape = cluster.to_shape(view);
         let category = Self::categorize(&color, &shape);
         Symbol {
-            color,
             shape,
             rect: cluster.rect.clone(),
             category,
         }
     }
-
 
     /// Compare this symbol with each template
     pub(crate) fn categorize(color: &ColorHsv, shape: &Shape) -> SymbolCategory {
