@@ -42,7 +42,9 @@ impl RawScanner {
             .collect()
     }
 
-    /// Detect the Finder patterns and seperate them from the data-carrying glyphs
+    /// Detect the Finder patterns and seperate them from the data-carrying glyphs.
+    ///
+    /// Decision is made based on the colors and shapes of each candidate.
     fn categorize_symbols(candidates: Vec<Symbol>, canvas: &Canvas) -> ScanResult {
         let mut result = ScanResult::from_vec_of_symbol(candidates);
         Self::render_symbols(canvas, &result);
