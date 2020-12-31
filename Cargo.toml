@@ -1,11 +1,6 @@
-[package]
-name = "symcode"
-version = "0.1.0"
-authors = ["Hill Tse <hftseab@ust.hk>"]
-edition = "2018"
+[workspace]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-visioncortex = "0.4.0"
-bit-vec = "0.6.3"
+members = [
+    "visioncortex",
+    "webapp"
+]
