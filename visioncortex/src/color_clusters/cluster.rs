@@ -1,4 +1,4 @@
-use crate::{BinaryImage, BoundingRect, Color, ColorSum, CompoundPath, PointI32, PathSimplifyMode, Shape};
+use crate::{BinaryImage, BoundingRect, Color, ColorImage, ColorSum, CompoundPath, PathSimplifyMode, PointI32, Shape};
 use crate::clusters::Cluster as BinaryCluster;
 use super::container::{ClusterIndex, ClustersView};
 
@@ -86,6 +86,15 @@ impl Cluster {
             }
         }
         perimeter
+    }
+
+    pub fn render_to_color_image(&self, parent: &ClustersView, image: &mut ColorImage) {
+        let color = self.residue_color();
+        for &i in self.iter() {
+            let x = i % parent.width;
+            let y = i / parent.width;
+            image.set_pixel(x as usize, y as usize, &color);
+        }
     }
 
     pub fn to_image(&self, parent: &ClustersView) -> BinaryImage {

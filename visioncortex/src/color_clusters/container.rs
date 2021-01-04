@@ -1,4 +1,4 @@
-use crate::{Color, PointI32};
+use crate::{Color, ColorImage, PointI32};
 use super::Cluster;
 
 #[derive(Copy, Clone, Default, Ord, PartialOrd, Eq, PartialEq)]
@@ -72,5 +72,17 @@ impl ClustersView<'_> {
         let a = self.pixels[index + 3];
 
         Some(Color::new_rgba(r, g, b, a))
+    }
+
+    pub fn to_color_image(&self) -> ColorImage {
+        let mut image = ColorImage::new_w_h(self.width as usize, self.height as usize);
+        self.clusters_output
+            .iter()
+            .rev()
+            .for_each(|&u| {
+                let cluster = self.get_cluster(u);
+                cluster.render_to_color_image(self, &mut image);
+            });
+        image
     }
 }
