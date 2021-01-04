@@ -38,8 +38,16 @@ impl Canvas {
         self.html_canvas.width() as usize
     }
 
+    pub fn set_width(&self, value: usize) {
+        self.html_canvas.set_width(value as u32);
+    }
+
     pub fn height(&self) -> usize {
         self.html_canvas.height() as usize
+    }
+
+    pub fn set_height(&self, value: usize) {
+        self.html_canvas.set_height(value as u32);
     }
 
     pub fn get_image_data(&self, x: u32, y: u32, width: u32, height: u32) -> Vec<u8> {

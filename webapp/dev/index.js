@@ -17,7 +17,6 @@ function loadImageFromSource(source) {
 
         debugCanvas.width = canvas.width;
         debugCanvas.height = canvas.height;
-        debugCtx.clearRect(0, 0, debugCanvas.width, debugCanvas);
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
@@ -26,5 +25,5 @@ function loadImageFromSource(source) {
 }
 
 function scanForFinders() {
-    console.log(RawScanner.scan_from_canvas_id('frame', 'debug', 1.5));
+    console.log(RawScanner.scan_from_canvas_id('frame', 'debug', 15));
 }

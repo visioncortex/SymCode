@@ -1,11 +1,9 @@
-use std::iter::Filter;
-
 use visioncortex::{ColorImage, color_clusters::Runner};
 use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, utils::render_color_image_to_canvas};
 
-use super::{FinderCandidate, TransformFitter, Transformer};
+use super::{FinderCandidate, transform::Transformer};
 
 #[wasm_bindgen]
 pub struct RawScanner {}
@@ -18,15 +16,16 @@ impl RawScanner {
         let debug_canvas = &Canvas::new_from_id(debug_canvas_id);
 
         let raw_frame = canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32);
-        let filter_candidates = Self::extract_finder_candidates(
+        let finder_candidates = Self::extract_finder_candidates(
             &raw_frame,
             canvas,
             debug_canvas
         );
-        if let Some(transform) = TransformFitter::from_scan_result(filter_candidates, transform_error_threshold) {
-            transform.print_coeffs()
+        if let Some(rectifiedImage) = Transformer::rectify_image(raw_frame, finder_candidates, transform_error_threshold) {
+            render_color_image_to_canvas(rectifiedImage, debug_canvas);
+            "Rectification complete".into()
         } else {
-            "No candidates are good enough".into()
+            "Cannot rectify image".into()
         }
     }
 }

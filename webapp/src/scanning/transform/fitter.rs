@@ -2,21 +2,19 @@ use permutator::{Combination, Permutation};
 use visioncortex::PointF64;
 use web_sys::console;
 
-use crate::{math::PerspectiveTransform};
-
-use super::FinderCandidate;
+use crate::{math::PerspectiveTransform, scanning::FinderCandidate};
 
 pub(crate) struct TransformFitter {}
 
 impl TransformFitter {
     // In order from left to right, the top-left corner of the 3 circles and the bot-right corner of the left-most circle
-    const DST_PTS: [PointF64; 4] = [PointF64 {x: 0.0, y: 10.0}, PointF64 {x: 12.0, y: 0.0}, PointF64 {x: 24.0, y: 10.0}, PointF64 {x: 8.0, y: 18.0}];
+    const DST_PTS: [PointF64; 4] = [PointF64 {x: 0.0, y: 100.0}, PointF64 {x: 120.0, y: 0.0}, PointF64 {x: 240.0, y: 100.0}, PointF64 {x: 80.0, y: 180.0}];
 
     /// The check points are defined as the bottom-right corners of the middle and the right finders (in this order)
-    const CHECK_PTS: [PointF64; 2] = [PointF64 {x: 20.0, y: 8.0}, PointF64 {x: 32.0, y: 18.0}];
+    const CHECK_PTS: [PointF64; 2] = [PointF64 {x: 200.0, y: 80.0}, PointF64 {x: 320.0, y: 180.0}];
 
     /// If the fitting fails (best_error > threshold), None is returned.
-    pub(crate) fn from_scan_result(finder_candidates: Vec<FinderCandidate>, error_threshold: f64) -> Option<PerspectiveTransform> {
+    pub(crate) fn from_finder_candidates(finder_candidates: Vec<FinderCandidate>, error_threshold: f64) -> Option<PerspectiveTransform> {
         let mut best_transform = PerspectiveTransform::default();
         let mut best_error = std::f64::MAX;
         finder_candidates.combination(3).for_each(|mut c| {

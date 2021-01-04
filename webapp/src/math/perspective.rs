@@ -99,7 +99,7 @@ impl PerspectiveTransform {
         }
     }
 
-    fn transform_inverse(&self, point: PointF64) -> PointF64 {
+    pub(crate) fn transform_inverse(&self, point: PointF64) -> PointF64 {
         let (x, y) = (point.x, point.y);
         PointF64 {
             x: (self.coeffs_inv[0]*x + self.coeffs_inv[1]*y + self.coeffs_inv[2]) / (self.coeffs_inv[6]*x + self.coeffs_inv[7]*y + 1.0),

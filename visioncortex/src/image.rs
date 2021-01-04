@@ -270,6 +270,14 @@ impl ColorImage {
         self.get_pixel_at(index)
     }
 
+    pub fn get_pixel_safe(&self, x: i32, y: i32) -> Option<Color> {
+        if  x >= 0 && x < self.width as i32 &&
+            y >= 0 && y < self.height as i32 {
+            return Some(self.get_pixel(x as usize, y as usize));
+        }
+        None
+    }
+
     pub fn get_pixel_at(&self, index: usize) -> Color {
         let index = index * 4;
         let r = self.pixels[index];
