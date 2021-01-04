@@ -45,10 +45,8 @@ impl RawScanner {
 
         let render_result = render_color_image_to_canvas(view.to_color_image(), debug_canvas); // Possibly unhandled exception
         
-        let finder_candidates: Vec<FinderCandidate> = view.clusters_output.iter()
-            .map(|&cluster_index| FinderCandidate::from_cluster_and_view(view.get_cluster(cluster_index), &view))
-            .filter(|option| option.is_some())
-            .map(|option| option.unwrap())
+        let finder_candidates: Vec<FinderCandidate> = view.clusters_output.into_iter()
+            .filter_map(|&cluster_index| FinderCandidate::from_cluster_and_view(view.get_cluster(cluster_index), &view))
             .collect();
         
         Self::render_finder_candidates(canvas, &finder_candidates);
