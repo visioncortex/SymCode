@@ -36,14 +36,10 @@ impl RawScanner {
         let clusters = runner.run(); // Performing clustering
         let view = clusters.view(); // Obtain the ClustersView (parent of clusters)
 
-        render_color_image_to_canvas(view.to_color_image(), debug_canvas);
+        let render_result = render_color_image_to_canvas(view.to_color_image(), debug_canvas); // Possibly unhandled exception
         
         view.clusters_output.iter()
-            .map(|&cluster_index| view.get_cluster(cluster_index))
-            .map(|cluster| {
-                //console::log_2(&cluster.rect.center().x.into(), &cluster.rect.center().y.into());
-                Symbol::from_cluster_and_view(cluster, &view)
-            })
+            .map(|&cluster_index| Symbol::from_cluster_and_view(view.get_cluster(cluster_index), &view))
             .collect()
     }
 
