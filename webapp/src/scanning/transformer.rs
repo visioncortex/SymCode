@@ -18,14 +18,14 @@ impl Transformer {
     const CHECK_PTS: [PointF64; 2] = [PointF64 {x: 20.0, y: 8.0}, PointF64 {x: 32.0, y: 18.0}];
 
     /// If the fitting fails (best_error > threshold), None is returned.
-    pub(crate) fn from_scan_result(scan_result: ScanResult) -> Option<Self> {
+    pub(crate) fn from_scan_result(scan_result: ScanResult, error_threshold: f64) -> Option<Self> {
         let mut best_transform = PerspectiveTransform::default();
         let mut best_error = std::f64::MAX;
         let finders = &scan_result.finders;
         finders.combination(3).for_each(|mut c| {
             c.permutation().for_each(|p| {
                 let src_pts = Self::get_src_pts(&p);
-                //console::log_1(&format!("{:?}", src_pts).into());
+                //console::log_1(&format!("\n{:?}", src_pts).into());
                 let transform = PerspectiveTransform::from_point_f64(&src_pts, &Self::DST_PTS);
                 let error = Self::evaluate_transform(&transform, &p, &Self::CHECK_PTS);
                 //console::log_1(&(transform.print_coeffs() + " " + &error.to_string()).into());
@@ -35,6 +35,9 @@ impl Transformer {
                 }
             });
         });
+        if best_error > error_threshold { // The lowest error is not low enough
+            return None;
+        }
         Some(
             Self {
                 transform: best_transform,

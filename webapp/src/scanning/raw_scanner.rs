@@ -11,7 +11,7 @@ pub struct RawScanner {}
 #[wasm_bindgen]
 impl RawScanner {
     /// Initiate scanning, should return whatever info is needed for decoding
-    pub fn scan_from_canvas_id(canvas_id: &str, debug_canvas_id: &str) -> String {
+    pub fn scan_from_canvas_id(canvas_id: &str, debug_canvas_id: &str, transform_error_threshold: f64) -> String {
         let canvas = &Canvas::new_from_id(canvas_id);
         let debug_canvas = &Canvas::new_from_id(debug_canvas_id);
         let clusters = Self::extract_symbol_candidates(
@@ -19,10 +19,11 @@ impl RawScanner {
             debug_canvas
         );
         let symbols = Self::categorize_symbols(clusters, canvas);
-        if let Some(transformer) = Transformer::from_scan_result(symbols) {
-            return transformer.print_coeffs();
+        if let Some(transformer) = Transformer::from_scan_result(symbols, transform_error_threshold) {
+            transformer.print_coeffs()
+        } else {
+            "No candidates are good enough".into()
         }
-        "Finished".into()
     }
 }
 
