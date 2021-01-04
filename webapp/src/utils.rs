@@ -1,4 +1,4 @@
-use visioncortex::{BoundingRect, ColorHsv, ColorImage, Sampler, Shape};
+use visioncortex::{ColorHsv, ColorImage};
 use wasm_bindgen::{Clamped, JsValue};
 use web_sys::{ImageData, console};
 
@@ -43,8 +43,4 @@ pub(crate) fn render_color_image_to_canvas(image: ColorImage, canvas: &Canvas) -
     let mut data = image.pixels.clone();
     let data = ImageData::new_with_u8_clamped_array_and_sh(Clamped(&mut data), image.width as u32, image.height as u32)?;
     canvas.get_rendering_context_2d().put_image_data(&data, 0.0, 0.0)
-}
-
-pub(crate) fn render_bounding_box_to_canvas(rect: BoundingRect, canvas: &Canvas) {
-    
 }

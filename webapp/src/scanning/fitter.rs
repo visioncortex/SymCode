@@ -2,9 +2,9 @@ use permutator::{Combination, Permutation};
 use visioncortex::PointF64;
 use web_sys::console;
 
-use crate::{math::PerspectiveTransform, scanning::ScanResult};
+use crate::{math::PerspectiveTransform};
 
-use super::Symbol;
+use super::FinderCandidate;
 
 pub(crate) struct TransformFitter {}
 
@@ -16,11 +16,10 @@ impl TransformFitter {
     const CHECK_PTS: [PointF64; 2] = [PointF64 {x: 20.0, y: 8.0}, PointF64 {x: 32.0, y: 18.0}];
 
     /// If the fitting fails (best_error > threshold), None is returned.
-    pub(crate) fn from_scan_result(scan_result: ScanResult, error_threshold: f64) -> Option<PerspectiveTransform> {
+    pub(crate) fn from_scan_result(finder_candidates: Vec<FinderCandidate>, error_threshold: f64) -> Option<PerspectiveTransform> {
         let mut best_transform = PerspectiveTransform::default();
         let mut best_error = std::f64::MAX;
-        let finders = &scan_result.finders;
-        finders.combination(3).for_each(|mut c| {
+        finder_candidates.combination(3).for_each(|mut c| {
             c.permutation().for_each(|p| {
                 let src_pts = Self::get_src_pts(&p);
                 //console::log_1(&format!("\n{:?}", src_pts).into());
@@ -42,7 +41,7 @@ impl TransformFitter {
     }
 
     /// Given three finder candidates from the raw frame (in order from left to right), obtain the 4 reference points (check definition of Self::DST_PTS)
-    fn get_src_pts(finders: &[&Symbol]) -> Vec<PointF64> {
+    fn get_src_pts(finders: &[&FinderCandidate]) -> Vec<PointF64> {
         if finders.len() != 3 {
             panic!("Don't know how to get source points from".to_owned() + &finders.len().to_string() + "finders.")
         }
@@ -70,7 +69,7 @@ impl TransformFitter {
     /// Given the transform candidate and the same three finder candidates as above, check whether the corresponding points in the finders agree with the check_pts.
     ///
     /// Returns the average of L2-norms of the two errors.
-    fn evaluate_transform(transform: &PerspectiveTransform, finders: &[&Symbol], check_pts: &[PointF64]) -> f64 {
+    fn evaluate_transform(transform: &PerspectiveTransform, finders: &[&FinderCandidate], check_pts: &[PointF64]) -> f64 {
         // Get the two points in image space
         let middle = PointF64::new(finders[1].rect.right as f64, finders[1].rect.bottom as f64);
         let right = PointF64::new(finders[2].rect.right as f64, finders[2].rect.bottom as f64);

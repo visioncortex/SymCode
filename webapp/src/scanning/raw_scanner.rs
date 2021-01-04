@@ -1,9 +1,11 @@
+use std::iter::Filter;
+
 use visioncortex::{ColorImage, color_clusters::Runner};
 use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, utils::render_color_image_to_canvas};
 
-use super::{ScanResult, Symbol, TransformFitter};
+use super::{FinderCandidate, TransformFitter, Transformer};
 
 #[wasm_bindgen]
 pub struct RawScanner {}
@@ -14,12 +16,14 @@ impl RawScanner {
     pub fn scan_from_canvas_id(canvas_id: &str, debug_canvas_id: &str, transform_error_threshold: f64) -> String {
         let canvas = &Canvas::new_from_id(canvas_id);
         let debug_canvas = &Canvas::new_from_id(debug_canvas_id);
-        let clusters = Self::extract_symbol_candidates(
-            canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32),
+
+        let raw_frame = canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32);
+        let filter_candidates = Self::extract_finder_candidates(
+            &raw_frame,
+            canvas,
             debug_canvas
         );
-        let symbols = Self::categorize_symbols(clusters, canvas);
-        if let Some(transform) = TransformFitter::from_scan_result(symbols, transform_error_threshold) {
+        if let Some(transform) = TransformFitter::from_scan_result(filter_candidates, transform_error_threshold) {
             transform.print_coeffs()
         } else {
             "No candidates are good enough".into()
@@ -28,34 +32,33 @@ impl RawScanner {
 }
 
 impl RawScanner {
-
-    fn extract_symbol_candidates(frame: ColorImage, debug_canvas: &Canvas) -> Vec<Symbol> {
+    /// Extract the Finder patterns.
+    ///
+    /// Decision is made based on the colors and shapes of each candidate.
+    fn extract_finder_candidates(frame: &ColorImage, canvas: &Canvas, debug_canvas: &Canvas) -> Vec<FinderCandidate> {
         // Color clustering requires the use of a Runner (it is taken after run())
         let mut runner = Runner::default();
-        runner.init(frame);
+        runner.init(frame.clone());
 
         let clusters = runner.run(); // Performing clustering
         let view = clusters.view(); // Obtain the ClustersView (parent of clusters)
 
         let render_result = render_color_image_to_canvas(view.to_color_image(), debug_canvas); // Possibly unhandled exception
         
-        view.clusters_output.iter()
-            .map(|&cluster_index| Symbol::from_cluster_and_view(view.get_cluster(cluster_index), &view))
-            .collect()
+        let finder_candidates: Vec<FinderCandidate> = view.clusters_output.iter()
+            .map(|&cluster_index| FinderCandidate::from_cluster_and_view(view.get_cluster(cluster_index), &view))
+            .filter(|option| option.is_some())
+            .map(|option| option.unwrap())
+            .collect();
+        
+        Self::render_finder_candidates(canvas, &finder_candidates);
+
+        finder_candidates
     }
 
-    /// Detect the Finder patterns and seperate them from the data-carrying glyphs.
-    ///
-    /// Decision is made based on the colors and shapes of each candidate.
-    fn categorize_symbols(candidates: Vec<Symbol>, canvas: &Canvas) -> ScanResult {
-        let result = ScanResult::from_vec_of_symbol(candidates);
-        Self::render_symbols(canvas, &result);
-        result
-    }
-
-    fn render_symbols(canvas: &Canvas, scan_result: &ScanResult) {
+    fn render_finder_candidates(canvas: &Canvas, finder_candidates: &[FinderCandidate]) {
         let ctx = canvas.get_rendering_context_2d();
-        for finder in scan_result.finders.iter() {
+        for finder in finder_candidates.into_iter() {
             ctx.set_stroke_style(JsValue::from_str(
                 "rgb(255, 0, 0)"
             ).as_ref());
