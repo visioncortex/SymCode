@@ -21,7 +21,7 @@ cfg_if::cfg_if! {
 /// Check Saturation and Value in HSV
 pub(crate) fn is_black(color: &ColorHsv) -> bool {
     const BLACK_LIMIT: f64 = 0.125;
-    console::log_1(&format!("{:?}", color).into());
+    //console::log_1(&format!("{:?}", color).into());
     color.s*color.v <= BLACK_LIMIT
 }
 
