@@ -20,5 +20,5 @@ function loadImageFromSource(source) {
 }
 
 function scanForFinders() {
-    console.log(RawScanner.scan_from_canvas_id('frame'));
+    console.log(RawScanner.scan_from_canvas_id('frame', 'debug'));
 }
