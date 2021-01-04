@@ -6,19 +6,16 @@ use crate::{math::PerspectiveTransform, scanning::ScanResult};
 
 use super::Symbol;
 
-pub(crate) struct Transformer {
-    /// This transform is used to transform points in the raw frame to a front-facing code image
-    transform: PerspectiveTransform,
-}
+pub(crate) struct TransformFitter {}
 
-impl Transformer {
+impl TransformFitter {
     // In order from left to right, the top-left corner of the 3 circles and the bot-right corner of the left-most circle
     const DST_PTS: [PointF64; 4] = [PointF64 {x: 0.0, y: 10.0}, PointF64 {x: 12.0, y: 0.0}, PointF64 {x: 24.0, y: 10.0}, PointF64 {x: 8.0, y: 18.0}];
 
     const CHECK_PTS: [PointF64; 2] = [PointF64 {x: 20.0, y: 8.0}, PointF64 {x: 32.0, y: 18.0}];
 
     /// If the fitting fails (best_error > threshold), None is returned.
-    pub(crate) fn from_scan_result(scan_result: ScanResult, error_threshold: f64) -> Option<Self> {
+    pub(crate) fn from_scan_result(scan_result: ScanResult, error_threshold: f64) -> Option<PerspectiveTransform> {
         let mut best_transform = PerspectiveTransform::default();
         let mut best_error = std::f64::MAX;
         let finders = &scan_result.finders;
@@ -39,14 +36,8 @@ impl Transformer {
             return None;
         }
         Some(
-            Self {
-                transform: best_transform,
-            }
+            best_transform
         )
-    }
-
-    pub(crate) fn print_coeffs(&self) -> String {
-        self.transform.print_coeffs()
     }
 
     /// Given three finder candidates from the raw frame (in order from left to right), obtain the 4 reference points (check definition of Self::DST_PTS)

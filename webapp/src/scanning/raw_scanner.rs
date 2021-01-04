@@ -3,7 +3,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, utils::render_color_image_to_canvas};
 
-use super::{ScanResult, Symbol, Transformer};
+use super::{ScanResult, Symbol, TransformFitter};
 
 #[wasm_bindgen]
 pub struct RawScanner {}
@@ -19,8 +19,8 @@ impl RawScanner {
             debug_canvas
         );
         let symbols = Self::categorize_symbols(clusters, canvas);
-        if let Some(transformer) = Transformer::from_scan_result(symbols, transform_error_threshold) {
-            transformer.print_coeffs()
+        if let Some(transform) = TransformFitter::from_scan_result(symbols, transform_error_threshold) {
+            transform.print_coeffs()
         } else {
             "No candidates are good enough".into()
         }
