@@ -1,6 +1,6 @@
-use visioncortex::{ColorHsv, ColorImage, Sampler, Shape};
+use visioncortex::{BoundingRect, ColorHsv, ColorImage, Sampler, Shape};
 use wasm_bindgen::{Clamped, JsValue};
-use web_sys::ImageData;
+use web_sys::{ImageData, console};
 
 use crate::canvas::Canvas;
 
@@ -20,9 +20,9 @@ cfg_if::cfg_if! {
 
 /// Check Saturation and Value in HSV
 pub(crate) fn is_black(color: &ColorHsv) -> bool {
-    const BLACK_LIMIT: f64 = 0.25;
-    color.s <= BLACK_LIMIT &&
-    color.v <= BLACK_LIMIT
+    const BLACK_LIMIT: f64 = 0.125;
+    console::log_1(&format!("{:?}", color).into());
+    color.s*color.v <= BLACK_LIMIT
 }
 
 /*
@@ -43,4 +43,8 @@ pub(crate) fn render_color_image_to_canvas(image: ColorImage, canvas: &Canvas) -
     let mut data = image.pixels.clone();
     let data = ImageData::new_with_u8_clamped_array_and_sh(Clamped(&mut data), image.width as u32, image.height as u32)?;
     canvas.get_rendering_context_2d().put_image_data(&data, 0.0, 0.0)
+}
+
+pub(crate) fn render_bounding_box_to_canvas(rect: BoundingRect, canvas: &Canvas) {
+    
 }
