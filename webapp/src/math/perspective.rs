@@ -12,6 +12,23 @@ pub(crate) struct PerspectiveTransform {
 impl PerspectiveTransform {
     // adapted from https://github.com/jlouthan/perspective-transform
 
+    pub(crate) fn from_point_f64(src_pts: &[PointF64], dst_pts: &[PointF64]) -> Self {
+        let mut src_f64 = vec![];
+        let mut dst_f64 = vec![];
+
+        for point in src_pts.into_iter() {
+            src_f64.push(point.x);
+            src_f64.push(point.y);
+        }
+
+        for point in dst_pts.into_iter() {
+            dst_f64.push(point.x);
+            dst_f64.push(point.y);
+        }
+
+        Self::new(src_f64, dst_f64)
+    }
+
     pub(crate) fn new(src_pts: Vec<f64>, dst_pts: Vec<f64>) -> PerspectiveTransform {
         let coeffs = Self::get_normalization_coefficients(&src_pts, &dst_pts, false);
         let coeffs_inv = Self::get_normalization_coefficients(&src_pts, &dst_pts, true);
@@ -23,7 +40,7 @@ impl PerspectiveTransform {
         }
     }
 
-    fn default() -> PerspectiveTransform {
+    pub(crate) fn default() -> PerspectiveTransform {
         PerspectiveTransform {
             src_pts: Vec::new(),
             dst_pts: Vec::new(),
