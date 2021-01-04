@@ -12,6 +12,7 @@ impl TransformFitter {
     // In order from left to right, the top-left corner of the 3 circles and the bot-right corner of the left-most circle
     const DST_PTS: [PointF64; 4] = [PointF64 {x: 0.0, y: 10.0}, PointF64 {x: 12.0, y: 0.0}, PointF64 {x: 24.0, y: 10.0}, PointF64 {x: 8.0, y: 18.0}];
 
+    /// The check points are defined as the bottom-right corners of the middle and the right finders (in this order)
     const CHECK_PTS: [PointF64; 2] = [PointF64 {x: 20.0, y: 8.0}, PointF64 {x: 32.0, y: 18.0}];
 
     /// If the fitting fails (best_error > threshold), None is returned.
@@ -67,8 +68,6 @@ impl TransformFitter {
     }
 
     /// Given the transform candidate and the same three finder candidates as above, check whether the corresponding points in the finders agree with the check_pts.
-    ///
-    /// The check points are defined as the bottom-right corners of the middle and the right finders (in this order).
     ///
     /// Returns the average of L2-norms of the two errors.
     fn evaluate_transform(transform: &PerspectiveTransform, finders: &[&Symbol], check_pts: &[PointF64]) -> f64 {
