@@ -1,4 +1,4 @@
-use visioncortex::{BoundingRect, ColorImage};
+use visioncortex::{BoundingRect, ColorImage, color_clusters::Clusters};
 use wasm_bindgen::{Clamped, JsValue};
 use web_sys::{ImageData, console};
 
@@ -40,6 +40,14 @@ pub(crate) fn render_color_image_to_canvas(image: &ColorImage, canvas: &Canvas) 
     canvas.set_height(image.height);
     ctx.clear_rect(0.0, 0.0, canvas.width() as f64, canvas.height() as f64);
     ctx.put_image_data(&data, 0.0, 0.0)
+}
+
+pub(crate) fn render_clusters_to_canvas(clusters: &Clusters, canvas: &Canvas) {
+    let view = clusters.view();
+    for cluster in view.clusters_output.iter()
+                    .map(|&cluster_index| view.get_cluster(cluster_index)) {
+        render_bounding_rect_to_canvas(&cluster.rect, canvas);
+    }
 }
 
 pub(crate) fn render_bounding_rect_to_canvas(rect: &BoundingRect, canvas: &Canvas) {
