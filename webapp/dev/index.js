@@ -7,7 +7,7 @@ const debugCtx = debugCanvas.getContext('2d');
 const img = new Image();
 document.getElementById('imageInput').addEventListener('change', function (e) { loadImageFromSource(this.files[0]) });
 
-//document.addEventListener('load', loadImageFromSource('./assets/sample_code_with_noise.jpg'));
+document.addEventListener('load', loadImageFromSource('./assets/camera_inputs/test_finders/1_2.jpg'));
 
 function loadImageFromSource(source) {
     img.src = source instanceof File ? URL.createObjectURL(source) : source;
