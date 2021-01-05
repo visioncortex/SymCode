@@ -1,4 +1,4 @@
-use visioncortex::{ColorImage};
+use visioncortex::{BoundingRect, ColorImage};
 use wasm_bindgen::{Clamped, JsValue};
 use web_sys::{ImageData, console};
 
@@ -40,4 +40,22 @@ pub(crate) fn render_color_image_to_canvas(image: &ColorImage, canvas: &Canvas) 
     canvas.set_height(image.height);
     ctx.clear_rect(0.0, 0.0, canvas.width() as f64, canvas.height() as f64);
     ctx.put_image_data(&data, 0.0, 0.0)
+}
+
+pub(crate) fn render_bounding_rect_to_canvas(rect: &BoundingRect, canvas: &Canvas) {
+    let ctx = canvas.get_rendering_context_2d();
+    ctx.set_stroke_style(JsValue::from_str(
+        "rgb(255, 0, 0)"
+    ).as_ref());
+    let x1 = rect.left as f64;
+    let y1 = rect.top as f64;
+    let x2 = rect.right as f64;
+    let y2 = rect.bottom as f64;
+    ctx.begin_path();
+    ctx.move_to(x1, y1);
+    ctx.line_to(x1, y2);
+    ctx.line_to(x2, y2);
+    ctx.line_to(x2, y1);
+    ctx.line_to(x1, y1);
+    ctx.stroke();
 }

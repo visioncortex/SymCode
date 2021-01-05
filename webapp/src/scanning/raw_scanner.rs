@@ -57,23 +57,9 @@ impl RawScanner {
     }
 
     fn render_finder_candidates(canvas: &Canvas, finder_candidates: &[FinderCandidate]) {
-        let ctx = canvas.get_rendering_context_2d();
         for finder in finder_candidates.iter() {
-            ctx.set_stroke_style(JsValue::from_str(
-                "rgb(255, 0, 0)"
-            ).as_ref());
             let rect = &finder.rect;
-            let x1 = rect.left as f64;
-            let y1 = rect.top as f64;
-            let x2 = rect.right as f64;
-            let y2 = rect.bottom as f64;
-            ctx.begin_path();
-            ctx.move_to(x1, y1);
-            ctx.line_to(x1, y2);
-            ctx.line_to(x2, y2);
-            ctx.line_to(x2, y1);
-            ctx.line_to(x1, y1);
-            ctx.stroke();
+            render_bounding_rect_to_canvas(rect, canvas);
         }
     }
 }
