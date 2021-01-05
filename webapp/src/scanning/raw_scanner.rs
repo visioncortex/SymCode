@@ -21,8 +21,12 @@ impl RawScanner {
             canvas,
             debug_canvas
         );
-        if let Some(rectifiedImage) = Transformer::rectify_image(raw_frame, finder_candidates, transform_error_threshold) {
-            render_color_image_to_canvas(rectifiedImage, debug_canvas);
+        if let Some(rectified_image) = Transformer::rectify_image(raw_frame, finder_candidates, transform_error_threshold) {
+            match render_color_image_to_canvas(rectified_image, debug_canvas) {
+                Ok(_) => {},
+                Err(e) => {return e},
+            }
+
             "Rectification complete".into()
         } else {
             "Cannot rectify image".into()
@@ -52,7 +56,7 @@ impl RawScanner {
 
     fn render_finder_candidates(canvas: &Canvas, finder_candidates: &[FinderCandidate]) {
         let ctx = canvas.get_rendering_context_2d();
-        for finder in finder_candidates.into_iter() {
+        for finder in finder_candidates.iter() {
             ctx.set_stroke_style(JsValue::from_str(
                 "rgb(255, 0, 0)"
             ).as_ref());
