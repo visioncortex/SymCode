@@ -18,6 +18,8 @@ pub struct GlyphCode {
 
 /// Define the glyph anchors
 impl GlyphCode {
+    pub const WIDTH: usize = 335;
+    pub const HEIGHT: usize = 195;
     /*
     const ANCHORS: [PointI32; Self::LENGTH] = [
         PointI32 {
