@@ -3,7 +3,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, utils::render_color_image_to_canvas};
 
-use super::{FinderCandidate, color_image_to_clusters, transform::Transformer};
+use super::{FinderCandidate, Recognizer, color_image_to_clusters, transform::Transformer};
 
 #[wasm_bindgen]
 pub struct RawScanner {}
@@ -22,11 +22,13 @@ impl RawScanner {
             debug_canvas
         );
         if let Some(rectified_image) = Transformer::rectify_image(raw_frame, finder_candidates, transform_error_threshold) {
-            match render_color_image_to_canvas(rectified_image, debug_canvas) {
+            match render_color_image_to_canvas(&rectified_image, debug_canvas) {
                 Ok(_) => {},
                 Err(e) => {return e},
             }
 
+            let glyph_code = Recognizer::recognize_glyphs_on_image(rectified_image);
+            
             "Rectification complete".into()
         } else {
             "Cannot rectify image".into()

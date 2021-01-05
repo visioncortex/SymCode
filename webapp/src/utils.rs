@@ -32,7 +32,7 @@ pub(crate) fn make_shape_square(original: &Shape) -> Shape {
 }
 */
 
-pub(crate) fn render_color_image_to_canvas(image: ColorImage, canvas: &Canvas) -> Result<(), JsValue> {
+pub(crate) fn render_color_image_to_canvas(image: &ColorImage, canvas: &Canvas) -> Result<(), JsValue> {
     let mut data = image.pixels.clone();
     let data = ImageData::new_with_u8_clamped_array_and_sh(Clamped(&mut data), image.width as u32, image.height as u32)?;
     let ctx = canvas.get_rendering_context_2d();
