@@ -1,4 +1,4 @@
-use visioncortex::{ColorHsv, ColorImage, PointF64, color_clusters::{Clusters, Runner}};
+use visioncortex::{ColorHsv, ColorImage, PointF64, color_clusters::{Cluster, Clusters, Runner}};
 
 /// Check Saturation and Value in HSV
 pub(crate) fn is_black(color: &ColorHsv) -> bool {
@@ -21,4 +21,9 @@ pub(crate) fn valid_pointf64_on_image(point: PointF64, image: &ColorImage) -> bo
 
     0.0 <= point.x && point.x <= w_upper &&
     0.0 <= point.y && point.y <= h_upper
+}
+
+pub(crate) fn clusters_to_vec_of_cluster(clusters: Clusters) -> Vec<Cluster> {
+    let view = clusters.view();
+    view.clusters_output.iter().map(|&cluster_index| {view.get_cluster(cluster_index).clone()}).collect()
 }
