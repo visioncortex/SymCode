@@ -29,7 +29,7 @@ impl RawScanner {
 
             let glyph_code = Recognizer::recognize_glyphs_on_image(rectified_image, anchor_error_threshold, debug_canvas);
             
-            "Rectification complete".into()
+            "Recognition complete".into()
         } else {
             "Cannot rectify image".into()
         }
