@@ -8,8 +8,8 @@ use super::TransformFitter;
 pub(crate) struct Transformer {}
 
 impl Transformer {
-    const CODE_WIDTH: usize = 330;
-    const CODE_HEIGHT: usize = 190;
+    const CODE_WIDTH: usize = 335;
+    const CODE_HEIGHT: usize = 195;
     /// Create an image in object space that is transformed from the most likely PerspectiveTransformation according to the finder candidates
     pub(crate) fn rectify_image(image: ColorImage, finder_candidates: Vec<FinderCandidate>, transform_error_threshold: f64) -> Option<ColorImage> {
         let image_to_object = TransformFitter::from_finder_candidates(finder_candidates, transform_error_threshold)?;

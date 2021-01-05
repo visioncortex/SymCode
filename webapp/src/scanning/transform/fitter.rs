@@ -8,10 +8,10 @@ pub(crate) struct TransformFitter {}
 
 impl TransformFitter {
     // In order from left to right, the top-left corner of the 3 circles and the bot-right corner of the left-most circle
-    const DST_PTS: [PointF64; 4] = [PointF64 {x: 0.0, y: 100.0}, PointF64 {x: 120.0, y: 0.0}, PointF64 {x: 240.0, y: 100.0}, PointF64 {x: 80.0, y: 180.0}];
+    const DST_PTS: [PointF64; 4] = [PointF64 {x: 5.0, y: 105.0}, PointF64 {x: 125.0, y: 5.0}, PointF64 {x: 245.0, y: 105.0}, PointF64 {x: 85.0, y: 185.0}];
 
     /// The check points are defined as the bottom-right corners of the middle and the right finders (in this order)
-    const CHECK_PTS: [PointF64; 2] = [PointF64 {x: 200.0, y: 80.0}, PointF64 {x: 320.0, y: 180.0}];
+    const CHECK_PTS: [PointF64; 2] = [PointF64 {x: 205.0, y: 85.0}, PointF64 {x: 325.0, y: 185.0}];
 
     /// If the fitting fails (best_error > threshold), None is returned.
     pub(crate) fn from_finder_candidates(finder_candidates: Vec<FinderCandidate>, error_threshold: f64) -> Option<PerspectiveTransform> {
