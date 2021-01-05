@@ -1,6 +1,7 @@
 use visioncortex::{BoundingRect, ColorHsv, Shape, color_clusters::{Cluster, ClustersView}};
 
-use crate::utils::is_black;
+use super::is_black;
+
 
 /// Those whose color and shape are close to an actual Finder
 pub(crate) struct FinderCandidate {

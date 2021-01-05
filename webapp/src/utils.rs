@@ -1,4 +1,4 @@
-use visioncortex::{ColorHsv, ColorImage};
+use visioncortex::{ColorImage};
 use wasm_bindgen::{Clamped, JsValue};
 use web_sys::{ImageData, console};
 
@@ -16,13 +16,6 @@ cfg_if::cfg_if! {
         #[inline]
         pub fn set_panic_hook() {}
     }
-}
-
-/// Check Saturation and Value in HSV
-pub(crate) fn is_black(color: &ColorHsv) -> bool {
-    const BLACK_LIMIT: f64 = 0.125;
-    //console::log_1(&format!("{:?}", color).into());
-    color.s*color.v <= BLACK_LIMIT
 }
 
 /*

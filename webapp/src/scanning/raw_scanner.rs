@@ -1,9 +1,9 @@
-use visioncortex::{ColorImage, color_clusters::Runner};
+use visioncortex::{ColorImage};
 use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, utils::render_color_image_to_canvas};
 
-use super::{FinderCandidate, transform::Transformer};
+use super::{FinderCandidate, color_image_to_clusters, transform::Transformer};
 
 #[wasm_bindgen]
 pub struct RawScanner {}
@@ -11,7 +11,7 @@ pub struct RawScanner {}
 #[wasm_bindgen]
 impl RawScanner {
     /// Initiate scanning, should return whatever info is needed for decoding
-    pub fn scan_from_canvas_id(canvas_id: &str, debug_canvas_id: &str, transform_error_threshold: f64) -> String {
+    pub fn scan_from_canvas_id(canvas_id: &str, debug_canvas_id: &str, transform_error_threshold: f64) -> JsValue {
         let canvas = &Canvas::new_from_id(canvas_id);
         let debug_canvas = &Canvas::new_from_id(debug_canvas_id);
 
@@ -35,16 +35,13 @@ impl RawScanner {
     ///
     /// Decision is made based on the colors and shapes of each candidate.
     fn extract_finder_candidates(frame: &ColorImage, canvas: &Canvas, debug_canvas: &Canvas) -> Vec<FinderCandidate> {
-        // Color clustering requires the use of a Runner (it is taken after run())
-        let mut runner = Runner::default();
-        runner.init(frame.clone());
 
-        let clusters = runner.run(); // Performing clustering
-        let view = clusters.view(); // Obtain the ClustersView (parent of clusters)
+        let clusters = color_image_to_clusters(frame.clone());
+        let view = clusters.view(); // Get the ClustersView (parent of clusters)
 
         let render_result = render_color_image_to_canvas(view.to_color_image(), debug_canvas); // Possibly unhandled exception
         
-        let finder_candidates: Vec<FinderCandidate> = view.clusters_output.into_iter()
+        let finder_candidates: Vec<FinderCandidate> = view.clusters_output.iter()
             .filter_map(|&cluster_index| FinderCandidate::from_cluster_and_view(view.get_cluster(cluster_index), &view))
             .collect();
         
