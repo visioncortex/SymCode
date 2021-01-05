@@ -312,10 +312,10 @@ impl ColorImage {
     }
 }
 
-pub fn bilinear_interpolate(im: ColorImage, p: PointF32) -> Color {
+pub fn bilinear_interpolate(im: &ColorImage, p: PointF32) -> Color {
     let x_0 = p.x.floor() as usize;
     let x_1 = p.x.ceil() as usize;
-    let y_0 = p.x.floor() as usize;
+    let y_0 = p.y.floor() as usize;
     let y_1 = p.y.ceil() as usize;
     let c_00 = im.get_pixel(x_0, y_0);
     let c_01 = im.get_pixel(x_0, y_1);
