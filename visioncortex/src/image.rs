@@ -327,11 +327,13 @@ pub fn bilinear_interpolate(im: &ColorImage, p: PointF32) -> Color {
         let f_01 = c_01.channel(channel).unwrap() as f32;
         let f_10 = c_10.channel(channel).unwrap() as f32;
         let f_11 = c_11.channel(channel).unwrap() as f32;
+        let x = p.x - p.x.floor();
+        let y = p.y - p.y.floor();
 
-        (f_00 * (1.0 - p.x) * (1.0 - p.y) +
-        f_10 * p.x * (1.0 - p.y) +
-        f_01 * (1.0 - p.x) * p.y +
-        f_11 * p.x * p.y) as u8
+        (f_00 * (1.0 - x) * (1.0 - y) +
+        f_10 * x * (1.0 - y) +
+        f_01 * (1.0 - x) * y +
+        f_11 * x * y) as u8
     };
 
     Color::new_rgba(
