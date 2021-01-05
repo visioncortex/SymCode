@@ -5,7 +5,6 @@ use super::is_black;
 
 /// Those whose color and shape are close to an actual Finder
 pub(crate) struct FinderCandidate {
-    pub(crate) shape: Shape,
     /// absolute coordinates
     pub(crate) rect: BoundingRect,
 }
@@ -17,7 +16,6 @@ impl FinderCandidate {
         if Self::is_finder(&shape, &color) {
             Some (
                 FinderCandidate {
-                    shape,
                     rect: cluster.rect,
                 }
             )
