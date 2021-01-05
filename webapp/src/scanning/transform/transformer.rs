@@ -17,9 +17,9 @@ impl Transformer {
         }
 
 
-        let mut rectified_image = ColorImage::new_w_h(GlyphCode::WIDTH, GlyphCode::HEIGHT);
-        for x in 0..GlyphCode::WIDTH {
-            for y in 0..GlyphCode::HEIGHT {
+        let mut rectified_image = ColorImage::new_w_h(GlyphCode::CODE_WIDTH, GlyphCode::CODE_HEIGHT);
+        for x in 0..GlyphCode::CODE_WIDTH {
+            for y in 0..GlyphCode::CODE_HEIGHT {
                 let position_in_image_space = image_to_object.transform_inverse(PointF64::new(x as f64, y as f64));
                 let position_in_image_space = PointF32::new(position_in_image_space.x as f32, position_in_image_space.y as f32);
 
@@ -42,8 +42,8 @@ impl Transformer {
 
     /// Check if the 4 corners in the object space will map to a out-of-bound point in the image space
     fn transform_to_image_out_of_bound(image: &ColorImage, image_to_object: &PerspectiveTransform) -> bool {
-        let w = (GlyphCode::WIDTH-1) as f64;
-        let h = (GlyphCode::HEIGHT-1) as f64;
+        let w = (GlyphCode::CODE_WIDTH-1) as f64;
+        let h = (GlyphCode::CODE_HEIGHT-1) as f64;
         let points_to_test = [
             PointF64::new(0.0, 0.0), PointF64::new(0.0, h),
             PointF64::new(w, 0.0), PointF64::new(w, h),
