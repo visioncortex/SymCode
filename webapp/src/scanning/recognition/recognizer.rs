@@ -1,6 +1,7 @@
 use visioncortex::ColorImage;
+use web_sys::console;
 
-use crate::scanning::color_image_to_clusters;
+use crate::{canvas::Canvas, scanning::color_image_to_clusters};
 
 use super::GlyphCode;
 
@@ -8,12 +9,14 @@ use super::GlyphCode;
 pub struct Recognizer {}
 
 impl Recognizer {
-    pub fn recognize_glyphs_on_image(image: ColorImage) -> GlyphCode {
+    pub fn recognize_glyphs_on_image(image: ColorImage, anchor_error_threshold: f64, debug_canvas: &Canvas) -> GlyphCode {
         let clusters = color_image_to_clusters(image);
 
         let mut glyph_code = GlyphCode::default();
-        glyph_code.add_clusters_to_anchors(clusters);
+        glyph_code.add_clusters_near_anchors(clusters, anchor_error_threshold, debug_canvas);
 
-        GlyphCode::default()
+        console::log_1(&format!("{:?}", glyph_code).into());
+
+        glyph_code
     }
 }

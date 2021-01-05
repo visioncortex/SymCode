@@ -1,7 +1,7 @@
 use visioncortex::{ColorImage};
 use wasm_bindgen::prelude::*;
 
-use crate::{canvas::Canvas, utils::render_color_image_to_canvas};
+use crate::{canvas::Canvas, utils::{render_bounding_rect_to_canvas, render_color_image_to_canvas}};
 
 use super::{FinderCandidate, Recognizer, color_image_to_clusters, transform::Transformer};
 
@@ -11,7 +11,7 @@ pub struct RawScanner {}
 #[wasm_bindgen]
 impl RawScanner {
     /// Initiate scanning, should return whatever info is needed for decoding
-    pub fn scan_from_canvas_id(canvas_id: &str, debug_canvas_id: &str, transform_error_threshold: f64) -> JsValue {
+    pub fn scan_from_canvas_id(canvas_id: &str, debug_canvas_id: &str, transform_error_threshold: f64, anchor_error_threshold: f64) -> JsValue {
         let canvas = &Canvas::new_from_id(canvas_id);
         let debug_canvas = &Canvas::new_from_id(debug_canvas_id);
 
@@ -27,7 +27,7 @@ impl RawScanner {
                 Err(e) => {return e},
             }
 
-            let glyph_code = Recognizer::recognize_glyphs_on_image(rectified_image);
+            let glyph_code = Recognizer::recognize_glyphs_on_image(rectified_image, anchor_error_threshold, debug_canvas);
             
             "Rectification complete".into()
         } else {

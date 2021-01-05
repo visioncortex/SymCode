@@ -7,7 +7,7 @@ const debugCtx = debugCanvas.getContext('2d');
 const img = new Image();
 document.getElementById('imageInput').addEventListener('change', function (e) { loadImageFromSource(this.files[0]) });
 
-document.addEventListener('load', loadImageFromSource('./assets/camera_inputs/test_finders/1_2.jpg'));
+//bdocument.addEventListener('load', loadImageFromSource('./assets/camera_inputs/test_finders/1_2.jpg'));
 
 function loadImageFromSource(source) {
     img.src = source instanceof File ? URL.createObjectURL(source) : source;
@@ -25,5 +25,5 @@ function loadImageFromSource(source) {
 }
 
 function scanForFinders() {
-    console.log(RawScanner.scan_from_canvas_id('frame', 'debug', 15));
+    console.log(RawScanner.scan_from_canvas_id('frame', 'debug', 15, 15));
 }
