@@ -45,7 +45,7 @@ impl RawScanner {
         let clusters = color_image_to_clusters(frame.clone());
         let view = clusters.view(); // Get the ClustersView (parent of clusters)
 
-        let render_result = render_color_image_to_canvas(view.to_color_image(), debug_canvas); // Possibly unhandled exception
+        let render_result = render_color_image_to_canvas(&view.to_color_image(), debug_canvas); // Possibly unhandled exception
         
         let finder_candidates: Vec<FinderCandidate> = view.clusters_output.iter()
             .filter_map(|&cluster_index| FinderCandidate::from_cluster_and_view(view.get_cluster(cluster_index), &view))
