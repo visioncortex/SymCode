@@ -3,7 +3,7 @@ use std::fmt::Write;
 
 pub use bit_vec::BitVec;
 
-use crate::{BoundingRect, Color, Field, PointF64, PointI32};
+use crate::{BoundingRect, Color, color::ColorType, Field, PointF32, PointF64, PointI32};
 
 /// Image with 1 bit per pixel
 #[derive(Debug, Clone, Default)]
@@ -310,6 +310,36 @@ impl ColorImage {
         }
         image
     }
+}
+
+pub fn bilinear_interpolate(im: ColorImage, p: PointF32) -> Color {
+    let x_0 = p.x.floor() as usize;
+    let x_1 = p.x.ceil() as usize;
+    let y_0 = p.x.floor() as usize;
+    let y_1 = p.y.ceil() as usize;
+    let c_00 = im.get_pixel(x_0, y_0);
+    let c_01 = im.get_pixel(x_0, y_1);
+    let c_10 = im.get_pixel(x_1, y_0);
+    let c_11 = im.get_pixel(x_1, y_1);
+
+    let interpolate = |channel: usize| {
+        let f_00 = c_00.channel(channel).unwrap() as f32;
+        let f_01 = c_01.channel(channel).unwrap() as f32;
+        let f_10 = c_10.channel(channel).unwrap() as f32;
+        let f_11 = c_11.channel(channel).unwrap() as f32;
+
+        (f_00 * (1.0 - p.x) * (1.0 - p.y) +
+        f_10 * p.x * (1.0 - p.y) +
+        f_01 * (1.0 - p.x) * p.y +
+        f_11 * p.x * p.y) as u8
+    };
+
+    Color::new_rgba(
+        interpolate(0),
+        interpolate(1), 
+        interpolate(2), 
+        interpolate(3),
+    )
 }
 
 #[cfg(test)]
