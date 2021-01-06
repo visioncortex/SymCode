@@ -2,6 +2,7 @@ use wasm_bindgen::prelude::*;
 
 mod canvas;
 mod common;
+mod crc;
 mod math;
 mod scanning;
 mod utils;
