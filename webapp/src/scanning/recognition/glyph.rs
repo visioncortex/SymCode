@@ -89,12 +89,12 @@ impl GlyphCode {
     fn find_closest_cluster(point: &PointF64, clusters: &[&Cluster], error_threshold: f64) -> Option<Cluster> {
         let eval_error = |p: &PointF64, c: &Cluster| {(*p - c.rect.center().to_point_f64()).norm()};
         
-        let mut best_cluster = clusters[0];
-        let mut min_error = eval_error(point, best_cluster);
+        let mut closest_cluster = clusters[0];
+        let mut min_error = eval_error(point, closest_cluster);
         for &cluster in clusters.iter().skip(1) {
             let error = eval_error(point, cluster);
             if error < min_error {
-                best_cluster = cluster;
+                closest_cluster = cluster;
                 min_error = error;
             }
         }
@@ -102,7 +102,7 @@ impl GlyphCode {
         if min_error > error_threshold {
             None
         } else {
-            Some(best_cluster.clone())
+            Some(closest_cluster.clone())
         }
     }
 
