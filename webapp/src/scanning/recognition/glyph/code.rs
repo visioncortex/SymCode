@@ -2,11 +2,11 @@ use visioncortex::{PointF64, color_clusters::{Cluster, Clusters}};
 
 use crate::{canvas::Canvas, utils::{euclid_dist_f64, render_vec_cluster_to_canvas}};
 
-use super::{GlyphCategory, GlyphLibrary};
+use super::{GlyphLabel, GlyphLibrary};
 
 #[derive(Debug, Default)]
 pub struct GlyphCode {
-    glyphs: [GlyphCategory; Self::LENGTH],
+    glyphs: [GlyphLabel; Self::LENGTH],
 }
 
 /// Define the glyph anchors
@@ -97,9 +97,9 @@ impl GlyphCode {
 
     fn set_glyph_with_cluster(&mut self, i: usize, cluster: Option<Cluster>, glyph_library: &GlyphLibrary) {
         if let Some(cluster) = cluster {
-            self.glyphs[i] = GlyphCategory::from_cluster(cluster);
+            self.glyphs[i] = GlyphLabel::from_cluster(cluster);
         } else {
-            self.glyphs[i] = GlyphCategory::Empty;
+            self.glyphs[i] = GlyphLabel::Empty;
         }
     }
 }

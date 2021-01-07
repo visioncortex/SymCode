@@ -6,34 +6,57 @@ use web_sys::console;
 use crate::scanning::is_black;
 
 #[derive(Debug)]
-pub enum GlyphCategory {
-    Empty,
-    Square,
+pub enum GlyphLabel {
+    Empty = 0,
+    Up,
+    Right,
+    Down,
+    Left,
 }
 
-impl Default for GlyphCategory {
+impl Default for GlyphLabel {
     fn default() -> Self {
         Self::Empty
     }
 }
 
-impl GlyphCategory {
+impl GlyphLabel {
+    /// Will be replaced by sth like FromPrimitive
+    fn from_usize_representation(label: usize) -> Self {
+        match label {
+            0 => Self::Empty,
+            1 => Self::Up,
+            2 => Self::Right,
+            3 => Self::Down,
+            4 => Self::Left,
+            _ => panic!("GlyphLabel representation ".to_owned() + &label.to_string() + " is not defined!"),
+        }
+    }
+
     // TODO
     pub fn from_cluster(cluster: Cluster) -> Self {
-        Self::Square
+        Self::Up
     }
 }
 
-pub struct GlyphLibrary {
-    pub templates: Vec<BinaryImage>,
+pub(crate) struct GlyphLibrary {
+    templates: Vec<(BinaryImage, GlyphLabel)>,
 }
 
 impl Default for GlyphLibrary {
     fn default() -> Self {
-        Self::load_from_directory(Self::DEFAULT_DIR)
+        Self { templates: vec![] }
     }
 }
 
+impl GlyphLibrary {
+    /// Takes the binary image of the template and the usize representation of the label
+    pub(crate) fn add_template(&mut self, image: BinaryImage, label: usize) {
+        self.templates.push((image, GlyphLabel::from_usize_representation(label)));
+    }
+}
+
+// For CMDAPP
 impl GlyphLibrary {
     const DEFAULT_DIR: &'static str = "./";
 
@@ -61,7 +84,7 @@ impl GlyphLibrary {
                             println!("{}", &(path.to_owned() + &file_name));
                             Some(
                                 match read_image(&(path.clone() + &file_name)) {
-                                    Ok(img) => img.to_binary_image(|c| is_black(&c.to_hsv())),
+                                    Ok(img) => (img.to_binary_image(|c| is_black(&c.to_hsv())), GlyphLabel::Empty), // Dummy label for category: figure it out later
                                     Err(e) => {
                                         //console::log_1(&e.into());
                                         return None;
@@ -79,6 +102,7 @@ impl GlyphLibrary {
     }
 }
 
+// For CMDAPP
 fn read_image(input_path: &str) -> Result<ColorImage, String> {
     let img = image::open(PathBuf::from(input_path));
     let img = match img {
@@ -92,6 +116,7 @@ fn read_image(input_path: &str) -> Result<ColorImage, String> {
     Ok(img)
 }
 
+// For CMDAPP
 #[cfg(test)]
 mod tests {
     use std::fs;
