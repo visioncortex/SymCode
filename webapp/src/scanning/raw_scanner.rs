@@ -1,5 +1,6 @@
 use visioncortex::{ColorImage};
 use wasm_bindgen::prelude::*;
+use web_sys::console;
 
 use crate::{canvas::Canvas, utils::{render_bounding_rect_to_canvas, render_color_image_to_canvas}};
 
@@ -28,6 +29,8 @@ impl RawScanner {
             }
 
             let glyph_code = Recognizer::recognize_glyphs_on_image(rectified_image, anchor_error_threshold, debug_canvas);
+            
+            console::log_1(&format!("{:?}", glyph_code).into());
             
             "Recognition complete".into()
         } else {
