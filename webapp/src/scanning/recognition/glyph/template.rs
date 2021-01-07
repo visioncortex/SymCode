@@ -1,9 +1,28 @@
 use std::{fs, path::PathBuf};
 
-use visioncortex::{BinaryImage, ColorImage};
+use visioncortex::{BinaryImage, ColorImage, color_clusters::Cluster};
 use web_sys::console;
 
 use crate::scanning::is_black;
+
+#[derive(Debug)]
+pub enum GlyphCategory {
+    Empty,
+    Square,
+}
+
+impl Default for GlyphCategory {
+    fn default() -> Self {
+        Self::Empty
+    }
+}
+
+impl GlyphCategory {
+    // TODO
+    pub fn from_cluster(cluster: Cluster) -> Self {
+        Self::Square
+    }
+}
 
 pub struct GlyphLibrary {
     pub templates: Vec<BinaryImage>,
@@ -16,7 +35,7 @@ impl Default for GlyphLibrary {
 }
 
 impl GlyphLibrary {
-    const DEFAULT_DIR: &'static str = "glyph_templates/";
+    const DEFAULT_DIR: &'static str = "./";
 
     /// Loads the glyph templates in the specified directory as BinaryImage.
     ///
@@ -28,6 +47,7 @@ impl GlyphLibrary {
             path.push_str("/".into());
         }
         let dir = PathBuf::from(path.clone());
+        console::log_1(&format!("{:?}", dir).into());
         if !dir.is_dir() {
             panic!("GlyphLibrary Error: Specified path ".to_owned() + &path + " is not a directory.");
         }
