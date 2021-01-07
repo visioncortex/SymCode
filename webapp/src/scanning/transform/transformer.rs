@@ -15,7 +15,6 @@ impl Transformer {
             return None;
         }
 
-
         let mut rectified_image = ColorImage::new_w_h(GlyphCode::CODE_WIDTH, GlyphCode::CODE_HEIGHT);
         // For each point in object space
         for x in 0..GlyphCode::CODE_WIDTH {
@@ -34,13 +33,15 @@ impl Transformer {
         Some(rectified_image)
     }
 
-    /// Check if the 4 corners in the object space will map to a out-of-bound point in the image space
+    /// Check if the 4 corners in the object space will map to out-of-bound points in the image space.
+    ///
+    /// Those are points that cannot be sampled.
     fn transform_to_image_out_of_bound(image: &ColorImage, image_to_object: &PerspectiveTransform) -> bool {
         let w = (GlyphCode::CODE_WIDTH-1) as f64;
         let h = (GlyphCode::CODE_HEIGHT-1) as f64;
         let points_to_test = [
-            PointF64::new(0.0, 0.0), PointF64::new(0.0, h),
-            PointF64::new(w, 0.0), PointF64::new(w, h),
+            PointF64::new(0.0, 0.0), PointF64::new(w, 0.0),
+            PointF64::new(0.0, h), PointF64::new(w, h),
         ];
 
         for &point in points_to_test.iter() {
