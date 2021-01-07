@@ -12,7 +12,7 @@ pub struct RawScanner {}
 #[wasm_bindgen]
 impl RawScanner {
     /// Initiate scanning, should return whatever info is needed for decoding
-    pub fn scan_from_canvas_id(canvas_id: &str, debug_canvas_id: &str, transform_error_threshold: f64, anchor_error_threshold: f64) -> JsValue {
+    pub fn scan_from_canvas_id(canvas_id: &str, debug_canvas_id: &str, rectify_error_threshold: f64, anchor_error_threshold: f64) -> JsValue {
         let canvas = &Canvas::new_from_id(canvas_id);
         let debug_canvas = &Canvas::new_from_id(debug_canvas_id);
 
@@ -22,7 +22,7 @@ impl RawScanner {
             canvas,
             debug_canvas
         );
-        if let Some(rectified_image) = Transformer::rectify_image(raw_frame, finder_candidates, transform_error_threshold) {
+        if let Some(rectified_image) = Transformer::rectify_image(raw_frame, finder_candidates, rectify_error_threshold) {
             match render_color_image_to_canvas(&rectified_image, debug_canvas) {
                 Ok(_) => {},
                 Err(e) => {return e},
