@@ -15,6 +15,12 @@ impl TransformFitter {
 
     /// If the fitting fails (best_error > threshold), None is returned.
     pub(crate) fn from_finder_candidates(finder_candidates: Vec<FinderCandidate>, error_threshold: f64) -> Option<PerspectiveTransform> {
+        // Need at least 3 finder candidates to try
+        if finder_candidates.len() < 3 {
+            console::log_1(&"Fitter error: Not enough finder candidates in this frame.".into());
+            return None;
+        }
+
         let mut best_transform = PerspectiveTransform::default();
         let mut best_error = std::f64::MAX;
         finder_candidates.combination(3).for_each(|mut c| {
