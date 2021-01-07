@@ -4,7 +4,11 @@ use visioncortex::{ColorHsv, ColorImage, PointF64, color_clusters::{Cluster, Clu
 pub(crate) fn is_black(color: &ColorHsv) -> bool {
     const BLACK_LIMIT: f64 = 0.125;
     //console::log_1(&format!("{:?}", color).into());
-    color.s*color.v <= BLACK_LIMIT
+    if color.s != 0.0 && color.v != 0.0 {
+        color.s*color.v <= BLACK_LIMIT
+    } else { // Either s or v is 0.0
+        (if color.s > 0.0 {color.s} else {color.v}) <= BLACK_LIMIT
+    }
 }
 
 pub(crate) fn color_image_to_clusters(image: ColorImage) -> Clusters {
