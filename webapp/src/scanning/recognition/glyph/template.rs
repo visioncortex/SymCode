@@ -36,7 +36,7 @@ impl GlyphLabel {
     }
 }
 
-pub(crate) struct GlyphLibrary {
+pub struct GlyphLibrary {
     templates: Vec<(BinaryImage, GlyphLabel)>,
 }
 

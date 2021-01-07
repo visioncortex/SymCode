@@ -55,7 +55,7 @@ impl GlyphCode {
     const LENGTH: usize = 3;
 
     /// Given clusters, for each anchor, check which cluster is the closest (and is close enough) and flag the glyph at that anchor
-    pub fn add_clusters_near_anchors(&mut self, clusters: Clusters, error_threshold: f64, debug_canvas: &Canvas) {
+    pub fn add_clusters_near_anchors(&mut self, clusters: Clusters, error_threshold: f64, glyph_library: &GlyphLibrary, debug_canvas: &Canvas) {
         let view = clusters.view();
         let clusters: Vec<&Cluster> =
             view.clusters_output.iter()
@@ -63,8 +63,6 @@ impl GlyphCode {
                 .filter(|&cluster| Self::cluster_size_is_reasonable(cluster))
                 .collect();
         render_vec_cluster_to_canvas(&clusters, debug_canvas);
-
-        let glyph_library = GlyphLibrary::default();
 
         for (i, anchor) in Self::ANCHORS.iter().enumerate() {
             let closest_cluster = Self::find_closest_cluster(anchor, &clusters, error_threshold);

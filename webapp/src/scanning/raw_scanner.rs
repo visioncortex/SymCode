@@ -22,7 +22,7 @@ impl RawScanner {
     pub fn new() -> Self {
         Self::default()
     }
-    
+
     /// Takes the id of the canvas element storing the template image, and the usize representation of the glyph label
     pub fn load_template_from_canvas_id(&mut self, canvas_id: &str, label: usize) {
         let canvas = &Canvas::new_from_id(canvas_id);
@@ -49,7 +49,7 @@ impl RawScanner {
                 Err(e) => {return e},
             }
 
-            let glyph_code = Recognizer::recognize_glyphs_on_image(rectified_image, anchor_error_threshold, debug_canvas);
+            let glyph_code = Recognizer::recognize_glyphs_on_image(rectified_image, anchor_error_threshold, &self.glyph_library, debug_canvas);
             
             console::log_1(&format!("{:?}", glyph_code).into());
             
