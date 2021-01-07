@@ -19,6 +19,10 @@ impl Default for RawScanner {
 
 #[wasm_bindgen]
 impl RawScanner {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    
     /// Takes the id of the canvas element storing the template image, and the usize representation of the glyph label
     pub fn load_template_from_canvas_id(&mut self, canvas_id: &str, label: usize) {
         let canvas = &Canvas::new_from_id(canvas_id);
@@ -29,7 +33,7 @@ impl RawScanner {
     }
 
     /// Initiate scanning, should return whatever info is needed for decoding
-    pub fn scan_from_canvas_id(canvas_id: &str, debug_canvas_id: &str, rectify_error_threshold: f64, anchor_error_threshold: f64) -> JsValue {
+    pub fn scan_from_canvas_id(&self, canvas_id: &str, debug_canvas_id: &str, rectify_error_threshold: f64, anchor_error_threshold: f64) -> JsValue {
         let canvas = &Canvas::new_from_id(canvas_id);
         let debug_canvas = &Canvas::new_from_id(debug_canvas_id);
 

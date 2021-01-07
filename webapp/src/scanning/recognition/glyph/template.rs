@@ -52,6 +52,7 @@ impl Default for GlyphLibrary {
 impl GlyphLibrary {
     /// Takes the binary image of the template and the usize representation of the label
     pub(crate) fn add_template(&mut self, image: BinaryImage, label: usize) {
+        //console::log_1(&format!("{}\n{}", label, image.to_string()).into());
         self.templates.push((image, GlyphLabel::from_usize_representation(label)));
     }
 }
