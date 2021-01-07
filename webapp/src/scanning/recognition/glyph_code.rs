@@ -2,23 +2,7 @@ use visioncortex::{PointF64, color_clusters::{Cluster, Clusters}};
 
 use crate::{canvas::Canvas, utils::render_vec_cluster_to_canvas};
 
-#[derive(Debug)]
-pub enum GlyphCategory {
-    Empty,
-    Square,
-}
-
-impl Default for GlyphCategory {
-    fn default() -> Self {
-        Self::Empty
-    }
-}
-
-impl GlyphCategory {
-    pub fn from_cluster(cluster: Cluster) -> Self {
-        Self::Square
-    }
-}
+use super::GlyphCategory;
 
 #[derive(Debug, Default)]
 pub struct GlyphCode {
