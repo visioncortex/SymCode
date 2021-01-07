@@ -93,6 +93,8 @@ impl GlyphCode {
     fn set_glyph_with_cluster(&mut self, i: usize, cluster: Option<Cluster>) {
         if let Some(cluster) = cluster {
             self.glyphs[i] = GlyphCategory::from_cluster(cluster);
-        } // Otherwise keep it as empty
+        } else {
+            self.glyphs[i] = GlyphCategory::Empty;
+        }
     }
 }
