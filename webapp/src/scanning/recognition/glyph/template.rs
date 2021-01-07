@@ -1,16 +1,69 @@
-use std::path::PathBuf;
+use std::{fs, path::PathBuf};
 
 use visioncortex::{BinaryImage, ColorImage};
+use web_sys::console;
+
+use crate::scanning::is_black;
 
 pub struct GlyphLibrary {
-    templates: Vec<BinaryImage>,
+    pub templates: Vec<BinaryImage>,
+}
+
+impl Default for GlyphLibrary {
+    fn default() -> Self {
+        Self::load_from_directory(Self::DEFAULT_DIR)
+    }
+}
+
+impl GlyphLibrary {
+    const DEFAULT_DIR: &'static str = "glyph_templates/";
+
+    /// Loads the glyph templates in the specified directory as BinaryImage.
+    ///
+    /// Panics if path is not found or no jpg is found there.
+    pub fn load_from_directory(path: &str) -> Self {
+        let mut path = String::from(path);
+
+        if !path.ends_with('/') {
+            path.push_str("/".into());
+        }
+        let dir = PathBuf::from(path.clone());
+        if !dir.is_dir() {
+            panic!("GlyphLibrary Error: Specified path ".to_owned() + &path + " is not a directory.");
+        }
+
+        if let Ok(entries) = fs::read_dir(dir) { // Read the directory
+            Self {
+                templates: entries.into_iter().filter_map(|entry| { // Read each entry in the directory
+                        if let Ok(file) = entry {
+                            // Read the image in the entry
+                            let file_name = file.file_name().into_string().unwrap();
+                            println!("{}", &(path.to_owned() + &file_name));
+                            Some(
+                                match read_image(&(path.clone() + &file_name)) {
+                                    Ok(img) => img.to_binary_image(|c| is_black(&c.to_hsv())),
+                                    Err(e) => {
+                                        //console::log_1(&e.into());
+                                        return None;
+                                    },
+                                }
+                            )
+                        } else {
+                            None
+                        }
+                    }).collect()
+            }
+        } else {
+            panic!("GlyphLibrary Error: Specified path ".to_owned() + &path + " cannot be read.");
+        }
+    }
 }
 
 fn read_image(input_path: &str) -> Result<ColorImage, String> {
     let img = image::open(PathBuf::from(input_path));
     let img = match img {
         Ok(file) => file.to_rgba8(),
-        Err(_) => return Err(String::from("No image file found at specified input path")),
+        Err(_) => return Err("No image file found at path ".to_owned() + input_path),
     };
 
     let (width, height) = (img.width() as usize, img.height() as usize);
@@ -133,5 +186,11 @@ mod tests {
                 panic!("Cannot access directory.")
             }
         }
+    }
+
+    #[test]
+    fn load_default_templates() {
+        let library = GlyphLibrary::default();
+        assert_eq!(library.templates.len(), 4);
     }
 }
