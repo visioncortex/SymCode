@@ -1,5 +1,4 @@
 use visioncortex::{ColorImage, PointF32, PointF64, bilinear_interpolate};
-use web_sys::console;
 
 use crate::{math::PerspectiveTransform, scanning::{FinderCandidate, GlyphCode, valid_pointf64_on_image}};
 
@@ -18,19 +17,14 @@ impl Transformer {
 
 
         let mut rectified_image = ColorImage::new_w_h(GlyphCode::CODE_WIDTH, GlyphCode::CODE_HEIGHT);
+        // For each point in object space
         for x in 0..GlyphCode::CODE_WIDTH {
             for y in 0..GlyphCode::CODE_HEIGHT {
+                // Obtains the sample point in image space
                 let position_in_image_space = image_to_object.transform_inverse(PointF64::new(x as f64, y as f64));
                 let position_in_image_space = PointF32::new(position_in_image_space.x as f32, position_in_image_space.y as f32);
 
-                // console::log_1(&format!("{} {} {} {}", 
-                //     position_in_image_space.x.floor() as usize,
-                //     position_in_image_space.x.ceil() as usize,
-                //     position_in_image_space.y.floor() as usize,
-                //     position_in_image_space.y.ceil() as usize,
-                //     ).into());
-                // console::log_1(&format!("{} {}", image.width, image.height).into());
-
+                // Interpolate the color there
                 rectified_image.set_pixel(x, y,
                     &bilinear_interpolate(&image, position_in_image_space)
                 );
