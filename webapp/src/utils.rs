@@ -1,4 +1,4 @@
-use visioncortex::{BoundingRect, ColorImage, PointF64, color_clusters::Cluster};
+use visioncortex::{BinaryImage, BoundingRect, ColorImage, PointF64, color_clusters::Cluster};
 use wasm_bindgen::{Clamped, JsValue};
 use web_sys::{ImageData, console};
 
@@ -34,6 +34,10 @@ pub(crate) fn make_shape_square(original: &Shape) -> Shape {
 
 pub(crate) fn euclid_dist_f64(p1: &PointF64, p2: &PointF64) -> f64 {
     (*p1-*p2).norm()
+}
+
+pub(crate) fn image_diff_area(img1: &BinaryImage, img2: &BinaryImage) -> u64 {
+    img1.diff(img2).area()
 }
 
 pub(crate) fn render_color_image_to_canvas(image: &ColorImage, canvas: &Canvas) -> Result<(), JsValue> {

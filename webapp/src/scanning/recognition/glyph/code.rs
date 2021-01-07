@@ -1,4 +1,4 @@
-use visioncortex::{PointF64, color_clusters::{Cluster, Clusters}};
+use visioncortex::{PointF64, color_clusters::{Cluster, Clusters, ClustersView}};
 
 use crate::{canvas::Canvas, utils::{euclid_dist_f64, render_vec_cluster_to_canvas}};
 
@@ -68,7 +68,7 @@ impl GlyphCode {
 
         for (i, anchor) in Self::ANCHORS.iter().enumerate() {
             let closest_cluster = Self::find_closest_cluster(anchor, &clusters, error_threshold);
-            self.set_glyph_with_cluster(i, closest_cluster, &glyph_library);
+            self.set_glyph_with_cluster(i, closest_cluster, &view, &glyph_library);
         }
     }
 
@@ -95,9 +95,9 @@ impl GlyphCode {
         }
     }
 
-    fn set_glyph_with_cluster(&mut self, i: usize, cluster: Option<Cluster>, glyph_library: &GlyphLibrary) {
+    fn set_glyph_with_cluster(&mut self, i: usize, cluster: Option<Cluster>, view: &ClustersView, glyph_library: &GlyphLibrary) {
         if let Some(cluster) = cluster {
-            self.glyphs[i] = GlyphLabel::from_cluster(cluster);
+            self.glyphs[i] = glyph_library.find_most_similar_glyph(cluster.to_image(view));
         } else {
             self.glyphs[i] = GlyphLabel::Empty;
         }
