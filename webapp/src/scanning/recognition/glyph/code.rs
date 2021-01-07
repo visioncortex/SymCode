@@ -1,6 +1,6 @@
 use visioncortex::{PointF64, color_clusters::{Cluster, Clusters}};
 
-use crate::{canvas::Canvas, utils::render_vec_cluster_to_canvas};
+use crate::{canvas::Canvas, utils::{euclid_dist_f64, render_vec_cluster_to_canvas}};
 
 use super::GlyphCategory;
 
@@ -71,7 +71,7 @@ impl GlyphCode {
 
     /// Find the cluster in clusters that is the closest to point, with error smaller than the error_threshold.
     fn find_closest_cluster(point: &PointF64, clusters: &[&Cluster], error_threshold: f64) -> Option<Cluster> {
-        let eval_error = |p: &PointF64, c: &Cluster| {(*p - PointF64::new(c.rect.left as f64, c.rect.top as f64)).norm()};
+        let eval_error = |p: &PointF64, c: &Cluster| {euclid_dist_f64(&p, &PointF64::new(c.rect.left as f64, c.rect.top as f64))};
         
         let mut closest_cluster = clusters[0];
         let mut min_error = eval_error(point, closest_cluster);

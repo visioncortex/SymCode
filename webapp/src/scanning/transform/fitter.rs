@@ -2,7 +2,7 @@ use permutator::{Combination, Permutation};
 use visioncortex::PointF64;
 use web_sys::console;
 
-use crate::{math::PerspectiveTransform, scanning::FinderCandidate};
+use crate::{math::PerspectiveTransform, scanning::FinderCandidate, utils::euclid_dist_f64};
 
 pub(crate) struct TransformFitter {}
 
@@ -82,6 +82,6 @@ impl TransformFitter {
         let middle = transform.transform(middle);
         let right = transform.transform(right);
         
-        ((middle-check_pts[0]).norm() + ((right-check_pts[1]).norm())) / 2.0
+        (euclid_dist_f64(&middle, &check_pts[0]) + (euclid_dist_f64(&right, &check_pts[1]))) / 2.0
     }
 }
