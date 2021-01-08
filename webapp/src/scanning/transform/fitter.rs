@@ -2,7 +2,7 @@ use permutator::{Combination, Permutation};
 use visioncortex::PointF64;
 use web_sys::console;
 
-use crate::{math::PerspectiveTransform, scanning::FinderCandidate, utils::euclid_dist_f64};
+use crate::{math::PerspectiveTransform, scanning::FinderCandidate, util::euclid_dist_f64};
 
 
 

@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 
-use crate::{canvas::Canvas, utils::render_color_image_to_canvas};
+use crate::{canvas::Canvas, util::render_color_image_to_canvas};
 
 use super::{FinderCandidate, GlyphLibrary, Recognizer, is_black, transform::Transformer};
 

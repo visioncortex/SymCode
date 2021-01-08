@@ -3,7 +3,7 @@ use std::{fs, path::PathBuf};
 use visioncortex::{BinaryImage, ColorImage, Sampler};
 use web_sys::console;
 
-use crate::{scanning::is_black, utils::image_diff_area};
+use crate::{scanning::is_black, util::image_diff_area};
 
 use super::GlyphCode;
 

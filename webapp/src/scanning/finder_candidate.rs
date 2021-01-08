@@ -1,6 +1,6 @@
 use visioncortex::{BoundingRect, ColorHsv, ColorImage, Shape, color_clusters::{Cluster, ClustersView}};
 
-use crate::{canvas::Canvas, utils::{render_bounding_rect_to_canvas, render_color_image_to_canvas}};
+use crate::{canvas::Canvas, util::{render_bounding_rect_to_canvas, render_color_image_to_canvas}};
 
 use super::{color_image_to_clusters, is_black};
 
