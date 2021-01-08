@@ -1,10 +1,9 @@
-use visioncortex::BinaryImage;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 
 use crate::{canvas::Canvas, utils::render_color_image_to_canvas};
 
-use super::{FinderCandidate, GlyphLabel, GlyphLibrary, Recognizer, is_black, transform::Transformer};
+use super::{FinderCandidate, GlyphLibrary, Recognizer, is_black, transform::Transformer};
 
 #[wasm_bindgen]
 pub struct RawScanner {

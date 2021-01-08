@@ -1,5 +1,5 @@
 use wasm_bindgen::{JsCast};
-use web_sys::{console, CanvasRenderingContext2d, HtmlCanvasElement};
+use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 use visioncortex::{ColorImage};
 
 use super::common::document;

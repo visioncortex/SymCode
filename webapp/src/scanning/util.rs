@@ -1,4 +1,4 @@
-use visioncortex::{ColorHsv, ColorImage, PointF64, color_clusters::{Cluster, Clusters, Runner}};
+use visioncortex::{ColorHsv, ColorImage, PointF64, color_clusters::{Clusters, Runner}};
 
 /// Check Saturation and Value in HSV
 pub(crate) fn is_black(color: &ColorHsv) -> bool {
