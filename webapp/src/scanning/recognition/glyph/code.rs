@@ -11,22 +11,30 @@ pub struct GlyphCode {
 
 /// Define the glyph anchors
 impl GlyphCode {
-    pub const CODE_WIDTH: usize = 335;
-    pub const CODE_HEIGHT: usize = 195;
+    pub const CODE_WIDTH: usize = 400;
+    pub const CODE_HEIGHT: usize = 390;
     
-    /// Centers of the glyphs
+    /// Top-left corners of the glyphs, in U-shaped order
     const ANCHORS: [PointF64; Self::LENGTH] = [
         PointF64 {
-            x: 5.0,
-            y: 5.0,
+            x: 40.0,
+            y: 40.0,
         },
         PointF64 {
-            x: 125.0,
-            y: 105.0,
+            x: 40.0,
+            y: 160.0,
         },
         PointF64 {
-            x: 245.0,
-            y: 5.0,
+            x: 160.0,
+            y: 280.0,
+        },
+        PointF64 {
+            x: 280.0,
+            y: 160.0,
+        },
+        PointF64 {
+            x: 280.0,
+            y: 40.0,
         },
     ];
 }
@@ -52,7 +60,7 @@ impl GlyphCode {
 }
 
 impl GlyphCode {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 5;
 
     /// Given clusters, for each anchor, check which cluster is the closest (and is close enough) and flag the glyph at that anchor
     pub fn add_clusters_near_anchors(&mut self, clusters: Clusters, error_threshold: f64, glyph_library: &GlyphLibrary, debug_canvas: &Canvas) {

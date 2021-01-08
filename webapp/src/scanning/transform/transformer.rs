@@ -47,7 +47,6 @@ impl Transformer {
         for &point in points_to_test.iter() {
             let point_in_image_space = image_to_object.transform_inverse(point);
             
-            //console::log_1(&format!("{:?}", point_in_image_space).into());
             if !valid_pointf64_on_image(point_in_image_space, image) {
                 return true;
             }
