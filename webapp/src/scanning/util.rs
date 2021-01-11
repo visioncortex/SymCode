@@ -1,4 +1,8 @@
-use visioncortex::{ColorHsv, ColorImage, PointF64, color_clusters::{Clusters, Runner}};
+use visioncortex::{BinaryImage, BoundingRect, ColorHsv, ColorImage, PointF64, color_clusters::{Cluster, Clusters, Runner}};
+use wasm_bindgen::{Clamped, JsValue};
+use web_sys::ImageData;
+
+use crate::canvas::Canvas;
 
 /// Check Saturation and Value in HSV
 pub(crate) fn is_black(color: &ColorHsv) -> bool {
@@ -25,4 +29,42 @@ pub(crate) fn valid_pointf64_on_image(point: PointF64, image: &ColorImage) -> bo
 
     0.0 <= point.x && point.x <= w_upper &&
     0.0 <= point.y && point.y <= h_upper
+}
+
+pub(crate) fn image_diff_area(img1: &BinaryImage, img2: &BinaryImage) -> u64 {
+    img1.diff(img2).area()
+}
+
+pub(crate) fn render_color_image_to_canvas(image: &ColorImage, canvas: &Canvas) -> Result<(), JsValue> {
+    let mut data = image.pixels.clone();
+    let data = ImageData::new_with_u8_clamped_array_and_sh(Clamped(&mut data), image.width as u32, image.height as u32)?;
+    let ctx = canvas.get_rendering_context_2d();
+    canvas.set_width(image.width);
+    canvas.set_height(image.height);
+    ctx.clear_rect(0.0, 0.0, canvas.width() as f64, canvas.height() as f64);
+    ctx.put_image_data(&data, 0.0, 0.0)
+}
+
+pub(crate) fn render_vec_cluster_to_canvas(clusters: &[&Cluster], canvas: &Canvas) {
+    for &cluster in clusters.iter() {
+        render_bounding_rect_to_canvas(&cluster.rect, canvas);
+    }
+}
+
+pub(crate) fn render_bounding_rect_to_canvas(rect: &BoundingRect, canvas: &Canvas) {
+    let ctx = canvas.get_rendering_context_2d();
+    ctx.set_stroke_style(JsValue::from_str(
+        "rgb(255, 0, 0)"
+    ).as_ref());
+    let x1 = rect.left as f64;
+    let y1 = rect.top as f64;
+    let x2 = rect.right as f64;
+    let y2 = rect.bottom as f64;
+    ctx.begin_path();
+    ctx.move_to(x1, y1);
+    ctx.line_to(x1, y2);
+    ctx.line_to(x2, y2);
+    ctx.line_to(x2, y1);
+    ctx.line_to(x1, y1);
+    ctx.stroke();
 }

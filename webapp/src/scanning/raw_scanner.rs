@@ -1,9 +1,9 @@
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 
-use crate::{canvas::Canvas, util::render_color_image_to_canvas};
+use crate::{canvas::Canvas};
 
-use super::{FinderCandidate, GlyphLibrary, Recognizer, is_black, transform::Transformer};
+use super::{FinderCandidate, GlyphLibrary, Recognizer, is_black, render_color_image_to_canvas, transform::Transformer};
 
 #[wasm_bindgen]
 pub struct RawScanner {

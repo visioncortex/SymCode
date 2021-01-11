@@ -1,6 +1,6 @@
 use visioncortex::{PointF64, color_clusters::{Cluster, Clusters, ClustersView}};
 
-use crate::{canvas::Canvas, util::{euclid_dist_f64, render_vec_cluster_to_canvas}};
+use crate::{canvas::Canvas, math::euclid_dist_f64, scanning::render_vec_cluster_to_canvas};
 
 use super::{GlyphLabel, GlyphLibrary};
 

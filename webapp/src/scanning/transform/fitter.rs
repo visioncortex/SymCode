@@ -2,7 +2,7 @@ use permutator::{Combination, Permutation};
 use visioncortex::PointF64;
 use web_sys::console;
 
-use crate::{math::PerspectiveTransform, scanning::FinderCandidate, util::euclid_dist_f64};
+use crate::{math::{PerspectiveTransform, euclid_dist_f64}, scanning::FinderCandidate};
 
 
 
@@ -38,6 +38,8 @@ impl TransformFitter {
                 if error < min_error {
                     best_transform = transform;
                     min_error = error;
+                    // console::log_1(&format!("\n{:?}", src_pts).into());
+                    // console::log_1(&min_error.into());
                 }
             });
         });
@@ -73,8 +75,8 @@ impl TransformFitter {
         // Calculate the vector from the center of the first finder center to the first check point
         let first_finder_to_check_point = first_check_point_img_space - finder_src_pts[0];
 
-        // Calculate the vectors from the centers of the remaining three finders centers to the remaining check points
-        // and Calculate their errors with the above vector
+        // Calculate the vectors from the centers of the remaining three finders centers
+        // to the remaining check points and Calculate their errors with the above vector
         let mut acc_error = 0.0;
         finder_src_pts.iter().enumerate().skip(1).for_each(|(i, &finder_src_pt)| {
             let check_point_img_space = img_to_obj.transform_inverse(Self::CHECK_PTS[i]);

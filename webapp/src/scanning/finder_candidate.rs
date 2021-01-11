@@ -1,8 +1,8 @@
 use visioncortex::{BoundingRect, ColorHsv, ColorImage, Shape, color_clusters::{Cluster, ClustersView}};
 
-use crate::{canvas::Canvas, util::{render_bounding_rect_to_canvas, render_color_image_to_canvas}};
+use crate::{canvas::Canvas};
 
-use super::{color_image_to_clusters, is_black};
+use super::{color_image_to_clusters, is_black, render_bounding_rect_to_canvas, render_color_image_to_canvas};
 
 
 /// Those whose color and shape are close to an actual Finder
