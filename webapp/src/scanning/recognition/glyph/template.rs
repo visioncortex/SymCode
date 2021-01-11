@@ -8,6 +8,9 @@ use crate::{scanning::{image_diff_area, is_black}};
 use super::GlyphCode;
 
 #[derive(Clone, Copy, Debug)]
+/// Used for testing purposes only.
+///
+/// For a given alphabet image, the index should go from top to bottom, left to right.
 pub enum GlyphLabel {
     Empty = 0,
     Up,
@@ -48,8 +51,9 @@ impl Default for GlyphLibrary {
 
 impl GlyphLibrary {
     /// Takes the binary image of the template and the usize representation of the label
-    pub(crate) fn add_template(&mut self, image: BinaryImage, label: usize) {
-        //console::log_1(&format!("{}\n{}", label, image.to_string()).into());
+    pub(crate) fn add_template(&mut self, image: BinaryImage) {
+        let label = self.templates.len() + 1;
+        console::log_1(&format!("{}\n{}", label, image.to_string()).into());
         self.templates.push((image, GlyphLabel::from_usize_representation(label)));
     }
 

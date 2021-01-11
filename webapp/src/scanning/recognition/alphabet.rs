@@ -1,4 +1,5 @@
 use visioncortex::{BinaryImage, BoundingRect, PointI32};
+use web_sys::console;
 
 use super::GlyphLibrary;
 
@@ -16,20 +17,16 @@ pub struct AlphabetReaderParams {
 }
 
 impl AlphabetReader {
-    pub fn read_alphabet(image: BinaryImage, params: AlphabetReaderParams) -> GlyphLibrary {
-        let mut library = GlyphLibrary::default();
-
+    pub fn read_alphabet_to_library(library: &mut GlyphLibrary, image: BinaryImage, params: AlphabetReaderParams) {
         for i in 0..params.num_rows {
             for j in 0..params.num_columns {
                 let offset = PointI32::new((j * params.offset_x) as i32, (i * params.offset_y) as i32);
                 let top_left = params.top_left + offset;
                 let rect = BoundingRect::new_x_y_w_h(top_left.x, top_left.y, params.glyph_width as i32, params.glyph_height as i32);
-                let label = i*params.num_columns + j;
 
-                library.add_template(image.crop_with_rect(rect), label);
+                let glyph_image = image.crop_with_rect(rect);
+                library.add_template(glyph_image);
             }
         }
-
-        library
     }
 }
