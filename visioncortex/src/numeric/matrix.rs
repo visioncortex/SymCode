@@ -22,6 +22,25 @@ pub fn transpose(matrix: &Field<f32>) -> Field<f32> {
     result
 }
 
+pub fn dot_mm(lhs: &Field<f32>, rhs: &Field<f32>) -> Field<f32> {
+    assert_eq!(lhs.width(), rhs.height());
+
+    let mut result = Field::with_default(lhs.height(), rhs.width());
+
+    for i in 0..(lhs.height() * rhs.height()) {
+        let pos = result.locate(i);
+        let mut entry = 0.0f32;
+
+        for j in 0..lhs.width() {
+            entry += lhs.get(lhs.index_at(pos.0, j)).unwrap() * rhs.get(rhs.index_at(j, pos.1)).unwrap();
+        }
+
+        result.set(i, &entry);
+    }
+    
+    result
+}
+
 pub fn dot_mv(matrix: &Field<f32>, vector: &[f32]) -> Vec<f32> {
     let cols = std::cmp::min(matrix.width(), vector.len());
 
