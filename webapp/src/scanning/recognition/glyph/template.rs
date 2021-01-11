@@ -246,10 +246,4 @@ mod tests {
             }
         }
     }
-
-    #[test]
-    fn load_default_templates() {
-        let library = GlyphLibrary::default();
-        assert_eq!(library.templates.len(), 4);
-    }
 }

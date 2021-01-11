@@ -2,7 +2,7 @@ use permutator::{Combination, Permutation};
 use visioncortex::PointF64;
 use web_sys::console;
 
-use crate::{math::{PerspectiveTransform, euclid_dist_f64}, scanning::FinderCandidate};
+use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64}, scanning::FinderCandidate};
 
 
 
@@ -29,17 +29,18 @@ impl TransformFitter {
         let mut min_error = std::f64::MAX;
         finder_candidates.combination(4).for_each(|mut c| {
             c.permutation().for_each(|p| {
-                // Make sure the first finder candidate is the one on top (in object space)
-                let src_pts = Self::get_src_pts(&p);
-                //console::log_1(&format!("\n{:?}", src_pts).into());
-                let transform = PerspectiveTransform::from_point_f64(&src_pts, &Self::DST_PTS);
-                let error = Self::evaluate_transform(&transform, &src_pts);
-                //console::log_1(&(transform.print_coeffs() + " " + &error.to_string()).into());
-                if error < min_error {
-                    best_transform = transform;
-                    min_error = error;
-                    // console::log_1(&format!("\n{:?}", src_pts).into());
-                    // console::log_1(&min_error.into());
+                if Self::correct_spatial_arrangement(&p) {
+                    let src_pts = Self::get_src_pts(&p);
+                    //console::log_1(&format!("\n{:?}", src_pts).into());
+                    let transform = PerspectiveTransform::from_point_f64(&src_pts, &Self::DST_PTS);
+                    let error = Self::evaluate_transform(&transform, &src_pts);
+                    //console::log_1(&(transform.print_coeffs() + " " + &error.to_string()).into());
+                    if error < min_error {
+                        best_transform = transform;
+                        min_error = error;
+                        // console::log_1(&format!("\n{:?}", src_pts).into());
+                        // console::log_1(&min_error.into());
+                    }
                 }
             });
         });
@@ -49,6 +50,16 @@ impl TransformFitter {
         Some(
             best_transform
         )
+    }
+
+    fn correct_spatial_arrangement(candidates: &[&FinderCandidate]) -> bool {
+        let position = |candidate: &FinderCandidate| { PointF64::new(candidate.rect.left as f64, candidate.rect.top as f64) };
+        let positions: Vec<PointF64> = candidates.iter().map(|&candidate| position(candidate)).collect();
+
+        // This is specific to the current design
+        clockwise_points_f64(&positions[0], &positions[1], &positions[2]) &&
+        clockwise_points_f64(&positions[0], &positions[3], &positions[1]) &&
+        clockwise_points_f64(&positions[2], &positions[1], &positions[3])
     }
 
     /// Given four finder candidates from the raw frame (in order from left to right), obtain the 4 reference points (check definition of Self::DST_PTS)
