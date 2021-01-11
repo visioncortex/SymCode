@@ -74,5 +74,5 @@ function loadAlphabet() {
 
 function loadingCompletes() {
     console.log("Template loading completes.");
-    //scanImageFromSource("assets/camera_inputs/test_prototype_2/9.jpg");
+    scanImageFromSource("assets/prototype_3/g520.png");
 }

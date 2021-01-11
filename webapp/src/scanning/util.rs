@@ -1,8 +1,10 @@
-use visioncortex::{BinaryImage, BoundingRect, ColorHsv, ColorImage, PointF64, color_clusters::{Cluster, Clusters, Runner}};
+use visioncortex::{BinaryImage, BoundingRect, ColorHsv, ColorImage, PointF64, bound::merge_expand, color_clusters::{Cluster, Clusters, Runner}};
 use wasm_bindgen::{Clamped, JsValue};
-use web_sys::ImageData;
+use web_sys::{ImageData, console};
 
 use crate::canvas::Canvas;
+
+use super::GlyphCode;
 
 /// Check Saturation and Value in HSV
 pub(crate) fn is_black(color: &ColorHsv) -> bool {
@@ -21,6 +23,39 @@ pub(crate) fn color_image_to_clusters(image: ColorImage) -> Clusters {
     runner.init(image);
 
     runner.run() // Performing clustering
+}
+
+/// Convert image to clusters then merge clusters that are close to each other
+pub(crate) fn color_image_to_merged_clusters(image: ColorImage, expand_x: i32, expand_y: i32) -> Vec<(BinaryImage, BoundingRect)> {
+    // Color clustering requires the use of a Runner (it is taken after run())
+    let mut runner = Runner::default();
+    runner.init(image.clone());
+
+    let clusters = runner.run(); // Performing clustering
+    let view = clusters.view();
+    let rects: Vec<BoundingRect> =
+        view.clusters_output.iter()
+        .map(|&cluster_index| view.get_cluster(cluster_index).rect)
+         // !! TEMPORARY solution !!
+        .filter(|rect| rect.width() as usize <= GlyphCode::GLYPH_SIZE+10 && rect.height() as usize <= GlyphCode::GLYPH_SIZE+10)
+        .collect();
+    //console::log_1(&format!("{:?}", rects).into());
+
+    let grouped_rects = merge_expand(rects, expand_x, expand_y);
+    let image = image.to_binary_image(|c| is_black(&c.to_hsv()));
+
+    grouped_rects.into_iter()
+        .map(|rects| {
+            let mut bounding_rect = rects[0];
+            rects.into_iter().skip(1)
+                .for_each(|rect| {
+                    bounding_rect.merge(rect);
+                });
+            let cropped_image = image.crop_with_rect(bounding_rect);
+            //console::log_1(&cropped_image.to_string().into());
+            (cropped_image, bounding_rect)
+        })
+        .collect()
 }
 
 pub(crate) fn valid_pointf64_on_image(point: PointF64, image: &ColorImage) -> bool {
@@ -48,6 +83,12 @@ pub(crate) fn render_color_image_to_canvas(image: &ColorImage, canvas: &Canvas) 
 pub(crate) fn render_vec_cluster_to_canvas(clusters: &[&Cluster], canvas: &Canvas) {
     for &cluster in clusters.iter() {
         render_bounding_rect_to_canvas(&cluster.rect, canvas);
+    }
+}
+
+pub(crate) fn render_vec_image_rect_to_canvas(rects: &[(BinaryImage, BoundingRect)], canvas: &Canvas) {
+    for rect in rects.iter() {
+        render_bounding_rect_to_canvas(&rect.1, canvas);
     }
 }
 

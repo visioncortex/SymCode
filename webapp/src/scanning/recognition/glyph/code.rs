@@ -1,6 +1,7 @@
-use visioncortex::{PointF64, color_clusters::{Cluster, Clusters, ClustersView}};
+use visioncortex::{BinaryImage, BoundingRect, PointF64, color_clusters::{Cluster, ClustersView}};
+use web_sys::console;
 
-use crate::{canvas::Canvas, math::euclid_dist_f64, scanning::render_vec_cluster_to_canvas};
+use crate::{canvas::Canvas, math::euclid_dist_f64, scanning::{render_vec_image_rect_to_canvas}};
 
 use super::{GlyphLabel, GlyphLibrary};
 
@@ -43,52 +44,51 @@ impl GlyphCode {
     /// Square bounding box
     pub const GLYPH_SIZE: usize = 80; // 80x80
 
-    /// True if the cluster is approximately the same size (and shape) as a valid glyph.
+    /// True if the bounding rect is approximately the same size (and shape) as a valid glyph.
     ///
     /// As GLYPH_SIZE is in object space, we can define the error tolerance based on GLYPH_SIZE on an absolute scale
-    pub fn cluster_size_is_reasonable(cluster: &Cluster) -> bool {
+    pub fn rect_size_is_reasonable(rect: &BoundingRect) -> bool {
         const TOLERANCE: usize = 10; // Allows fluctuations of up to this number of units in object space
 
-        let cluster_width = cluster.rect.width() as usize;
-        let cluster_height = cluster.rect.height() as usize;
+        let width = rect.width() as usize;
+        let height = rect.height() as usize;
 
         let reasonable_error = 
             |a: usize| {(std::cmp::max(a, Self::GLYPH_SIZE) - std::cmp::min(a, Self::GLYPH_SIZE)) <= TOLERANCE};
         
-        reasonable_error(cluster_width) && reasonable_error(cluster_height)
+        reasonable_error(width) && reasonable_error(height)
     }
 }
 
 impl GlyphCode {
     const LENGTH: usize = 5;
 
-    /// Given clusters, for each anchor, check which cluster is the closest (and is close enough) and flag the glyph at that anchor
-    pub fn add_clusters_near_anchors(&mut self, clusters: Clusters, error_threshold: f64, glyph_library: &GlyphLibrary, debug_canvas: &Canvas) {
-        let view = clusters.view();
-        let clusters: Vec<&Cluster> =
-            view.clusters_output.iter()
-                .map(|&cluster_index| view.get_cluster(cluster_index))
-                .filter(|&cluster| Self::cluster_size_is_reasonable(cluster))
+    /// Given cropped images and their bounding rects (effectively `clusters`), for each anchor, check which cluster is the closest (and is close enough) and flag the glyph at that anchor
+    pub fn add_clusters_near_anchors(&mut self, clusters: Vec<(BinaryImage, BoundingRect)>, error_threshold: f64, glyph_library: &GlyphLibrary, debug_canvas: &Canvas) {
+        
+        let clusters: Vec<(BinaryImage, BoundingRect)> =
+            clusters.into_iter()
+                .filter(|(_, rect)| Self::rect_size_is_reasonable(rect))
                 .collect();
-        render_vec_cluster_to_canvas(&clusters, debug_canvas);
+        render_vec_image_rect_to_canvas(&clusters, debug_canvas);
 
         for (i, anchor) in Self::ANCHORS.iter().enumerate() {
             let closest_cluster = Self::find_closest_cluster(anchor, &clusters, error_threshold);
-            self.set_glyph_with_cluster(i, closest_cluster, &view, &glyph_library);
+            self.set_glyph_with_cluster(i, closest_cluster, &glyph_library);
         }
     }
 
     /// Find the cluster in clusters that is the closest to point, with error smaller than the error_threshold.
-    fn find_closest_cluster(point: &PointF64, clusters: &[&Cluster], error_threshold: f64) -> Option<Cluster> {
-        let eval_error = |p: &PointF64, c: &Cluster| {euclid_dist_f64(&p, &PointF64::new(c.rect.left as f64, c.rect.top as f64))};
+    fn find_closest_cluster(point: &PointF64, clusters: &[(BinaryImage, BoundingRect)], error_threshold: f64) -> Option<BinaryImage> {
+        let eval_error = |p: &PointF64, rect: &BoundingRect| {euclid_dist_f64(&p, &PointF64::new(rect.left as f64, rect.top as f64))};
         
-        let (closest_cluster, min_error) =
-            clusters.iter().skip(1)
+        let (closest_cluster_index, _,  min_error) =
+            clusters.iter().enumerate().skip(1)
             // Find the cluster with minimum error
-            .fold((clusters[0], eval_error(point, clusters[0])), |min_tuple, &cluster| {
-                let error = eval_error(point, cluster);
-                if error < min_tuple.1 {
-                    (cluster, error)
+            .fold((0, &clusters[0].1, eval_error(point, &clusters[0].1)), |min_tuple, (index, (_, rect))| {
+                let error = eval_error(point, rect);
+                if error < min_tuple.2 {
+                    (index, rect, error)
                 } else {
                     min_tuple
                 }
@@ -97,13 +97,13 @@ impl GlyphCode {
         if min_error > error_threshold {
             None
         } else {
-            Some(closest_cluster.clone())
+            Some(clusters[closest_cluster_index].0.clone())
         }
     }
 
-    fn set_glyph_with_cluster(&mut self, i: usize, cluster: Option<Cluster>, view: &ClustersView, glyph_library: &GlyphLibrary) {
+    fn set_glyph_with_cluster(&mut self, i: usize, cluster: Option<BinaryImage>, glyph_library: &GlyphLibrary) {
         if let Some(cluster) = cluster {
-            self.glyphs[i] = glyph_library.find_most_similar_glyph(cluster.to_image(view));
+            self.glyphs[i] = glyph_library.find_most_similar_glyph(cluster);
         } else {
             self.glyphs[i] = GlyphLabel::Empty;
         }
