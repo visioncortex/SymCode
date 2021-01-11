@@ -3,12 +3,15 @@ use std::{fs, path::PathBuf};
 use visioncortex::{BinaryImage, ColorImage, Sampler};
 use web_sys::console;
 
+use num_derive::FromPrimitive;
+use num_traits::FromPrimitive;
+
 use crate::{scanning::{image_diff_area, is_black}};
 
 use super::GlyphCode;
 
-#[derive(Clone, Copy, Debug)]
-/// Used for testing purposes only.
+#[derive(Clone, Copy, Debug, FromPrimitive)]
+/// Useful for testing purposes only.
 ///
 /// For a given alphabet image, the index should go from top to bottom, left to right.
 pub enum GlyphLabel {
@@ -28,13 +31,12 @@ impl Default for GlyphLabel {
 impl GlyphLabel {
     /// Will be replaced by sth like FromPrimitive
     fn from_usize_representation(label: usize) -> Self {
-        match label {
-            0 => Self::Empty,
-            1 => Self::Up,
-            2 => Self::Right,
-            3 => Self::Down,
-            4 => Self::Left,
-            _ => panic!("GlyphLabel representation ".to_owned() + &label.to_string() + " is not defined!"),
+        match FromPrimitive::from_usize(label) {
+            Some(glyph_label) => glyph_label,
+            None => {
+                console::log_1(&format!("No corresponding label for {}.", label).into());
+                panic!();
+            },
         }
     }
 }
