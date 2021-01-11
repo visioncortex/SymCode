@@ -39,6 +39,7 @@ function loadAllTemplates() {
 function loadTemplateByIndex(index) {
     if (index > numTemplates) {
         console.log("Template loading completes.");
+        scanImageFromSource("assets/camera_inputs/test_prototype_2/9.jpg");
         return;
     }
     const path = "assets/glyph_templates/" + index + ".jpg";
