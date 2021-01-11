@@ -45,6 +45,7 @@ impl TransformFitter {
             });
         });
         if min_error > error_threshold { // The lowest error is not low enough
+            console::log_1(&format!("Fitter error: min fitting error {} > error threshold {}.", min_error, error_threshold).into());
             return None;
         }
         Some(

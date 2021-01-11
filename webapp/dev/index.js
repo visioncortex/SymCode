@@ -29,7 +29,7 @@ function scanImageFromSource(source) {
 }
 
 function scan() {
-    console.log(scanner.scan_from_canvas_id('frame', 'debug', 15, 15));
+    console.log(scanner.scan_from_canvas_id('frame', 'debug', 20, 15));
 }
 
 function loadAllTemplates() {
