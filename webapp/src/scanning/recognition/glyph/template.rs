@@ -16,10 +16,26 @@ use super::GlyphCode;
 /// For a given alphabet image, the index should go from top to bottom, left to right.
 pub enum GlyphLabel {
     Empty = 0,
-    Up,
-    Right,
-    Down,
-    Left,
+
+    LongRR,
+    LongDD,
+    LongLL,
+    LongUU,
+
+    LongRL,
+    LongDU,
+    LongLR,
+    LongUD,
+
+    SmallDouble1,
+    SmallDouble2,
+    SmallDouble3,
+    SmallDouble4,
+
+    SmallTriple1,
+    SmallTriple2,
+    SmallTriple3,
+    SmallTriple4,
 }
 
 impl Default for GlyphLabel {
@@ -55,7 +71,7 @@ impl GlyphLibrary {
     /// Takes the binary image of the template and the usize representation of the label
     pub(crate) fn add_template(&mut self, image: BinaryImage) {
         let label = self.templates.len() + 1;
-        console::log_1(&format!("{}\n{}", label, image.to_string()).into());
+        //console::log_1(&format!("{}\n{}", label, image.to_string()).into());
         self.templates.push((image, GlyphLabel::from_usize_representation(label)));
     }
 
