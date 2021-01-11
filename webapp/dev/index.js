@@ -11,7 +11,7 @@ const img = new Image();
 const numTemplates = 4;
 document.getElementById('imageInput').addEventListener('change', function (e) { scanImageFromSource(this.files[0]) });
 
-document.addEventListener('load', loadAllTemplates());
+document.addEventListener('load', loadAlphabet());
 
 function scanImageFromSource(source) {
     img.src = source instanceof File ? URL.createObjectURL(source) : source;
@@ -38,8 +38,7 @@ function loadAllTemplates() {
 
 function loadTemplateByIndex(index) {
     if (index > numTemplates) {
-        console.log("Template loading completes.");
-        scanImageFromSource("assets/camera_inputs/test_prototype_2/9.jpg");
+        loadingCompletes();
         return;
     }
     const path = "assets/glyph_templates/" + index + ".jpg";
@@ -51,8 +50,29 @@ function loadTemplateByIndex(index) {
         loadBufferCtx.clearRect(0, 0, loadBuffer.width, loadBuffer.height);
         loadBufferCtx.drawImage(img, 0, 0);
 
-        scanner.load_template_from_canvas_id('loadBuffer', index);
+        scanner.load_template_from_canvas_id('loadBuffer');
 
         loadTemplateByIndex(index + 1);
     };
+}
+
+function loadAlphabet() {
+    const path = "assets/alphabet.jpg";
+    img.src = path;
+    img.onload = function () {
+        loadBuffer.width = img.naturalWidth;
+        loadBuffer.height = img.naturalHeight;
+
+        loadBufferCtx.clearRect(0, 0, loadBuffer.width, loadBuffer.height);
+        loadBufferCtx.drawImage(img, 0, 0);
+
+        scanner.load_alphabet_from_canvas_id('loadBuffer');
+
+        loadingCompletes();
+    };
+}
+
+function loadingCompletes() {
+    console.log("Template loading completes.");
+    //scanImageFromSource("assets/camera_inputs/test_prototype_2/9.jpg");
 }

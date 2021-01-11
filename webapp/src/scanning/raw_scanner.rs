@@ -1,9 +1,10 @@
+use visioncortex::PointI32;
 use wasm_bindgen::prelude::*;
 use web_sys::console;
 
 use crate::{canvas::Canvas};
 
-use super::{FinderCandidate, GlyphLibrary, Recognizer, is_black, render_color_image_to_canvas, transform::Transformer};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, GlyphLibrary, Recognizer, is_black, render_color_image_to_canvas, transform::Transformer};
 
 #[wasm_bindgen]
 pub struct RawScanner {
@@ -23,12 +24,30 @@ impl RawScanner {
     }
 
     /// Takes the id of the canvas element storing the template image, and the usize representation of the glyph label
-    pub fn load_template_from_canvas_id(&mut self, canvas_id: &str, label: usize) {
+    pub fn load_template_from_canvas_id(&mut self, canvas_id: &str) {
         let canvas = &Canvas::new_from_id(canvas_id);
         let image = canvas
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
             .to_binary_image(|c| is_black(&c.to_hsv()));
-        self.glyph_library.add_template(image, label);
+        self.glyph_library.add_template(image);
+    }
+
+    /// Takes the id of the canvas element storing the alphabet. The parameters are currently hardcoded here.
+    pub fn load_alphabet_from_canvas_id(&mut self, canvas_id: &str) {
+        let canvas = &Canvas::new_from_id(canvas_id);
+        let image = canvas
+            .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
+            .to_binary_image(|c| is_black(&c.to_hsv()));
+        let params = AlphabetReaderParams {
+            top_left: PointI32::new(53, 53),
+            glyph_width: GlyphCode::GLYPH_SIZE,
+            glyph_height: GlyphCode::GLYPH_SIZE,
+            offset_x: 111,
+            offset_y: 112,
+            num_columns: 4,
+            num_rows: 4,
+        };
+        AlphabetReader::read_alphabet_to_library(&mut self.glyph_library, image, params);
     }
 
     /// Initiate scanning, should return whatever info is needed for decoding
