@@ -18,6 +18,7 @@ pub mod color;
 pub mod disjoint_sets;
 pub mod field;
 pub mod image;
+pub mod numeric;
 pub mod point;
 pub mod sampler;
 pub mod statistic;
