@@ -36,8 +36,7 @@ pub(crate) fn color_image_to_merged_clusters(image: ColorImage, expand_x: i32, e
     let rects: Vec<BoundingRect> =
         view.clusters_output.iter()
         .map(|&cluster_index| view.get_cluster(cluster_index).rect)
-         // !! TEMPORARY solution !!
-        .filter(|rect| rect.width() as usize <= GlyphCode::GLYPH_SIZE+10 && rect.height() as usize <= GlyphCode::GLYPH_SIZE+10)
+        .filter(|rect| GlyphCode::rect_not_too_large(rect))
         .collect();
     //console::log_1(&format!("{:?}", rects).into());
 
