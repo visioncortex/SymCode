@@ -1,3 +1,5 @@
+use web_sys::console;
+
 extern crate cfg_if;
 
 cfg_if::cfg_if! {
@@ -10,4 +12,8 @@ cfg_if::cfg_if! {
         #[inline]
         pub fn set_panic_hook() {}
     }
+}
+
+pub(crate) fn console_log(content: &str) {
+    console::log_1(&content.into());
 }
