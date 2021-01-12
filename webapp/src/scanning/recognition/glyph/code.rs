@@ -1,4 +1,4 @@
-use visioncortex::{BinaryImage, BoundingRect, PointF64, color_clusters::{Cluster, ClustersView}};
+use visioncortex::{BinaryImage, BoundingRect, PointF64};
 use web_sys::console;
 
 use crate::{canvas::Canvas, math::euclid_dist_f64, scanning::{render_vec_image_rect_to_canvas}};
@@ -78,7 +78,7 @@ impl GlyphCode {
     const LENGTH: usize = 5;
 
     /// Given cropped images and their bounding rects (effectively `clusters`), for each anchor, check which cluster is the closest (and is close enough) and flag the glyph at that anchor
-    pub fn add_clusters_near_anchors(&mut self, clusters: Vec<(BinaryImage, BoundingRect)>, error_threshold: f64, glyph_library: &GlyphLibrary, debug_canvas: &Canvas) {
+    pub fn add_images_rects_near_anchors(&mut self, clusters: Vec<(BinaryImage, BoundingRect)>, error_threshold: f64, glyph_library: &GlyphLibrary, debug_canvas: &Canvas) {
         
         let clusters: Vec<(BinaryImage, BoundingRect)> =
             clusters.into_iter()

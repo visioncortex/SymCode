@@ -13,7 +13,7 @@ impl Recognizer {
         let images_rects = color_image_to_merged_clusters(image, 7, 7); // Expand each cluster by 7 units vertically and horizontally
         
         let mut glyph_code = GlyphCode::default();
-        glyph_code.add_clusters_near_anchors(images_rects, anchor_error_threshold, glyph_library , debug_canvas);
+        glyph_code.add_images_rects_near_anchors(images_rects, anchor_error_threshold, glyph_library , debug_canvas);
 
         glyph_code
     }
