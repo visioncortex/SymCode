@@ -1,8 +1,8 @@
 use visioncortex::PointI32;
 use wasm_bindgen::prelude::*;
-use web_sys::console;
 
-use crate::{canvas::Canvas};
+
+use crate::{canvas::Canvas, util::console_log_util};
 
 use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, GlyphLibrary, Recognizer, is_black, render_color_image_to_canvas, transform::Transformer};
 
@@ -72,7 +72,7 @@ impl RawScanner {
             canvas,
             debug_canvas
         );
-        console::log_1(&format!("Extracted {} finder candidates from raw frame.", finder_candidates.len()).into());
+        console_log_util(&format!("Extracted {} finder candidates from raw frame.", finder_candidates.len()));
         if let Some(rectified_image) = Transformer::rectify_image(raw_frame, finder_candidates, rectify_error_threshold) {
             match render_color_image_to_canvas(&rectified_image, debug_canvas) {
                 Ok(_) => {},
@@ -81,7 +81,7 @@ impl RawScanner {
 
             let glyph_code = Recognizer::recognize_glyphs_on_image(rectified_image, anchor_error_threshold, &self.glyph_library, self.stat_tolerance, debug_canvas);
             
-            console::log_1(&format!("{:?}", glyph_code).into());
+            console_log_util(&format!("{:?}", glyph_code));
             
             "Recognition complete".into()
         } else {

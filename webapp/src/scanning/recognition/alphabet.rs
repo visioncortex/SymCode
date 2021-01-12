@@ -1,5 +1,4 @@
 use visioncortex::{BinaryImage, BoundingRect, PointI32};
-use web_sys::console;
 
 use super::GlyphLibrary;
 
@@ -28,6 +27,6 @@ impl AlphabetReader {
                 library.add_template(glyph_image, stat_tolerance);
             }
         }
-        //console::log_1(&format!("{:?}", library).into());
+        //console_log_util(&format!("{:?}", library));
     }
 }

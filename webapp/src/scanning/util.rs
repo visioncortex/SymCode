@@ -9,7 +9,7 @@ use super::GlyphCode;
 /// Check Saturation and Value in HSV
 pub(crate) fn is_black(color: &ColorHsv) -> bool {
     const BLACK_LIMIT: f64 = 0.125;
-    //console::log_1(&format!("{:?}", color).into());
+    //console_log_util(&format!("{:?}", color));
     if color.s != 0.0 && color.v != 0.0 {
         color.s*color.v <= BLACK_LIMIT
     } else { // Either s or v is 0.0
@@ -51,7 +51,7 @@ pub(crate) fn color_image_to_merged_clusters(image: ColorImage, expand_x: i32, e
                 }
         })
         .collect();
-    //console::log_1(&format!("{:?}", rects).into());
+    //console_log_util(&format!("{:?}", rects));
 
     let grouped_clusters = merge_expand(clusters, expand_x, expand_y);
 
@@ -63,7 +63,7 @@ pub(crate) fn color_image_to_merged_clusters(image: ColorImage, expand_x: i32, e
                     bounding_rect.merge(cluster.rect);
                 });
             let grouped_image = group_clusters(clusters, view, bounding_rect);
-            //console::log_1(&grouped_image.to_string().into());
+            //console_log_util(&grouped_image.to_string());
             (grouped_image, bounding_rect)
         })
         .collect()

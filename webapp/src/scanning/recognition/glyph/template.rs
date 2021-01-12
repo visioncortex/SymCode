@@ -1,7 +1,6 @@
 use std::{fs, path::PathBuf};
 
 use visioncortex::{BinaryImage, ColorImage, Sampler};
-use web_sys::console;
 
 use crate::{scanning::{image_diff_area, is_black}, util::console_log_util};
 
@@ -22,7 +21,7 @@ impl GlyphLibrary {
     /// Takes the binary image of the template and the usize representation of the label
     pub(crate) fn add_template(&mut self, image: BinaryImage, stat_tolerance: f64) {
         let label = self.templates.len() + 1;
-        //console::log_1(&format!("{}\n{}", label, image.to_string()).into());
+        //console_log_util(&format!("{}\n{}", label, image.to_string()));
         self.templates.push(Glyph::from_image_label(image, GlyphLabel::from_usize_representation(label), stat_tolerance));
     }
 
@@ -57,10 +56,10 @@ impl GlyphLibrary {
         let mut path = String::from(path);
 
         if !path.ends_with('/') {
-            path.push_str("/".into());
+            path.push_str("/");
         }
         let dir = PathBuf::from(path.clone());
-        console::log_1(&format!("{:?}", dir).into());
+        console_log_util(&format!("{:?}", dir));
         if !dir.is_dir() {
             panic!("GlyphLibrary Error: Specified path ".to_owned() + &path + " is not a directory.");
         }
@@ -78,7 +77,7 @@ impl GlyphLibrary {
                                     match read_image(&(path.clone() + &file_name)) {
                                         Ok(img) => (img.to_binary_image(|c| is_black(&c.to_hsv())), GlyphLabel::Empty), // Dummy label for category: figure it out later
                                         Err(e) => {
-                                            //console::log_1(&e.into());
+                                            //console_log_util(&e);
                                             return None;
                                         },
                                     }

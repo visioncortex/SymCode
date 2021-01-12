@@ -1,5 +1,4 @@
 use visioncortex::ColorImage;
-use web_sys::console;
 
 use crate::{canvas::Canvas, scanning::color_image_to_merged_clusters};
 

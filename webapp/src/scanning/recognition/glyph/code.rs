@@ -1,5 +1,4 @@
 use visioncortex::{BinaryImage, BoundingRect, PointF64};
-use web_sys::console;
 
 use crate::{canvas::Canvas, math::euclid_dist_f64, scanning::{render_vec_image_rect_to_canvas}};
 

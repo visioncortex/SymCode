@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 use visioncortex::BinaryImage;
-use web_sys::console;
+
+use crate::util::console_log_util;
 
 use super::{ShapeEncoding};
 
@@ -47,7 +48,7 @@ impl GlyphLabel {
         match FromPrimitive::from_usize(label) {
             Some(glyph_label) => glyph_label,
             None => {
-                console::log_1(&format!("No corresponding label for {}.", label).into());
+                console_log_util(&format!("No corresponding label for {}.", label));
                 panic!();
             },
         }

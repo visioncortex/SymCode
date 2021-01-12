@@ -1,8 +1,7 @@
 use permutator::{Combination, Permutation};
 use visioncortex::PointF64;
-use web_sys::console;
 
-use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::FinderCandidate};
+use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::FinderCandidate, util::console_log_util};
 
 
 
@@ -21,7 +20,7 @@ impl TransformFitter {
     pub(crate) fn from_finder_candidates(finder_candidates: Vec<FinderCandidate>, error_threshold: f64) -> Option<PerspectiveTransform> {
         // Need at least 4 finder candidates to try
         if finder_candidates.len() < Self::NUM_FINDERS {
-            console::log_1(&"Fitter error: Not enough finder candidates in this frame.".into());
+            console_log_util(&"Fitter error: Not enough finder candidates in this frame.");
             return None;
         }
 
@@ -31,21 +30,21 @@ impl TransformFitter {
             c.permutation().for_each(|p| {
                 if Self::correct_spatial_arrangement(&p) {
                     let src_pts = Self::get_src_pts(&p);
-                    //console::log_1(&format!("\n{:?}", src_pts).into());
+                    //console_log_util(&format!("\n{:?}", src_pts));
                     let transform = PerspectiveTransform::from_point_f64(&src_pts, &Self::DST_PTS);
                     let error = Self::evaluate_transform(&transform, &src_pts);
-                    //console::log_1(&(transform.print_coeffs() + " " + &error.to_string()).into());
+                    //console_log_util(&(transform.print_coeffs() + " " + &error.to_string()));
                     if error < min_error {
                         best_transform = transform;
                         min_error = error;
-                        // console::log_1(&format!("\n{:?}", src_pts).into());
-                        // console::log_1(&min_error.into());
+                        // console_log_util(&format!("\n{:?}", src_pts));
+                        // console_log_util(&min_error.to_string());
                     }
                 }
             });
         });
         if min_error > error_threshold { // The lowest error is not low enough
-            console::log_1(&format!("Fitter error: min fitting error {} > error threshold {}.", min_error, error_threshold).into());
+            console_log_util(&format!("Fitter error: min fitting error {} > error threshold {}.", min_error, error_threshold));
             return None;
         }
         Some(
