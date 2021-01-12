@@ -27,15 +27,15 @@ pub enum GlyphLabel {
     LongLR,
     LongUD,
 
-    SmallDouble1,
-    SmallDouble2,
-    SmallDouble3,
-    SmallDouble4,
+    SmallDoubleUD,
+    SmallDoubleRL,
+    SmallDoubleDU,
+    SmallDoubleLR,
 
-    SmallTriple1,
-    SmallTriple2,
-    SmallTriple3,
-    SmallTriple4,
+    SmallTripleU,
+    SmallTripleR,
+    SmallTripleD,
+    SmallTripleL,
 }
 
 impl Default for GlyphLabel {
