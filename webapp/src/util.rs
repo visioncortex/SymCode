@@ -14,6 +14,6 @@ cfg_if::cfg_if! {
     }
 }
 
-pub(crate) fn console_log(content: &str) {
+pub(crate) fn console_log_util(content: &str) {
     console::log_1(&content.into());
 }
