@@ -61,6 +61,7 @@ impl RawScanner {
             canvas,
             debug_canvas
         );
+        console::log_1(&format!("Extracted {} finder candidates from raw frame.", finder_candidates.len()).into());
         if let Some(rectified_image) = Transformer::rectify_image(raw_frame, finder_candidates, rectify_error_threshold) {
             match render_color_image_to_canvas(&rectified_image, debug_canvas) {
                 Ok(_) => {},

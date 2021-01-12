@@ -1,4 +1,4 @@
-use visioncortex::{BinaryImage, BoundingRect, ColorHsv, ColorImage, PointF64, bound::merge_expand, color_clusters::{Cluster, Clusters, Runner}};
+use visioncortex::{BinaryImage, BoundingRect, ColorHsv, ColorImage, PointF64, bound::merge_expand, color_clusters::{Cluster, Clusters, Runner, RunnerConfig}};
 use wasm_bindgen::{Clamped, JsValue};
 use web_sys::{ImageData, console};
 
@@ -19,8 +19,15 @@ pub(crate) fn is_black(color: &ColorHsv) -> bool {
 
 pub(crate) fn color_image_to_clusters(image: ColorImage) -> Clusters {
     // Color clustering requires the use of a Runner (it is taken after run())
-    let mut runner = Runner::default();
-    runner.init(image);
+    let runner = Runner::new(RunnerConfig {
+        batch_size: 25600,
+        good_min_area: 64 * 64,
+        good_max_area: 256 * 256,
+        is_same_color_a: 2,
+        is_same_color_b: 1,
+        deepen_diff: 64,
+        hollow_neighbours: 1,
+    }, image);
 
     runner.run() // Performing clustering
 }
