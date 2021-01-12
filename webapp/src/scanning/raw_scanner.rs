@@ -24,12 +24,12 @@ impl RawScanner {
     }
 
     /// Takes the id of the canvas element storing the template image, and the usize representation of the glyph label
-    pub fn load_template_from_canvas_id(&mut self, canvas_id: &str) {
+    pub fn load_template_from_canvas_id(&mut self, canvas_id: &str, stat_tolerance: f64) {
         let canvas = &Canvas::new_from_id(canvas_id);
         let image = canvas
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
             .to_binary_image(|c| is_black(&c.to_hsv()));
-        self.glyph_library.add_template(image);
+        self.glyph_library.add_template(image, stat_tolerance);
     }
 
     /// Takes the id of the canvas element storing the alphabet. The parameters are currently hardcoded here.
@@ -46,6 +46,7 @@ impl RawScanner {
             offset_y: 112,
             num_columns: 4,
             num_rows: 4,
+            stat_tolerance: 0.2,
         };
         AlphabetReader::read_alphabet_to_library(&mut self.glyph_library, image, params);
     }

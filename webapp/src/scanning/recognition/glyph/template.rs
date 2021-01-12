@@ -3,62 +3,12 @@ use std::{fs, path::PathBuf};
 use visioncortex::{BinaryImage, ColorImage, Sampler};
 use web_sys::console;
 
-use num_derive::FromPrimitive;
-use num_traits::FromPrimitive;
-
 use crate::{scanning::{image_diff_area, is_black}};
 
-use super::GlyphCode;
-
-#[derive(Clone, Copy, Debug, FromPrimitive)]
-/// Useful for testing purposes only.
-///
-/// For a given alphabet image, the index should go from top to bottom, left to right.
-pub enum GlyphLabel {
-    Empty = 0,
-
-    LongRR,
-    LongDD,
-    LongLL,
-    LongUU,
-
-    LongRL,
-    LongDU,
-    LongLR,
-    LongUD,
-
-    SmallDoubleUD,
-    SmallDoubleRL,
-    SmallDoubleDU,
-    SmallDoubleLR,
-
-    SmallTripleU,
-    SmallTripleR,
-    SmallTripleD,
-    SmallTripleL,
-}
-
-impl Default for GlyphLabel {
-    fn default() -> Self {
-        Self::Empty
-    }
-}
-
-impl GlyphLabel {
-    /// Will be replaced by sth like FromPrimitive
-    fn from_usize_representation(label: usize) -> Self {
-        match FromPrimitive::from_usize(label) {
-            Some(glyph_label) => glyph_label,
-            None => {
-                console::log_1(&format!("No corresponding label for {}.", label).into());
-                panic!();
-            },
-        }
-    }
-}
+use super::{Glyph, GlyphCode, GlyphLabel};
 
 pub struct GlyphLibrary {
-    templates: Vec<(BinaryImage, GlyphLabel)>,
+    templates: Vec<Glyph>,
 }
 
 impl Default for GlyphLibrary {
@@ -69,10 +19,10 @@ impl Default for GlyphLibrary {
 
 impl GlyphLibrary {
     /// Takes the binary image of the template and the usize representation of the label
-    pub(crate) fn add_template(&mut self, image: BinaryImage) {
+    pub(crate) fn add_template(&mut self, image: BinaryImage, stat_tolerance: f64) {
         let label = self.templates.len() + 1;
         //console::log_1(&format!("{}\n{}", label, image.to_string()).into());
-        self.templates.push((image, GlyphLabel::from_usize_representation(label)));
+        self.templates.push(Glyph::from_image_label(image, GlyphLabel::from_usize_representation(label), stat_tolerance));
     }
 
     pub(crate) fn find_most_similar_glyph(&self, image: BinaryImage) -> GlyphLabel {
@@ -80,11 +30,11 @@ impl GlyphLibrary {
         let image = &Sampler::resample_image(&image, size, size);
 
         self.templates.iter()
-            .fold( (image_diff_area(&self.templates[0].0, image), self.templates[0].1),
-                |(min_error, min_label), (template, label)| {
-                    let error = image_diff_area(template, image);
+            .fold( (image_diff_area(&self.templates[0].image, image), self.templates[0].label),
+                |(min_error, min_label), glyph| {
+                    let error = image_diff_area(&glyph.image, image);
                     if error < min_error {
-                        (error, *label)
+                        (error, glyph.label)
                     } else {
                         (min_error, min_label)
                     }
@@ -99,7 +49,7 @@ impl GlyphLibrary {
     /// Loads the glyph templates in the specified directory as BinaryImage.
     ///
     /// Panics if path is not found or no jpg is found there.
-    pub fn load_from_directory(path: &str) -> Self {
+    pub fn load_from_directory(path: &str, stat_tolerance: f64) -> Self {
         let mut path = String::from(path);
 
         if !path.ends_with('/') {
@@ -113,24 +63,28 @@ impl GlyphLibrary {
 
         if let Ok(entries) = fs::read_dir(dir) { // Read the directory
             Self {
-                templates: entries.into_iter().filter_map(|entry| { // Read each entry in the directory
-                        if let Ok(file) = entry {
-                            // Read the image in the entry
-                            let file_name = file.file_name().into_string().unwrap();
-                            println!("{}", &(path.to_owned() + &file_name));
-                            Some(
-                                match read_image(&(path.clone() + &file_name)) {
-                                    Ok(img) => (img.to_binary_image(|c| is_black(&c.to_hsv())), GlyphLabel::Empty), // Dummy label for category: figure it out later
-                                    Err(e) => {
-                                        //console::log_1(&e.into());
-                                        return None;
-                                    },
-                                }
-                            )
-                        } else {
-                            None
-                        }
-                    }).collect()
+                templates:
+                    entries.into_iter()
+                        .filter_map(|entry| { // Read each entry in the directory
+                            if let Ok(file) = entry {
+                                // Read the image in the entry
+                                let file_name = file.file_name().into_string().unwrap();
+                                println!("{}", &(path.to_owned() + &file_name));
+                                Some(
+                                    match read_image(&(path.clone() + &file_name)) {
+                                        Ok(img) => (img.to_binary_image(|c| is_black(&c.to_hsv())), GlyphLabel::Empty), // Dummy label for category: figure it out later
+                                        Err(e) => {
+                                            //console::log_1(&e.into());
+                                            return None;
+                                        },
+                                    }
+                                )
+                            } else {
+                                None
+                            }
+                        })
+                        .map(|(image, label)| Glyph::from_image_label(image, label, stat_tolerance))
+                        .collect()
             }
         } else {
             panic!("GlyphLibrary Error: Specified path ".to_owned() + &path + " cannot be read.");

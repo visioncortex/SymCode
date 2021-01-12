@@ -14,6 +14,7 @@ pub struct AlphabetReaderParams {
     pub offset_y: usize,
     pub num_columns: usize,
     pub num_rows: usize,
+    pub stat_tolerance: f64,
 }
 
 impl AlphabetReader {
@@ -25,7 +26,7 @@ impl AlphabetReader {
                 let rect = BoundingRect::new_x_y_w_h(top_left.x, top_left.y, params.glyph_width as i32, params.glyph_height as i32);
 
                 let glyph_image = image.crop_with_rect(rect);
-                library.add_template(glyph_image);
+                library.add_template(glyph_image, params.stat_tolerance);
             }
         }
     }
