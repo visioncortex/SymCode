@@ -1,4 +1,4 @@
-use crate::{BinaryImage, BoundingRect, Color, ColorImage, ColorSum, CompoundPath, PathSimplifyMode, PointI32, Shape};
+use crate::{BinaryImage, Bound, BoundingRect, Color, ColorImage, ColorSum, CompoundPath, PathSimplifyMode, PointI32, Shape};
 use crate::clusters::Cluster as BinaryCluster;
 use super::container::{ClusterIndex, ClustersView};
 
@@ -13,6 +13,12 @@ pub struct Cluster {
     pub residue_sum: ColorSum,
     pub rect: BoundingRect,
     pub merged_into: Option<ClusterIndex>,
+}
+
+impl Bound for &Cluster {
+    fn bound(&self) -> BoundingRect {
+        self.rect
+    }
 }
 
 impl Cluster {
