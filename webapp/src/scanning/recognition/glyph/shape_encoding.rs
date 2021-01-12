@@ -5,6 +5,7 @@ use visioncortex::{BinaryImage};
 
 use super::ShapeStats;
 
+#[derive(Debug)]
 pub struct ShapeEncoding {
     bits: BitVec,
 }

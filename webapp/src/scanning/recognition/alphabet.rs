@@ -29,5 +29,6 @@ impl AlphabetReader {
                 library.add_template(glyph_image, params.stat_tolerance);
             }
         }
+        console::log_1(&format!("{:?}", library).into());
     }
 }

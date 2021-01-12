@@ -7,6 +7,7 @@ use crate::{scanning::{image_diff_area, is_black}};
 
 use super::{Glyph, GlyphCode, GlyphLabel};
 
+#[derive(Debug)]
 pub struct GlyphLibrary {
     templates: Vec<Glyph>,
 }

@@ -1,3 +1,4 @@
+use std::fmt::Debug;
 use visioncortex::BinaryImage;
 use web_sys::console;
 
@@ -57,6 +58,15 @@ pub struct Glyph {
     pub image: BinaryImage,
     pub label: GlyphLabel,
     pub encoding: ShapeEncoding,
+}
+
+impl Debug for Glyph {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Glyph")
+            .field("label", &self.label)
+            .field("encoding", &self.encoding)
+            .finish()
+    }
 }
 
 impl Glyph {
