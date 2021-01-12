@@ -13,6 +13,7 @@ crate-type = ["cdylib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
+bit-vec = "0.6.3"
 cfg-if = "0.1"
 console_log = { version = "0.2", features = ["color"] }
 wasm-bindgen = { version = "0.2", features = ["serde-serialize"]  }
