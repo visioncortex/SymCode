@@ -44,19 +44,33 @@ impl GlyphCode {
     /// Square bounding box
     pub const GLYPH_SIZE: usize = 80; // 80x80
 
-    /// True if the bounding rect is approximately the same size (and shape) as a valid glyph.
-    ///
     /// As GLYPH_SIZE is in object space, we can define the error tolerance based on GLYPH_SIZE on an absolute scale
-    pub fn rect_size_is_reasonable(rect: &BoundingRect) -> bool {
-        const TOLERANCE: usize = 10; // Allows fluctuations of up to this number of units in object space
+    ///
+    /// Allows fluctuations of up to this number of units in object space
+    const GLYPH_SIZE_TOLERANCE: usize = 10;
 
+    pub fn rect_not_too_large(rect: &BoundingRect) -> bool {
+        let rect_longer_side = std::cmp::max(rect.width(), rect.height()) as usize;
+        (rect_longer_side <= Self::GLYPH_SIZE) || (rect_longer_side - Self::GLYPH_SIZE <= Self::GLYPH_SIZE_TOLERANCE) 
+    }
+
+    pub fn rect_not_too_small(rect: &BoundingRect) -> bool {
+        let rect_shorter_side = std::cmp::min(rect.width(), rect.height()) as usize;
+        (rect_shorter_side >= Self::GLYPH_SIZE) || (Self::GLYPH_SIZE - rect_shorter_side <= Self::GLYPH_SIZE_TOLERANCE) 
+    }
+
+    /// True if the bounding rect is approximately the same size as a valid glyph.
+    pub fn rect_size_is_reasonable(rect: &BoundingRect) -> bool {
+        /*
         let width = rect.width() as usize;
         let height = rect.height() as usize;
 
         let reasonable_error = 
-            |a: usize| {(std::cmp::max(a, Self::GLYPH_SIZE) - std::cmp::min(a, Self::GLYPH_SIZE)) <= TOLERANCE};
+            |a: usize| {(std::cmp::max(a, Self::GLYPH_SIZE) - std::cmp::min(a, Self::GLYPH_SIZE)) <= Self::GLYPH_SIZE_TOLERANCE};
         
         reasonable_error(width) && reasonable_error(height)
+        */
+        Self::rect_not_too_large(rect) && Self::rect_not_too_small(rect)
     }
 }
 
