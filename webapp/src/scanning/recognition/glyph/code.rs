@@ -78,7 +78,7 @@ impl GlyphCode {
     const LENGTH: usize = 5;
 
     /// Given cropped images and their bounding rects (effectively `clusters`), for each anchor, check which cluster is the closest (and is close enough) and flag the glyph at that anchor
-    pub fn add_images_rects_near_anchors(&mut self, clusters: Vec<(BinaryImage, BoundingRect)>, error_threshold: f64, glyph_library: &GlyphLibrary, debug_canvas: &Canvas) {
+    pub fn add_images_rects_near_anchors(&mut self, clusters: Vec<(BinaryImage, BoundingRect)>, error_threshold: f64, glyph_library: &GlyphLibrary, stat_tolerance: f64, debug_canvas: &Canvas) {
         
         let clusters: Vec<(BinaryImage, BoundingRect)> =
             clusters.into_iter()
@@ -88,7 +88,7 @@ impl GlyphCode {
 
         for (i, anchor) in Self::ANCHORS.iter().enumerate() {
             let closest_cluster = Self::find_closest_cluster(anchor, &clusters, error_threshold);
-            self.set_glyph_with_cluster(i, closest_cluster, &glyph_library);
+            self.set_glyph_with_cluster(i, closest_cluster, &glyph_library, stat_tolerance);
         }
     }
 
@@ -115,9 +115,9 @@ impl GlyphCode {
         }
     }
 
-    fn set_glyph_with_cluster(&mut self, i: usize, cluster: Option<BinaryImage>, glyph_library: &GlyphLibrary) {
+    fn set_glyph_with_cluster(&mut self, i: usize, cluster: Option<BinaryImage>, glyph_library: &GlyphLibrary, stat_tolerance: f64) {
         if let Some(cluster) = cluster {
-            self.glyphs[i] = glyph_library.find_most_similar_glyph(cluster);
+            self.glyphs[i] = glyph_library.find_most_similar_glyph(cluster, stat_tolerance);
         } else {
             self.glyphs[i] = GlyphLabel::Empty;
         }

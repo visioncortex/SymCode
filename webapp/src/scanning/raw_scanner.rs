@@ -9,11 +9,15 @@ use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, Gl
 #[wasm_bindgen]
 pub struct RawScanner {
     glyph_library: GlyphLibrary,
+    stat_tolerance: f64,
 }
 
 impl Default for RawScanner {
     fn default() -> Self {
-        Self { glyph_library: GlyphLibrary::default() }
+        Self {
+            glyph_library: GlyphLibrary::default(),
+            stat_tolerance: 0.2,
+        }
     }
 }
 
@@ -23,13 +27,20 @@ impl RawScanner {
         Self::default()
     }
 
+    pub fn from_stat_tolerance(stat_tolerance: f64) -> Self {
+        Self {
+            glyph_library: GlyphLibrary::default(),
+            stat_tolerance,
+        }
+    }
+
     /// Takes the id of the canvas element storing the template image, and the usize representation of the glyph label
-    pub fn load_template_from_canvas_id(&mut self, canvas_id: &str, stat_tolerance: f64) {
+    pub fn load_template_from_canvas_id(&mut self, canvas_id: &str) {
         let canvas = &Canvas::new_from_id(canvas_id);
         let image = canvas
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
             .to_binary_image(|c| is_black(&c.to_hsv()));
-        self.glyph_library.add_template(image, stat_tolerance);
+        self.glyph_library.add_template(image, self.stat_tolerance);
     }
 
     /// Takes the id of the canvas element storing the alphabet. The parameters are currently hardcoded here.
@@ -46,9 +57,8 @@ impl RawScanner {
             offset_y: 112,
             num_columns: 4,
             num_rows: 4,
-            stat_tolerance: 0.2,
         };
-        AlphabetReader::read_alphabet_to_library(&mut self.glyph_library, image, params);
+        AlphabetReader::read_alphabet_to_library(&mut self.glyph_library, image, params, self.stat_tolerance);
     }
 
     /// Initiate scanning, should return whatever info is needed for decoding
@@ -69,7 +79,7 @@ impl RawScanner {
                 Err(e) => {return e},
             }
 
-            let glyph_code = Recognizer::recognize_glyphs_on_image(rectified_image, anchor_error_threshold, &self.glyph_library, debug_canvas);
+            let glyph_code = Recognizer::recognize_glyphs_on_image(rectified_image, anchor_error_threshold, &self.glyph_library, self.stat_tolerance, debug_canvas);
             
             console::log_1(&format!("{:?}", glyph_code).into());
             
