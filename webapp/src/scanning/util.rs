@@ -48,7 +48,12 @@ pub(crate) fn color_image_to_merged_clusters(image: ColorImage, expand_x: i32, e
     //console::log_1(&format!("{:?}", rects).into());
 
     let grouped_rects = merge_expand(rects, expand_x, expand_y);
-    let image = image.to_binary_image(|c| is_black(&c.to_hsv()));
+    let image = image.to_binary_image(|c| {
+        let r = c.r as u32;
+        let g = c.g as u32;
+        let b = c.b as u32;
+        (r*r + g*g + b*b) < 3 * 50 * 50
+    });
 
     grouped_rects.into_iter()
         .map(|rects| {
