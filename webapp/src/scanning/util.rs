@@ -1,4 +1,4 @@
-use visioncortex::{BinaryImage, BoundingRect, ColorHsv, ColorImage, PointF64, bound::merge_expand, color_clusters::{Cluster, Clusters, Runner, RunnerConfig}};
+use visioncortex::{BinaryImage, BoundingRect, ColorHsv, ColorImage, PointF64, PointI32, bound::merge_expand, color_clusters::{Cluster, Clusters, ClustersView, Runner, RunnerConfig}};
 use wasm_bindgen::{Clamped, JsValue};
 use web_sys::{ImageData, console};
 
@@ -36,37 +36,50 @@ pub(crate) fn color_image_to_clusters(image: ColorImage) -> Clusters {
 pub(crate) fn color_image_to_merged_clusters(image: ColorImage, expand_x: i32, expand_y: i32) -> Vec<(BinaryImage, BoundingRect)> {
     // Color clustering requires the use of a Runner (it is taken after run())
     let mut runner = Runner::default();
-    runner.init(image.clone());
+    runner.init(image);
 
     let clusters = runner.run(); // Performing clustering
-    let view = clusters.view();
-    let rects: Vec<BoundingRect> =
+    let view = &clusters.view();
+    let clusters: Vec<&Cluster> =
         view.clusters_output.iter()
-        .map(|&cluster_index| view.get_cluster(cluster_index).rect)
-        .filter(|rect| GlyphCode::rect_not_too_large(rect))
+        .filter_map(|&cluster_index| {
+                let cluster = view.get_cluster(cluster_index);
+                if GlyphCode::rect_not_too_large(&cluster.rect) {
+                    Some(cluster)
+                } else {
+                    None
+                }
+        })
         .collect();
     //console::log_1(&format!("{:?}", rects).into());
 
-    let grouped_rects = merge_expand(rects, expand_x, expand_y);
-    let image = image.to_binary_image(|c| {
-        let r = c.r as u32;
-        let g = c.g as u32;
-        let b = c.b as u32;
-        (r*r + g*g + b*b) < 3 * 50 * 50
-    });
+    let grouped_clusters = merge_expand(clusters, expand_x, expand_y);
 
-    grouped_rects.into_iter()
-        .map(|rects| {
-            let mut bounding_rect = rects[0];
-            rects.into_iter().skip(1)
-                .for_each(|rect| {
-                    bounding_rect.merge(rect);
+    grouped_clusters.into_iter()
+        .map(|clusters| {
+            let mut bounding_rect = clusters[0].rect;
+            clusters.iter().skip(1)
+                .for_each(|cluster| {
+                    bounding_rect.merge(cluster.rect);
                 });
-            let cropped_image = image.crop_with_rect(bounding_rect);
-            //console::log_1(&cropped_image.to_string().into());
-            (cropped_image, bounding_rect)
+            let grouped_image = group_clusters(clusters, view, bounding_rect);
+            //console::log_1(&grouped_image.to_string().into());
+            (grouped_image, bounding_rect)
         })
         .collect()
+}
+
+fn group_clusters(clusters: Vec<&Cluster>, view: &ClustersView, overall_rect: BoundingRect) -> BinaryImage {
+    let mut result = BinaryImage::new_w_h(overall_rect.width() as usize, overall_rect.height() as usize);
+    let overall_offset = PointI32::new(overall_rect.left, overall_rect.top);
+    clusters.into_iter()
+        .for_each(|cluster| {
+            let cluster_image = cluster.to_image(view);
+            let offset = PointI32::new(cluster.rect.left, cluster.rect.top) - overall_offset;
+            result.paste_from(&cluster_image, offset);
+        });
+
+    result
 }
 
 pub(crate) fn valid_pointf64_on_image(point: PointF64, image: &ColorImage) -> bool {
