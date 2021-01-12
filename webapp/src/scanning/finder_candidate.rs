@@ -1,6 +1,6 @@
 use visioncortex::{BoundingRect, ColorHsv, ColorImage, Shape, color_clusters::{Cluster, ClustersView}};
 
-use crate::{canvas::Canvas};
+use crate::{canvas::Canvas, util::console_log_util};
 
 use super::{color_image_to_clusters, is_black, render_bounding_rect_to_canvas, render_color_image_to_canvas};
 
@@ -21,7 +21,10 @@ impl FinderCandidate {
         let clusters = color_image_to_clusters(frame.clone());
         let view = clusters.view();
 
-        let render_result = render_color_image_to_canvas(&view.to_color_image(), debug_canvas); // Possibly unhandled exception
+        match render_color_image_to_canvas(&view.to_color_image(), debug_canvas) {
+            Ok(_) => {},
+            Err(_) => console_log_util("Error in rendering first stage clustering."),
+        }
         
         let finder_candidates: Vec<Self> = view.clusters_output.iter()
             .filter_map(|&cluster_index| Self::from_cluster_and_view(view.get_cluster(cluster_index), &view))
