@@ -3,9 +3,9 @@ use std::{fs, path::PathBuf};
 use visioncortex::{BinaryImage, ColorImage, Sampler};
 use web_sys::console;
 
-use crate::{scanning::{image_diff_area, is_black}};
+use crate::{scanning::{image_diff_area, is_black}, util::console_log_util};
 
-use super::{Glyph, GlyphCode, GlyphLabel};
+use super::{Glyph, GlyphCode, GlyphLabel, ShapeEncoding};
 
 #[derive(Debug)]
 pub struct GlyphLibrary {
@@ -26,11 +26,14 @@ impl GlyphLibrary {
         self.templates.push(Glyph::from_image_label(image, GlyphLabel::from_usize_representation(label), stat_tolerance));
     }
 
-    pub(crate) fn find_most_similar_glyph(&self, image: BinaryImage) -> GlyphLabel {
+    pub(crate) fn find_most_similar_glyph(&self, image: BinaryImage, stat_tolerance: f64) -> GlyphLabel {
         let size = GlyphCode::GLYPH_SIZE;
         let image = &Sampler::resample_image(&image, size, size);
+        let input_encoding = &ShapeEncoding::from_image(image, stat_tolerance);
+        console_log_util(&format!("{:?}", input_encoding));
 
         self.templates.iter()
+            .filter(|template| template.encoding.diff(input_encoding) == 0)
             .fold( (image_diff_area(&self.templates[0].image, image), self.templates[0].label),
                 |(min_error, min_label), glyph| {
                     let error = image_diff_area(&glyph.image, image);
