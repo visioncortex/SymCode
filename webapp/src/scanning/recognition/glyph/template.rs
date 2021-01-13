@@ -32,16 +32,19 @@ impl GlyphLibrary {
         console_log_util(&format!("{:?}", input_encoding));
 
         self.templates.iter()
-            .filter(|template| template.encoding.diff(input_encoding) == 0)
-            .fold( (image_diff_area(&self.templates[0].image, image), self.templates[0].label),
-                |(min_error, min_label), glyph| {
-                    let error = image_diff_area(&glyph.image, image);
+            .fold( (std::u64::MAX, GlyphLabel::default()),
+                |(min_error, min_label), template| {
+                    if template.encoding.diff(input_encoding) > 0 {
+                        return (min_error, min_label);
+                    }
+                    let error = image_diff_area(&template.image, image);
                     if error < min_error {
-                        (error, glyph.label)
+                        (error, template.label)
                     } else {
                         (min_error, min_label)
                     }
-                }).1
+                }
+            ).1
     }
 }
 
