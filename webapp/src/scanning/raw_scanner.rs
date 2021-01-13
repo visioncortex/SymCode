@@ -63,6 +63,10 @@ impl RawScanner {
 
     /// Initiate scanning, should return whatever info is needed for decoding
     pub fn scan_from_canvas_id(&self, canvas_id: &str, debug_canvas_id: &str, rectify_error_threshold: f64, anchor_error_threshold: f64, finder_candidates_upper_limit: usize) -> JsValue {
+        if self.glyph_library.is_empty() {
+            return "No templates loaded into RawScanner object yet!".into();
+        }
+        
         let canvas = &Canvas::new_from_id(canvas_id);
         let debug_canvas = &Canvas::new_from_id(debug_canvas_id);
 

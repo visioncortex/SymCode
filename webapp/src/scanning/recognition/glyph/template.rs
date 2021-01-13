@@ -18,14 +18,17 @@ impl Default for GlyphLibrary {
 }
 
 impl GlyphLibrary {
+    pub fn is_empty(&self) -> bool {
+        self.templates.is_empty()
+    }
     /// Takes the binary image of the template and the usize representation of the label
-    pub(crate) fn add_template(&mut self, image: BinaryImage, stat_tolerance: f64) {
+    pub fn add_template(&mut self, image: BinaryImage, stat_tolerance: f64) {
         let label = self.templates.len() + 1;
         //console_log_util(&format!("{}\n{}", label, image.to_string()));
         self.templates.push(Glyph::from_image_label(image, GlyphLabel::from_usize_representation(label), stat_tolerance));
     }
 
-    pub(crate) fn find_most_similar_glyph(&self, image: BinaryImage, stat_tolerance: f64) -> GlyphLabel {
+    pub fn find_most_similar_glyph(&self, image: BinaryImage, stat_tolerance: f64) -> GlyphLabel {
         let size = GlyphCode::GLYPH_SIZE;
         let image = &Sampler::resample_image(&image, size, size);
         let input_encoding = &ShapeEncoding::from_image(image, stat_tolerance);
