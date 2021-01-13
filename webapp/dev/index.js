@@ -1,4 +1,4 @@
-import { RawScanner, RawScannerConfig } from "symcode";
+import { RawScanner, RawScannerConfig, AlphabetReaderParams } from "symcode";
 
 const scanner = RawScanner.new();
 const canvas = document.getElementById('frame');
@@ -63,6 +63,12 @@ function loadTemplateByIndex(index) {
 
 function loadAlphabet() {
     const path = "assets/alphabet.jpg";
+    const params = AlphabetReaderParams.new()
+        .top_left(53, 53)
+        .glyph_size(80, 80)
+        .offset(111, 112)
+        .matrix_size(4, 4)
+    ;
     img.src = path;
     img.onload = function () {
         loadBuffer.width = img.naturalWidth;
@@ -71,7 +77,7 @@ function loadAlphabet() {
         loadBufferCtx.clearRect(0, 0, loadBuffer.width, loadBuffer.height);
         loadBufferCtx.drawImage(img, 0, 0);
 
-        scanner.load_alphabet_from_canvas_id('loadBuffer');
+        scanner.load_alphabet_from_canvas_id('loadBuffer', params);
 
         loadingCompletes();
     };
@@ -79,5 +85,5 @@ function loadAlphabet() {
 
 function loadingCompletes() {
     console.log("Template loading completes.");
-    scanImageFromSource("assets/camera_inputs/test_prototype_3/3.jpg");
+    scanImageFromSource("assets/camera_inputs/test_prototype_3/0.jpg");
 }

@@ -1,18 +1,66 @@
 use visioncortex::{BinaryImage, BoundingRect, PointI32};
+use wasm_bindgen::prelude::*;
 
-use super::GlyphLibrary;
+use super::{GlyphCode, GlyphLibrary};
 
 pub struct AlphabetReader {}
 
+#[wasm_bindgen]
 pub struct AlphabetReaderParams {
     // top-left point of the top-left glyph
-    pub top_left: PointI32,
-    pub glyph_width: usize,
-    pub glyph_height: usize,
-    pub offset_x: usize,
-    pub offset_y: usize,
-    pub num_columns: usize,
-    pub num_rows: usize,
+    pub(crate) top_left: PointI32,
+    pub(crate) glyph_width: usize,
+    pub(crate) glyph_height: usize,
+    pub(crate) offset_x: usize,
+    pub(crate) offset_y: usize,
+    pub(crate) num_columns: usize,
+    pub(crate) num_rows: usize,
+}
+
+impl Default for AlphabetReaderParams {
+    fn default() -> Self {
+        Self {
+            top_left: PointI32::new(0, 0),
+            glyph_width: GlyphCode::GLYPH_SIZE,
+            glyph_height: GlyphCode::GLYPH_SIZE,
+            offset_x: 115,
+            offset_y: 115,
+            num_columns: 4,
+            num_rows: 4,
+        }
+    }
+}
+
+#[wasm_bindgen]
+impl AlphabetReaderParams {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    // Can't use macros inside wasm_bindgen impls
+
+    pub fn top_left(mut self, x: i32, y: i32) -> Self {
+        self.top_left = PointI32::new(x, y);
+        self
+    }
+
+    pub fn glyph_size(mut self, width: usize, height: usize) -> Self {
+        self.glyph_width = width;
+        self.glyph_height = height;
+        self
+    }
+
+    pub fn offset(mut self, x: usize, y: usize) -> Self {
+        self.offset_x = x;
+        self.offset_y = y;
+        self
+    }
+
+    pub fn matrix_size(mut self, num_columns: usize, num_rows: usize) -> Self {
+        self.num_columns = num_columns;
+        self.num_rows = num_rows;
+        self
+    }
 }
 
 impl AlphabetReader {
