@@ -24,7 +24,9 @@ function scanImageFromSource(source) {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
+        let startTime = new Date();
         scan();
+        console.log("Scanning finishes in " + (new Date() - startTime) / 1000 + " seconds.");
     };
 }
 
@@ -74,5 +76,5 @@ function loadAlphabet() {
 
 function loadingCompletes() {
     console.log("Template loading completes.");
-    //scanImageFromSource("assets/camera_inputs/test_prototype_3/0.jpg");
+    scanImageFromSource("assets/camera_inputs/test_prototype_3/0.jpg");
 }
