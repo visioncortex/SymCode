@@ -1,4 +1,4 @@
-import { RawScanner } from "symcode";
+import { RawScanner, RawScannerConfig } from "symcode";
 
 const scanner = RawScanner.new();
 const canvas = document.getElementById('frame');
@@ -31,7 +31,9 @@ function scanImageFromSource(source) {
 }
 
 function scan() {
-    console.log(scanner.scan_from_canvas_id('frame', 'debug', 20, 15, 7));
+    const config = RawScannerConfig.from_canvas_id('frame')
+        .debug_canvas('debug');
+    console.log(scanner.scan_with_config(config));
 }
 
 function loadAllTemplates() {

@@ -1,7 +1,6 @@
 use visioncortex::PointI32;
 use wasm_bindgen::prelude::*;
 
-
 use crate::{canvas::Canvas, util::console_log_util};
 
 use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, GlyphLibrary, Recognizer, is_black, render_color_image_to_canvas, transform::Transformer};
@@ -61,6 +60,17 @@ impl RawScanner {
         AlphabetReader::read_alphabet_to_library(&mut self.glyph_library, image, params, self.stat_tolerance);
     }
 
+    pub fn scan_with_config(&self, config: RawScannerConfig) -> JsValue {
+        Self::scan_from_canvas_id(
+            self,
+            &config.canvas_id,
+            &config.debug_canvas_id,
+            config.rectify_error_threshold,
+            config.anchor_error_threshold,
+            config.max_finder_candidates
+        )
+    }
+
     /// Initiate scanning, should return whatever info is needed for decoding
     pub fn scan_from_canvas_id(&self, canvas_id: &str, debug_canvas_id: &str, rectify_error_threshold: f64, anchor_error_threshold: f64, finder_candidates_upper_limit: usize) -> JsValue {
         if self.glyph_library.is_empty() {
@@ -77,7 +87,7 @@ impl RawScanner {
             debug_canvas
         );
         console_log_util(&format!("Extracted {} finder candidates from raw frame.", finder_candidates.len()));
-        if finder_candidates.len() > finder_candidates_upper_limit {
+        if finder_candidates.len() > max_finder_candidates {
             return "Too many finder candidates!".into();
         }
         
@@ -95,5 +105,66 @@ impl RawScanner {
         } else {
             "Cannot rectify image".into()
         }
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Debug)]
+pub struct RawScannerConfig {
+    canvas_id: String,
+    debug_canvas_id: String,
+    rectify_error_threshold: f64,
+    anchor_error_threshold: f64,
+    max_finder_candidates: usize,
+}
+
+impl Default for RawScannerConfig {
+    fn default() -> Self {
+        Self {
+            canvas_id: "frame".into(),
+            debug_canvas_id: "".into(),
+            rectify_error_threshold: 20.0,
+            anchor_error_threshold: 15.0,
+            max_finder_candidates: 7,
+        }
+    }
+}
+
+#[wasm_bindgen]
+impl RawScannerConfig {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn from_canvas_id(canvas_id: &str) -> Self {
+        Self::default()
+            .canvas(canvas_id)
+    }
+
+    // Can't use macros inside wasm_bindgen impls
+
+    pub fn canvas(mut self, canvas_id: &str) -> Self {
+        self.canvas_id = canvas_id.into();
+        self
+    }
+
+    pub fn debug_canvas(mut self, debug_canvas_id: &str) -> Self {
+        self.debug_canvas_id = debug_canvas_id.into();
+        self
+    }
+
+    pub fn rectify_error_threshold(mut self, rectify_error_threshold: f64) -> Self {
+        self.rectify_error_threshold = rectify_error_threshold;
+        self
+    }
+
+    pub fn anchor_error_threshold(mut self, anchor_error_threshold: f64) -> Self {
+        self.anchor_error_threshold = anchor_error_threshold;
+        self
+    }
+
+    pub fn max_finder_candidates(mut self, max_finder_candidates: usize) -> Self {
+        self.max_finder_candidates = max_finder_candidates;
+        self
     }
 }
