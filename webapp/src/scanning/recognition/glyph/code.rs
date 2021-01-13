@@ -77,13 +77,15 @@ impl GlyphCode {
     const LENGTH: usize = 5;
 
     /// Given cropped images and their bounding rects (effectively `clusters`), for each anchor, check which cluster is the closest (and is close enough) and flag the glyph at that anchor
-    pub fn add_images_rects_near_anchors(&mut self, clusters: Vec<(BinaryImage, BoundingRect)>, error_threshold: f64, glyph_library: &GlyphLibrary, stat_tolerance: f64, debug_canvas: &Canvas) {
+    pub fn add_images_rects_near_anchors(&mut self, clusters: Vec<(BinaryImage, BoundingRect)>, error_threshold: f64, glyph_library: &GlyphLibrary, stat_tolerance: f64, debug_canvas: &Option<Canvas>) {
         
         let clusters: Vec<(BinaryImage, BoundingRect)> =
             clusters.into_iter()
                 .filter(|(_, rect)| Self::rect_size_is_reasonable(rect))
                 .collect();
-        render_vec_image_rect_to_canvas(&clusters, debug_canvas);
+        if let Some(debug_canvas) = debug_canvas {
+            render_vec_image_rect_to_canvas(&clusters, debug_canvas);
+        }
 
         for (i, anchor) in Self::ANCHORS.iter().enumerate() {
             let closest_cluster = Self::find_closest_cluster(anchor, &clusters, error_threshold);

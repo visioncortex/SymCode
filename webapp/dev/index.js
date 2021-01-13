@@ -32,7 +32,8 @@ function scanImageFromSource(source) {
 
 function scan() {
     const config = RawScannerConfig.from_canvas_id('frame')
-        .debug_canvas('debug');
+        .debug_canvas('debug')
+    ;
     console.log(scanner.scan_with_config(config));
 }
 
@@ -78,5 +79,5 @@ function loadAlphabet() {
 
 function loadingCompletes() {
     console.log("Template loading completes.");
-    scanImageFromSource("assets/camera_inputs/test_prototype_3/0.jpg");
+    scanImageFromSource("assets/camera_inputs/test_prototype_3/3.jpg");
 }

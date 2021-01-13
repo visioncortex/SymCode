@@ -72,13 +72,17 @@ impl RawScanner {
     }
 
     /// Initiate scanning, should return whatever info is needed for decoding
-    pub fn scan_from_canvas_id(&self, canvas_id: &str, debug_canvas_id: &str, rectify_error_threshold: f64, anchor_error_threshold: f64, finder_candidates_upper_limit: usize) -> JsValue {
+    pub fn scan_from_canvas_id(&self, canvas_id: &str, debug_canvas_id: &str, rectify_error_threshold: f64, anchor_error_threshold: f64, max_finder_candidates: usize) -> JsValue {
         if self.glyph_library.is_empty() {
             return "No templates loaded into RawScanner object yet!".into();
         }
         
         let canvas = &Canvas::new_from_id(canvas_id);
-        let debug_canvas = &Canvas::new_from_id(debug_canvas_id);
+        let debug_canvas = &(if !debug_canvas_id.is_empty() {
+            Some(Canvas::new_from_id(debug_canvas_id))
+        } else {
+            None
+        });
 
         let raw_frame = canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32);
         let finder_candidates = FinderCandidate::extract_finder_candidates(
@@ -92,9 +96,11 @@ impl RawScanner {
         }
         
         if let Some(rectified_image) = Transformer::rectify_image(raw_frame, finder_candidates, rectify_error_threshold) {
-            match render_color_image_to_canvas(&rectified_image, debug_canvas) {
-                Ok(_) => {},
-                Err(e) => {return e},
+            if let Some(debug_canvas) = debug_canvas {
+                match render_color_image_to_canvas(&rectified_image, debug_canvas) {
+                    Ok(_) => {},
+                    Err(e) => {return e},
+                }
             }
 
             let glyph_code = Recognizer::recognize_glyphs_on_image(rectified_image, anchor_error_threshold, &self.glyph_library, self.stat_tolerance, debug_canvas);

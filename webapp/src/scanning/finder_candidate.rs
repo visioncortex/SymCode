@@ -16,14 +16,16 @@ impl FinderCandidate {
     /// Extract the Finder patterns.
     ///
     /// Decision is made based on the colors and shapes of each cluster.
-    pub(crate) fn extract_finder_candidates(frame: &ColorImage, canvas: &Canvas, debug_canvas: &Canvas) -> Vec<Self> {
+    pub(crate) fn extract_finder_candidates(frame: &ColorImage, canvas: &Canvas, debug_canvas: &Option<Canvas>) -> Vec<Self> {
 
         let clusters = color_image_to_clusters(frame.clone());
         let view = clusters.view();
 
-        match render_color_image_to_canvas(&view.to_color_image(), debug_canvas) {
-            Ok(_) => {},
-            Err(_) => console_log_util("Error in rendering first stage clustering."),
+        if let Some(debug_canvas) = debug_canvas {
+            match render_color_image_to_canvas(&view.to_color_image(), debug_canvas) {
+                Ok(_) => {},
+                Err(_) => console_log_util("Error in rendering first stage clustering."),
+            }
         }
         
         let finder_candidates: Vec<Self> = view.clusters_output.iter()
