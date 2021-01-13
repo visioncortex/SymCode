@@ -62,7 +62,7 @@ impl RawScanner {
     }
 
     /// Initiate scanning, should return whatever info is needed for decoding
-    pub fn scan_from_canvas_id(&self, canvas_id: &str, debug_canvas_id: &str, rectify_error_threshold: f64, anchor_error_threshold: f64) -> JsValue {
+    pub fn scan_from_canvas_id(&self, canvas_id: &str, debug_canvas_id: &str, rectify_error_threshold: f64, anchor_error_threshold: f64, finder_candidates_upper_limit: usize) -> JsValue {
         let canvas = &Canvas::new_from_id(canvas_id);
         let debug_canvas = &Canvas::new_from_id(debug_canvas_id);
 
@@ -73,6 +73,10 @@ impl RawScanner {
             debug_canvas
         );
         console_log_util(&format!("Extracted {} finder candidates from raw frame.", finder_candidates.len()));
+        if finder_candidates.len() > finder_candidates_upper_limit {
+            return "Too many finder candidates!".into();
+        }
+        
         if let Some(rectified_image) = Transformer::rectify_image(raw_frame, finder_candidates, rectify_error_threshold) {
             match render_color_image_to_canvas(&rectified_image, debug_canvas) {
                 Ok(_) => {},
