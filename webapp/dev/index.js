@@ -149,4 +149,12 @@ function startStreaming(videoWidth, videoHeight) {
 function drawFrame(dx, dy) {
     cameraInputBufferCtx.clearRect(0, 0, cameraInputBuffer.width, cameraInputBuffer.height);
     cameraInputBufferCtx.drawImage(camera, dx, dy, inputFrameSize.width, inputFrameSize.height);
+
+    sleep(1/fps)
+        .then(() => drawFrame(dx, dy));
+}
+
+function sleep(s) {
+    const ms = s*1000;
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
