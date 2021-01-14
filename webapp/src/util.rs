@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use web_sys::console;
 
 extern crate cfg_if;
@@ -14,6 +16,8 @@ cfg_if::cfg_if! {
     }
 }
 
-pub(crate) fn console_log_util(content: &str) {
-    console::log_1(&content.into());
+pub(crate) fn console_log_util<T>(content: T)
+where T: Display
+{
+    console::log_1(&content.to_string().into());
 }
