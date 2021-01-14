@@ -13,6 +13,9 @@ const cameraInputBufferCtx = cameraInputBuffer.getContext('2d');
 const img = new Image();
 const numTemplates = 4;
 
+let debugging = true;
+let finishScanning = false;
+
 const inputFrameSize = {
     width: 720,
     height: 720,
@@ -34,17 +37,23 @@ function scanImageFromSource(source) {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
-        let startTime = new Date();
-        scan();
-        console.log("Scanning finishes in " + (new Date() - startTime) / 1000 + " seconds.");
+        scan_from_canvas('frame');
     };
 }
 
-function scan() {
-    const config = RawScannerConfig.from_canvas_id('frame')
-        .debug_canvas('debug')
-    ;
-    console.log(scanner.scan_with_config(config));
+// Returns true if a Symcode is recognized and decoded
+function scan_from_canvas(canvas_id) {
+    return new Promise((resolve) => {
+        let startTime = new Date();
+        let config = RawScannerConfig.from_canvas_id(canvas_id);
+        if (debugging) {
+            config = config.debug_canvas('debug');
+        }
+        const result = scanner.scan_with_config(config);
+        console.log(result);
+        console.log("Scanning finishes in " + (new Date() - startTime) / 1000 + " seconds.");
+        resolve(result.localeCompare("Success") == 0);
+    });
 }
 
 function loadAllTemplates() {
@@ -140,18 +149,25 @@ function startStreaming(videoWidth, videoHeight) {
     console.log(videoWidth + " " + videoHeight);
     cameraInputBuffer.width = inputFrameSize.width;
     cameraInputBuffer.height = inputFrameSize.height;
-    const dx = (videoWidth - inputFrameSize.width) / 2;
-    const dy = (videoHeight - inputFrameSize.height) / 2;
+    const sx = (videoWidth - inputFrameSize.width) / 2;
+    const sy = (videoHeight - inputFrameSize.height) / 2;
 
-    drawFrame(dx, dy);
+    drawFrame(sx, sy);
 }
 
-function drawFrame(dx, dy) {
+function drawFrame(sx, sy) {
     cameraInputBufferCtx.clearRect(0, 0, cameraInputBuffer.width, cameraInputBuffer.height);
-    cameraInputBufferCtx.drawImage(camera, dx, dy, inputFrameSize.width, inputFrameSize.height);
-
-    sleep(1/fps)
-        .then(() => drawFrame(dx, dy));
+    cameraInputBufferCtx.drawImage(camera, sx, sy, inputFrameSize.width, inputFrameSize.height,
+                                        0, 0, cameraInputBuffer.width, cameraInputBuffer.height);
+    scan_from_canvas('cameraInputBuffer')
+        .then((successful) => {
+            if (!successful) {
+                sleep(1/fps)
+                    .then(() => drawFrame(sx, sy))
+            } else {
+                return;
+            }
+        });
 }
 
 function sleep(s) {

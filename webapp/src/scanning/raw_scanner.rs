@@ -98,7 +98,7 @@ impl RawScanner {
             
             console_log_util(&format!("{:?}", glyph_code));
             
-            "Recognition complete".into()
+            "Success".into()
         } else {
             "Cannot rectify image".into()
         }
