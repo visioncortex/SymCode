@@ -17,7 +17,7 @@ pub(crate) fn is_black(color: &ColorHsv) -> bool {
     }
 }
 
-pub(crate) fn color_image_to_clusters(image: ColorImage) -> Clusters {
+pub(crate) fn raw_frame_to_clusters(image: ColorImage) -> Clusters {
     // Color clustering requires the use of a Runner (it is taken after run())
     let runner = Runner::new(RunnerConfig {
         batch_size: 25600,
@@ -33,24 +33,35 @@ pub(crate) fn color_image_to_clusters(image: ColorImage) -> Clusters {
 }
 
 /// Convert image to clusters then merge clusters that are close to each other
-pub(crate) fn color_image_to_merged_clusters(image: ColorImage, expand_x: i32, expand_y: i32) -> Vec<(BinaryImage, BoundingRect)> {
+pub(crate) fn color_image_to_merged_clusters(image: ColorImage, expand_x: i32, expand_y: i32, debug_canvas: &Option<Canvas>) -> Vec<(BinaryImage, BoundingRect)> {
     // Color clustering requires the use of a Runner (it is taken after run())
-    let mut runner = Runner::default();
-    runner.init(image);
+    let runner = Runner::new(RunnerConfig {
+        batch_size: 25600,
+        good_min_area: 16 * 16,
+        good_max_area: 256 * 256,
+        is_same_color_a: 2,
+        is_same_color_b: 1,
+        deepen_diff: 128,
+        hollow_neighbours: 1,
+    }, image);
 
     let clusters = runner.run(); // Performing clustering
     let view = &clusters.view();
     let clusters: Vec<&Cluster> =
         view.clusters_output.iter()
         .filter_map(|&cluster_index| {
-                let cluster = view.get_cluster(cluster_index);
-                if GlyphCode::rect_not_too_large(&cluster.rect) {
-                    Some(cluster)
-                } else {
-                    None
-                }
+            let cluster = view.get_cluster(cluster_index);
+            if GlyphCode::rect_not_too_large(&cluster.rect) {
+                Some(cluster)
+            } else {
+                None
+            }
         })
         .collect();
+    
+    if let Some(debug_canvas) = debug_canvas {
+        render_vec_cluster_to_canvas(&clusters, debug_canvas);
+    }
 
     let grouped_clusters = merge_expand(clusters, expand_x, expand_y);
 
@@ -61,6 +72,11 @@ pub(crate) fn color_image_to_merged_clusters(image: ColorImage, expand_x: i32, e
                 .for_each(|cluster| {
                     bounding_rect.merge(cluster.rect);
                 });
+            
+            if let Some(debug_canvas) = debug_canvas {
+                render_bounding_rect_to_canvas_with_color(&bounding_rect, debug_canvas, Color::new(0, 0, 255));
+            }
+                
             let grouped_image = group_clusters(clusters, view, bounding_rect);
             //console_log_util(&grouped_image.to_string());
             (grouped_image, bounding_rect)

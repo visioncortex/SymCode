@@ -2,7 +2,7 @@ use visioncortex::{BoundingRect, ColorHsv, ColorImage, Shape, color_clusters::{C
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{color_image_to_clusters, is_black, render_bounding_rect_to_canvas, render_color_image_to_canvas};
+use super::{raw_frame_to_clusters, is_black, render_bounding_rect_to_canvas, render_color_image_to_canvas};
 
 
 /// Those whose color and shape are close to an actual Finder
@@ -18,7 +18,7 @@ impl FinderCandidate {
     /// Decision is made based on the colors and shapes of each cluster.
     pub(crate) fn extract_finder_candidates(frame: &ColorImage, canvas: &Canvas, debug_canvas: &Option<Canvas>) -> Vec<Self> {
 
-        let clusters = color_image_to_clusters(frame.clone());
+        let clusters = raw_frame_to_clusters(frame.clone());
         let view = clusters.view();
 
         if let Some(debug_canvas) = debug_canvas {
@@ -32,7 +32,7 @@ impl FinderCandidate {
             .filter_map(|&cluster_index| Self::from_cluster_and_view(view.get_cluster(cluster_index), &view))
             .collect();
         
-        Self::render_finder_candidates(canvas, &finder_candidates);
+        //Self::render_finder_candidates(canvas, &finder_candidates);
 
         finder_candidates
     }
