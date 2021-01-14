@@ -11,10 +11,24 @@
     a {
       color: #88f;
     }
+    #camera {
+        width: 300px;
+        height: 300px;
+        display: none;
+    }
     </style>
   </head>
   <body>
-    <h1>Scan a SymCode</h1>
+    <div>
+        <h1>Scan a SymCode</h1>
+    </div>
+    <div>
+        <video id="camera" autoplay playsinline></video>
+        <br>
+        <canvas id="cameraInputBuffer"></canvas>
+    </div>
+    <br>
+    <button id="cameraButton">Camera</button>
     <input type="file" id="imageInput" accept="image/*">
     <br>
     <canvas id="frame"></canvas>
