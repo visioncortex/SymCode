@@ -97,6 +97,10 @@ impl GlyphCode {
     fn find_closest_cluster(point: &PointF64, clusters: &[(BinaryImage, BoundingRect)], error_threshold: f64) -> Option<BinaryImage> {
         let eval_error = |p: &PointF64, rect: &BoundingRect| {euclid_dist_f64(&p, &PointF64::new(rect.left as f64, rect.top as f64))};
         
+        if clusters.is_empty() {
+            return None;
+        }
+        
         let (closest_cluster_index, _,  min_error) =
             clusters.iter().enumerate().skip(1)
             // Find the cluster with minimum error
