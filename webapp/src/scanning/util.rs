@@ -49,7 +49,7 @@ pub(crate) fn color_image_to_merged_clusters(image: ColorImage, expand_x: i32, e
         good_max_area: 256 * 256,
         is_same_color_a: 2,
         is_same_color_b: 1,
-        deepen_diff: 128,
+        deepen_diff: 64,
         hollow_neighbours: 1,
     }, image);
 
