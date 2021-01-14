@@ -18,7 +18,7 @@ const inputFrameSize = {
     width: 650,
     height: 650,
 };
-const fps = 30;
+const fps = 60;
 
 document.getElementById('imageInput').addEventListener('change', function (e) { scanImageFromSource(this.files[0]) });
 
