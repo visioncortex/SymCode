@@ -8,8 +8,6 @@ const debugCanvas = document.getElementById('debug');
 const ctx = canvas.getContext('2d');
 const camera = document.getElementById('camera');
 const cameraButton = document.getElementById('cameraButton');
-const cameraInputBuffer = document.getElementById('cameraInputBuffer');
-const cameraInputBufferCtx = cameraInputBuffer.getContext('2d');
 const img = new Image();
 const numTemplates = 4;
 
@@ -147,8 +145,8 @@ function getCameraVideoDimensions() {
 function startStreaming(videoWidth, videoHeight) {
     console.log("Start streaming");
     console.log(videoWidth + " " + videoHeight);
-    cameraInputBuffer.width = inputFrameSize.width;
-    cameraInputBuffer.height = inputFrameSize.height;
+    canvas.width = inputFrameSize.width;
+    canvas.height = inputFrameSize.height;
     const sx = (videoWidth - inputFrameSize.width) / 2;
     const sy = (videoHeight - inputFrameSize.height) / 2;
 
@@ -156,10 +154,10 @@ function startStreaming(videoWidth, videoHeight) {
 }
 
 function drawFrame(sx, sy) {
-    cameraInputBufferCtx.clearRect(0, 0, cameraInputBuffer.width, cameraInputBuffer.height);
-    cameraInputBufferCtx.drawImage(camera, sx, sy, inputFrameSize.width, inputFrameSize.height,
-                                        0, 0, cameraInputBuffer.width, cameraInputBuffer.height);
-    scan_from_canvas('cameraInputBuffer')
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(camera, sx, sy, inputFrameSize.width, inputFrameSize.height,
+                                        0, 0, canvas.width, canvas.height);
+    scan_from_canvas('frame')
         .then((successful) => {
             if (!successful) {
                 sleep(1/fps)
