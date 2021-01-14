@@ -53,13 +53,27 @@ pub(crate) fn color_image_to_merged_clusters(image: ColorImage, expand_x: i32, e
         hollow_neighbours: 1,
     }, image);
 
+    let cluster_in_quiet_zone = |cluster: &Cluster| {
+        let center = cluster.rect.center();
+        let quiet_width = GlyphCode::CODE_QUIET_WIDTH as i32;
+        let code_width = GlyphCode::CODE_WIDTH as i32;
+        let code_height = GlyphCode::CODE_HEIGHT as i32;
+        center.x < quiet_width ||
+        center.y < quiet_width ||
+        center.x > code_width - quiet_width ||
+        center.y > code_height - quiet_width
+    };
+
     let clusters = runner.run(); // Performing clustering
     let view = &clusters.view();
     let clusters: Vec<&Cluster> =
         view.clusters_output.iter()
         .filter_map(|&cluster_index| {
             let cluster = view.get_cluster(cluster_index);
-            if GlyphCode::rect_not_too_large(&cluster.rect) && is_black_rgb(&cluster.color()) {
+            if GlyphCode::rect_not_too_large(&cluster.rect) &&
+                is_black_rgb(&cluster.color()) &&
+                !cluster_in_quiet_zone(cluster)
+            {
                 Some(cluster)
             } else {
                 None

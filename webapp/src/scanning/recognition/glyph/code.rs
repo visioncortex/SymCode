@@ -12,7 +12,8 @@ pub struct GlyphCode {
 /// Define the glyph anchors
 impl GlyphCode {
     pub const CODE_WIDTH: usize = 400;
-    pub const CODE_HEIGHT: usize = 390;
+    pub const CODE_HEIGHT: usize = 400;
+    pub const CODE_QUIET_WIDTH: usize = 40;
     
     /// Top-left corners of the glyphs, in U-shaped order
     const ANCHORS: [PointF64; Self::LENGTH] = [
