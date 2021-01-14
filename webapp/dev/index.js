@@ -109,6 +109,14 @@ const constraints = {
     video: { width: {min: 720}, height: {min: 720} },
 };
 
+function stopCamera() {
+    const stream = camera.srcObject;
+    stream.getTracks().forEach(function(track) {
+        track.stop();
+    });
+    camera.srcObject = null;
+}
+
 cameraButton.onclick = function() {
     navigator.mediaDevices
         .getUserMedia(constraints)
@@ -163,6 +171,7 @@ function drawFrame(sx, sy) {
                 sleep(1/fps)
                     .then(() => drawFrame(sx, sy))
             } else {
+                stopCamera();
                 return;
             }
         });
