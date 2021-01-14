@@ -102,7 +102,7 @@ function loadAlphabet() {
 
 function loadingCompletes() {
     console.log("Template loading completes.");
-    scanImageFromSource("assets/camera_inputs/test_prototype_3/0.jpg");
+    scanImageFromSource("assets/streaming_test/failed.png");
 }
 
 const constraints = {
