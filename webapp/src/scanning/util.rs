@@ -1,8 +1,8 @@
-use visioncortex::{BinaryImage, BoundingRect, ColorHsv, ColorImage, PointF64, PointI32, bound::merge_expand, color_clusters::{Cluster, Clusters, ClustersView, Runner, RunnerConfig}};
+use visioncortex::{BinaryImage, BoundingRect, Color, ColorHsv, ColorImage, PointF64, PointI32, bound::merge_expand, color_clusters::{Cluster, Clusters, ClustersView, Runner, RunnerConfig}};
 use wasm_bindgen::{Clamped, JsValue};
 use web_sys::{ImageData, console};
 
-use crate::canvas::Canvas;
+use crate::{canvas::Canvas, util::console_log_util};
 
 use super::GlyphCode;
 
@@ -105,7 +105,7 @@ pub(crate) fn render_color_image_to_canvas(image: &ColorImage, canvas: &Canvas) 
 
 pub(crate) fn render_vec_cluster_to_canvas(clusters: &[&Cluster], canvas: &Canvas) {
     for &cluster in clusters.iter() {
-        render_bounding_rect_to_canvas(&cluster.rect, canvas);
+        render_bounding_rect_to_canvas_with_color(&cluster.rect, canvas, Color::new(0, 255, 0));
     }
 }
 
@@ -116,9 +116,14 @@ pub(crate) fn render_vec_image_rect_to_canvas(rects: &[(BinaryImage, BoundingRec
 }
 
 pub(crate) fn render_bounding_rect_to_canvas(rect: &BoundingRect, canvas: &Canvas) {
+    render_bounding_rect_to_canvas_with_color(rect, canvas, Color::new(255, 0, 0));
+}
+
+pub(crate) fn render_bounding_rect_to_canvas_with_color(rect: &BoundingRect, canvas: &Canvas, color: Color) {
     let ctx = canvas.get_rendering_context_2d();
     ctx.set_stroke_style(JsValue::from_str(
-        "rgb(255, 0, 0)"
+        &color.to_color_string()
+        //&("rgb(".to_owned() + &color.r.to_string() + ", " + &color.g.to_string() + ", " + &color.b.to_string() + ")")
     ).as_ref());
     let x1 = rect.left as f64;
     let y1 = rect.top as f64;
