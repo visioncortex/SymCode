@@ -17,6 +17,14 @@ pub(crate) fn is_black(color: &ColorHsv) -> bool {
     }
 }
 
+pub(crate) fn is_black_rgb(color: &Color) -> bool {
+    let r = color.r as u32;
+    let g = color.g as u32;
+    let b = color.b as u32;
+
+    r*r + g*g + b*b < 3*128*128
+}
+
 pub(crate) fn raw_frame_to_clusters(image: ColorImage) -> Clusters {
     // Color clustering requires the use of a Runner (it is taken after run())
     let runner = Runner::new(RunnerConfig {
@@ -51,7 +59,7 @@ pub(crate) fn color_image_to_merged_clusters(image: ColorImage, expand_x: i32, e
         view.clusters_output.iter()
         .filter_map(|&cluster_index| {
             let cluster = view.get_cluster(cluster_index);
-            if GlyphCode::rect_not_too_large(&cluster.rect) {
+            if GlyphCode::rect_not_too_large(&cluster.rect) && is_black_rgb(&cluster.color()) {
                 Some(cluster)
             } else {
                 None
@@ -59,9 +67,9 @@ pub(crate) fn color_image_to_merged_clusters(image: ColorImage, expand_x: i32, e
         })
         .collect();
     
-    if let Some(debug_canvas) = debug_canvas {
-        render_vec_cluster_to_canvas(&clusters, debug_canvas);
-    }
+    // if let Some(debug_canvas) = debug_canvas {
+    //     render_vec_cluster_to_canvas(&clusters, debug_canvas);
+    // }
 
     let grouped_clusters = merge_expand(clusters, expand_x, expand_y);
 
