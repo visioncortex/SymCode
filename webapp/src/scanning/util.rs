@@ -51,7 +51,6 @@ pub(crate) fn color_image_to_merged_clusters(image: ColorImage, expand_x: i32, e
                 }
         })
         .collect();
-    //console_log_util(&format!("{:?}", rects));
 
     let grouped_clusters = merge_expand(clusters, expand_x, expand_y);
 
