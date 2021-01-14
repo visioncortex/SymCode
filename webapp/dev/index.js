@@ -15,8 +15,8 @@ let debugging = true;
 let finishScanning = false;
 
 const inputFrameSize = {
-    width: 720,
-    height: 720,
+    width: 650,
+    height: 650,
 };
 const fps = 30;
 
