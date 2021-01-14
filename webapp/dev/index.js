@@ -117,7 +117,7 @@ cameraButton.onclick = function() {
 }
 
 function handleSuccess(stream) {
-    camera.style.display = "block";
+    //camera.style.display = "block";
     camera.srcObject = stream;
     getCameraVideoDimensions()
         .then(({width, height}) => {
