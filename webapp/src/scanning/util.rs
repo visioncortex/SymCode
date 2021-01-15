@@ -1,13 +1,11 @@
-use visioncortex::{BinaryImage, BoundingRect, Color, ColorHsv, ColorImage, PointF64, PointI32, bound::merge_expand, color_clusters::{Cluster, Clusters, ClustersView, Runner, RunnerConfig}};
+use visioncortex::{BinaryImage, BoundingRect, Color, ColorHsv, ColorImage, PointF64, color_clusters::{Cluster, Clusters, Runner, RunnerConfig}};
 use wasm_bindgen::{Clamped, JsValue};
-use web_sys::{ImageData, console};
+use web_sys::{ImageData};
 
-use crate::{canvas::Canvas, util::console_log_util};
-
-use super::GlyphCode;
+use crate::canvas::Canvas;
 
 /// Check Saturation and Value in HSV
-pub(crate) fn is_black(color: &ColorHsv) -> bool {
+pub(crate) fn is_black_hsv(color: &ColorHsv) -> bool {
     const BLACK_LIMIT: f64 = 0.125;
     //console_log_util(&format!("{:?}", color));
     if color.s != 0.0 && color.v != 0.0 {

@@ -1,9 +1,11 @@
+use std::u64;
+
 use visioncortex::PointI32;
 use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, GlyphLibrary, Recognizer, is_black, render_color_image_to_canvas, transform::Transformer};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, GlyphLibrary, Recognizer, is_black_hsv, render_color_image_to_canvas, transform::Transformer};
 
 #[wasm_bindgen]
 pub struct RawScanner {
@@ -38,7 +40,7 @@ impl RawScanner {
         let canvas = &Canvas::new_from_id(canvas_id);
         let image = canvas
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
-            .to_binary_image(|c| is_black(&c.to_hsv()));
+            .to_binary_image(|c| is_black_hsv(&c.to_hsv()));
         self.glyph_library.add_template(image, self.stat_tolerance);
     }
 
@@ -47,7 +49,7 @@ impl RawScanner {
         let canvas = &Canvas::new_from_id(canvas_id);
         let image = canvas
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
-            .to_binary_image(|c| is_black(&c.to_hsv()));
+            .to_binary_image(|c| is_black_hsv(&c.to_hsv()));
         AlphabetReader::read_alphabet_to_library(&mut self.glyph_library, image, params, self.stat_tolerance);
     }
 

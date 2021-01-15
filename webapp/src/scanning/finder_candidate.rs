@@ -2,7 +2,7 @@ use visioncortex::{BoundingRect, ColorHsv, ColorImage, Shape, color_clusters::{C
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{raw_frame_to_clusters, is_black, render_bounding_rect_to_canvas, render_color_image_to_canvas};
+use super::{raw_frame_to_clusters, is_black_hsv, render_bounding_rect_to_canvas, render_color_image_to_canvas};
 
 
 /// Those whose color and shape are close to an actual Finder
@@ -62,7 +62,7 @@ impl FinderCandidate {
     }
 
     fn is_finder(shape: &Shape, color: &ColorHsv) -> bool {
-        is_black(color) && Self::shape_is_finder(shape)
+        is_black_hsv(color) && Self::shape_is_finder(shape)
     }
 
     fn shape_is_finder(shape: &Shape) -> bool {

@@ -2,7 +2,7 @@ use std::{fs, path::PathBuf};
 
 use visioncortex::{BinaryImage, ColorImage, Sampler};
 
-use crate::{scanning::{image_diff_area, is_black}, util::console_log_util};
+use crate::{scanning::{image_diff_area, is_black_hsv}, util::console_log_util};
 
 use super::{Glyph, GlyphCode, GlyphLabel, ShapeEncoding};
 
@@ -86,7 +86,7 @@ impl GlyphLibrary {
                                 println!("{}", &(path.to_owned() + &file_name));
                                 Some(
                                     match read_image(&(path.clone() + &file_name)) {
-                                        Ok(img) => (img.to_binary_image(|c| is_black(&c.to_hsv())), GlyphLabel::Empty), // Dummy label for category: figure it out later
+                                        Ok(img) => (img.to_binary_image(|c| is_black_hsv(&c.to_hsv())), GlyphLabel::Empty), // Dummy label for category: figure it out later
                                         Err(e) => {
                                             //console_log_util(&e);
                                             return None;
@@ -127,14 +127,14 @@ mod tests {
 
     use visioncortex::BinaryImage;
 
-    use crate::scanning::is_black;
+    use crate::scanning::is_black_hsv;
 
     use super::*;
 
     #[test]
     fn test_read_image() {
         let image = match read_image("dev/assets/test.jpg") {
-            Ok(img) => img.to_binary_image(|c| is_black(&c.to_hsv())),
+            Ok(img) => img.to_binary_image(|c| is_black_hsv(&c.to_hsv())),
             Err(e) => panic!(e),
         };
         assert_eq!(image.to_string(), BinaryImage::from_string(&(
@@ -192,7 +192,7 @@ mod tests {
                         if file_name == "test.jpg" {
                             found_test = true;
                             let image = match read_image(&(path.to_owned() + &file_name)) {
-                                Ok(img) => img.to_binary_image(|c| is_black(&c.to_hsv())),
+                                Ok(img) => img.to_binary_image(|c| is_black_hsv(&c.to_hsv())),
                                 Err(e) => panic!(e),
                             };
                             assert_eq!(image.to_string(), BinaryImage::from_string(&(
