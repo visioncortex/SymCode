@@ -1,6 +1,5 @@
 use std::u64;
 
-use visioncortex::PointI32;
 use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
@@ -59,7 +58,6 @@ impl RawScanner {
             &config.canvas_id,
             &config.debug_canvas_id,
             config.rectify_error_threshold,
-            config.anchor_error_threshold,
             config.max_finder_candidates,
             config.max_encoding_difference,
             config.empty_cluster_threshold,
@@ -67,9 +65,10 @@ impl RawScanner {
     }
 
     /// Initiate scanning, should return whatever info is needed for decoding
+    #[allow(clippy::too_many_arguments)]
     pub fn scan_from_canvas_id(&self, canvas_id: &str, debug_canvas_id: &str,
-        rectify_error_threshold: f64, anchor_error_threshold: f64,
-        max_finder_candidates: usize, max_encoding_difference: usize, empty_cluster_threshold: f64
+        rectify_error_threshold: f64, max_finder_candidates: usize,
+        max_encoding_difference: usize, empty_cluster_threshold: f64
     ) -> JsValue {
         if self.glyph_library.is_empty() {
             return "No templates loaded into RawScanner object yet!".into();
@@ -103,7 +102,6 @@ impl RawScanner {
 
             let glyph_code = Recognizer::recognize_glyphs_on_image(
                 rectified_image,
-                anchor_error_threshold,
                 &self.glyph_library,
                 self.stat_tolerance,
                 max_encoding_difference,
@@ -125,7 +123,6 @@ pub struct RawScannerConfig {
     canvas_id: String,
     debug_canvas_id: String,
     rectify_error_threshold: f64,
-    anchor_error_threshold: f64,
     max_finder_candidates: usize,
     max_encoding_difference: usize,
     empty_cluster_threshold: f64,
@@ -137,7 +134,6 @@ impl Default for RawScannerConfig {
             canvas_id: "frame".into(),
             debug_canvas_id: "".into(),
             rectify_error_threshold: 20.0,
-            anchor_error_threshold: 15.0,
             max_finder_candidates: 7,
             max_encoding_difference: 1,
             empty_cluster_threshold: 0.2,
@@ -170,11 +166,6 @@ impl RawScannerConfig {
 
     pub fn rectify_error_threshold(mut self, rectify_error_threshold: f64) -> Self {
         self.rectify_error_threshold = rectify_error_threshold;
-        self
-    }
-
-    pub fn anchor_error_threshold(mut self, anchor_error_threshold: f64) -> Self {
-        self.anchor_error_threshold = anchor_error_threshold;
         self
     }
 

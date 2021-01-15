@@ -66,12 +66,6 @@ pub(crate) fn render_vec_cluster_to_canvas(clusters: &[&Cluster], canvas: &Canva
     }
 }
 
-pub(crate) fn render_vec_image_rect_to_canvas(rects: &[(BinaryImage, BoundingRect)], canvas: &Canvas) {
-    for rect in rects.iter() {
-        render_bounding_rect_to_canvas(&rect.1, canvas);
-    }
-}
-
 pub(crate) fn render_bounding_rect_to_canvas(rect: &BoundingRect, canvas: &Canvas) {
     render_bounding_rect_to_canvas_with_color(rect, canvas, Color::new(255, 0, 0));
 }

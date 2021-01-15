@@ -88,7 +88,7 @@ impl GlyphLibrary {
                                     match read_image(&(path.clone() + &file_name)) {
                                         Ok(img) => (img.to_binary_image(|c| is_black_hsv(&c.to_hsv())), GlyphLabel::Empty), // Dummy label for category: figure it out later
                                         Err(e) => {
-                                            //console_log_util(&e);
+                                            console_log_util(&e);
                                             return None;
                                         },
                                     }
