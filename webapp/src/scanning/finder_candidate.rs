@@ -15,7 +15,7 @@ pub(crate) struct FinderCandidate {
 impl FinderCandidate {
     /// Extract the Finder patterns.
     ///
-    /// Decision is made based on the colors and shapes of each cluster.
+    /// Decision is made based on the shapes of each cluster.
     pub(crate) fn extract_finder_candidates(frame: BinaryImage, canvas: &Canvas, debug_canvas: &Option<Canvas>) -> Vec<Self> {
 
         let clusters = frame.to_clusters(false);
