@@ -13,6 +13,7 @@ use num_traits::FromPrimitive;
 ///
 /// For a given alphabet image, the index should go from top to bottom, left to right.
 pub enum GlyphLabel {
+    Invalid = -1,
     Empty = 0,
 
     LongRR,

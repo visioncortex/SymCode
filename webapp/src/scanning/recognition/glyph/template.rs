@@ -35,7 +35,7 @@ impl GlyphLibrary {
         console_log_util(&format!("{:?}", input_encoding));
 
         self.templates.iter()
-            .fold( (std::u64::MAX, GlyphLabel::default()),
+            .fold( (std::u64::MAX, GlyphLabel::Invalid),
                 |(min_error, min_label), template| {
                     if template.encoding.diff(input_encoding) > max_encoding_difference {
                         return (min_error, min_label);
