@@ -106,11 +106,11 @@ impl Sampler {
         for y in 0..dst_rect.height() {
             for x in 0..dst_rect.width() {
                 let s = 1;
-                let xx = 0
-                    + s * x as i32 * src_rect.width() / dst_rect.width() as i32
+                let xx =
+                    s * x as i32 * src_rect.width() / dst_rect.width() as i32
                     + s * src_rect.left;
-                let yy = 0
-                    + s * y as i32 * src_rect.height() / dst_rect.height() as i32
+                let yy =
+                    s * y as i32 * src_rect.height() / dst_rect.height() as i32
                     + s * src_rect.top;
                 let pixel = src.get_pixel_safe(xx / s, yy / s);
                 if !overlay || pixel {
