@@ -83,9 +83,9 @@ impl SymcodeScanner {
         });
 
         let raw_frame = canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32);
-        console_log_util(&format!("Start downsampling. image size is {} x {}.", raw_frame.width, raw_frame.height));
-        let raw_frame = Self::downsample_raw_frame(raw_frame, 1);
-        console_log_util("Downsampling done.");
+        // console_log_util(&format!("Start downsampling. image size is {} x {}.", raw_frame.width, raw_frame.height));
+        // let raw_frame = Self::downsample_raw_frame(raw_frame, 1);
+        // console_log_util("Downsampling done.");
         
         let finder_candidates = FinderCandidate::extract_finder_candidates(
             &raw_frame,
@@ -123,7 +123,9 @@ impl SymcodeScanner {
 }
 
 impl SymcodeScanner {
-    /// Downsample by shifting the width/height by the specified amount
+    /// Downsample by shifting the width/height by the specified amount.
+    ///
+    /// Prefer cropping original frame over downsampling.
     fn downsample_raw_frame(raw_frame: ColorImage, shift_bits: usize) -> ColorImage {
         let new_width = raw_frame.width >> shift_bits;
         let new_height = raw_frame.height >> shift_bits;
