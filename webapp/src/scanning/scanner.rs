@@ -1,6 +1,5 @@
 use std::u64;
 
-use visioncortex::{ColorImage, ColorSum, PointI32};
 use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
@@ -118,43 +117,6 @@ impl SymcodeScanner {
         } else {
             "Cannot rectify image".into()
         }
-    }
-}
-
-impl SymcodeScanner {
-    /// Downsample by shifting the width/height by the specified amount.
-    ///
-    /// Prefer cropping original frame over downsampling.
-    fn downsample_raw_frame(raw_frame: ColorImage, shift_bits: usize) -> ColorImage {
-        let new_width = raw_frame.width >> shift_bits;
-        let new_height = raw_frame.height >> shift_bits;
-        let mut result = ColorImage::new_w_h(new_width, new_height);
-        let step: usize = 1 << shift_bits; // step size in sampling
-
-        let get_average_color_in_square = |top_left: PointI32| {
-            let mut color_sum = ColorSum::new();
-
-            for i in 0..step {
-                for j in 0..step {
-                    let point = top_left + PointI32::new(j as i32, i as i32);
-                    if let Some(color) = raw_frame.get_pixel_at_point_safe(point) {
-                        color_sum.add(&color);
-                    }
-                }
-            }
-
-            color_sum.average()
-        };
-
-        for i in 0..(raw_frame.height/step) {
-            for j in 0..(raw_frame.width/step) {
-                let average_color = get_average_color_in_square(PointI32::new((j*step) as i32, (i*step) as i32));
-                //console_log_util(&format!("{} {}", j, i));
-                result.set_pixel(j/step, i/step, &average_color);
-            }
-        }
-
-        result
     }
 }
 

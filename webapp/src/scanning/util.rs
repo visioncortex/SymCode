@@ -1,4 +1,4 @@
-use visioncortex::{BinaryImage, BoundingRect, Color, ColorHsv, ColorImage, PointF64, color_clusters::Cluster};
+use visioncortex::{BinaryImage, BoundingRect, Color, ColorHsv, ColorImage, PointF64};
 use wasm_bindgen::{Clamped, JsValue};
 use web_sys::{ImageData};
 

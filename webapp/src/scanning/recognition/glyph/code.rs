@@ -13,7 +13,6 @@ pub struct GlyphCode {
 impl GlyphCode {
     pub const CODE_WIDTH: usize = 400;
     pub const CODE_HEIGHT: usize = 400;
-    pub const CODE_QUIET_WIDTH: usize = 40;
     
     /// Top-left corners of the glyphs, in U-shaped order
     const ANCHORS: [PointI32; Self::LENGTH] = [
@@ -43,16 +42,6 @@ impl GlyphCode {
 impl GlyphCode {
     /// Square bounding box
     pub const GLYPH_SIZE: usize = 80; // 80x80
-
-    /// As GLYPH_SIZE is in object space, we can define the error tolerance based on GLYPH_SIZE on an absolute scale
-    ///
-    /// Allows fluctuations of up to this number of units in object space
-    const GLYPH_SIZE_TOLERANCE: usize = 10;
-
-    pub fn rect_not_too_large(rect: &BoundingRect) -> bool {
-        let rect_longer_side = std::cmp::max(rect.width(), rect.height()) as usize;
-        (rect_longer_side <= Self::GLYPH_SIZE) || (rect_longer_side - Self::GLYPH_SIZE <= Self::GLYPH_SIZE_TOLERANCE) 
-    }
 }
 
 impl GlyphCode {

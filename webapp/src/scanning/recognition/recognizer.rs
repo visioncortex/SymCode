@@ -1,8 +1,8 @@
 use std::u64;
 
-use visioncortex::{BinaryImage, ColorImage, PointI32, color_clusters::{Cluster, ClustersView, HIERARCHICAL_MAX, Runner, RunnerConfig}};
+use visioncortex::{ColorImage};
 
-use crate::{canvas::Canvas, scanning::{binarize_image, is_black_rgb}};
+use crate::{canvas::Canvas, scanning::{binarize_image}};
 
 use super::{GlyphCode, GlyphLibrary};
 
