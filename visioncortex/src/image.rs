@@ -3,7 +3,7 @@ use std::fmt::Write;
 
 pub use bit_vec::BitVec;
 
-use crate::{BoundingRect, Color, ColorType, Field, PointF32, PointF64, PointI32};
+use crate::{BoundingRect, Color, ColorName, ColorType, Field, PointF32, PointF64, PointI32};
 
 /// Image with 1 bit per pixel
 #[derive(Debug, Clone, Default)]
@@ -197,6 +197,22 @@ impl BinaryImage {
                 }
             }
         }
+    }
+
+    pub fn to_color_image(&self) -> ColorImage {
+        let mut image = ColorImage::new_w_h(self.width, self.height);
+        let black = Color::color(&ColorName::Black);
+        let white = Color::color(&ColorName::White);
+        for y in 0..self.height {
+            for x in 0..self.width {
+                image.set_pixel(x, y, if self.get_pixel(x, y) {
+                    &black
+                } else {
+                    &white
+                });
+            }
+        }
+        image
     }
 }
 

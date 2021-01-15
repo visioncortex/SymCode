@@ -5,7 +5,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, GlyphLibrary, Recognizer, is_black_hsv, render_color_image_to_canvas, transform::Transformer};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, GlyphLibrary, Recognizer, binarize_image, is_black_hsv, render_color_image_to_canvas, transform::Transformer};
 
 #[wasm_bindgen]
 pub struct SymcodeScanner {
@@ -83,12 +83,11 @@ impl SymcodeScanner {
         });
 
         let raw_frame = canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32);
-        // console_log_util(&format!("Start downsampling. image size is {} x {}.", raw_frame.width, raw_frame.height));
-        // let raw_frame = Self::downsample_raw_frame(raw_frame, 1);
-        // console_log_util("Downsampling done.");
+        
+        let binary_raw_frame = binarize_image(&raw_frame);
         
         let finder_candidates = FinderCandidate::extract_finder_candidates(
-            &raw_frame,
+            binary_raw_frame,
             canvas,
             debug_canvas
         );

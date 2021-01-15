@@ -4,6 +4,10 @@ use web_sys::{ImageData};
 
 use crate::canvas::Canvas;
 
+pub(crate) fn binarize_image(color_image: &ColorImage) -> BinaryImage {
+    color_image.to_binary_image(|c| is_black_rgb(&c))
+}
+
 /// Check Saturation and Value in HSV
 pub(crate) fn is_black_hsv(color: &ColorHsv) -> bool {
     const BLACK_LIMIT: f64 = 0.125;
@@ -35,6 +39,11 @@ pub(crate) fn image_diff_area(img1: &BinaryImage, img2: &BinaryImage) -> u64 {
     img1.diff(img2).area()
 }
 
+pub(crate) fn render_binary_image_to_canvas(image: &BinaryImage, canvas: &Canvas) -> Result<(), JsValue> {
+    let image = &image.to_color_image();
+    render_color_image_to_canvas(image, canvas)
+}
+
 pub(crate) fn render_color_image_to_canvas(image: &ColorImage, canvas: &Canvas) -> Result<(), JsValue> {
     let mut data = image.pixels.clone();
     let data = ImageData::new_with_u8_clamped_array_and_sh(Clamped(&mut data), image.width as u32, image.height as u32)?;
@@ -43,12 +52,6 @@ pub(crate) fn render_color_image_to_canvas(image: &ColorImage, canvas: &Canvas) 
     canvas.set_height(image.height);
     ctx.clear_rect(0.0, 0.0, canvas.width() as f64, canvas.height() as f64);
     ctx.put_image_data(&data, 0.0, 0.0)
-}
-
-pub(crate) fn render_vec_cluster_to_canvas(clusters: &[&Cluster], canvas: &Canvas) {
-    for &cluster in clusters.iter() {
-        render_bounding_rect_to_canvas_with_color(&cluster.rect, canvas, Color::new(0, 255, 0));
-    }
 }
 
 pub(crate) fn render_bounding_rect_to_canvas(rect: &BoundingRect, canvas: &Canvas) {
