@@ -61,13 +61,15 @@ impl RawScanner {
             config.rectify_error_threshold,
             config.anchor_error_threshold,
             config.max_finder_candidates,
-            config.max_encoding_difference
+            config.max_encoding_difference,
+            config.empty_cluster_threshold,
         )
     }
 
     /// Initiate scanning, should return whatever info is needed for decoding
     pub fn scan_from_canvas_id(&self, canvas_id: &str, debug_canvas_id: &str,
-        rectify_error_threshold: f64, anchor_error_threshold: f64, max_finder_candidates: usize, max_encoding_difference: usize
+        rectify_error_threshold: f64, anchor_error_threshold: f64,
+        max_finder_candidates: usize, max_encoding_difference: usize, empty_cluster_threshold: f64
     ) -> JsValue {
         if self.glyph_library.is_empty() {
             return "No templates loaded into RawScanner object yet!".into();
@@ -105,6 +107,7 @@ impl RawScanner {
                 &self.glyph_library,
                 self.stat_tolerance,
                 max_encoding_difference,
+                (empty_cluster_threshold * (GlyphCode::GLYPH_SIZE * GlyphCode::GLYPH_SIZE) as f64) as u64,
                 debug_canvas);
             
             console_log_util(&format!("{:?}", glyph_code));
@@ -125,6 +128,7 @@ pub struct RawScannerConfig {
     anchor_error_threshold: f64,
     max_finder_candidates: usize,
     max_encoding_difference: usize,
+    empty_cluster_threshold: f64,
 }
 
 impl Default for RawScannerConfig {
@@ -136,6 +140,7 @@ impl Default for RawScannerConfig {
             anchor_error_threshold: 15.0,
             max_finder_candidates: 7,
             max_encoding_difference: 1,
+            empty_cluster_threshold: 0.2,
         }
     }
 }

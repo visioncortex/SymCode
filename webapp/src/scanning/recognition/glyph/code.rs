@@ -124,6 +124,31 @@ impl GlyphCode {
         }
     }
 
+    /// Given a rectified image and the size of each glyph in the object space (assumed to be squares).
+    ///
+    /// Assign the corresponding glyphs to each anchor.
+    pub fn from_rectified_image_by_cropping(image: BinaryImage,
+        symbol_size: usize, glyph_library: &GlyphLibrary,
+        stat_tolerance: f64, max_encoding_difference: usize, empty_cluster_threshold: u64
+    ) -> Self {
+        let mut glyph_code = Self::default();
+        Self::ANCHORS.iter().enumerate().for_each(|(i, anchor)| {
+            let cluster = Self::crop_cluster_at_anchor(anchor, &image, symbol_size, empty_cluster_threshold);
+            glyph_code.set_glyph_with_cluster(i, cluster, glyph_library, stat_tolerance, max_encoding_difference)
+        });
+        glyph_code
+    }
+
+    fn crop_cluster_at_anchor(anchor: &PointI32, image: &BinaryImage, symbol_size: usize, empty_cluster_threshold: u64) -> Option<BinaryImage> {
+        let rect = BoundingRect::new_x_y_w_h(anchor.x, anchor.y, symbol_size as i32, symbol_size as i32);
+        let cluster = image.crop_with_rect(rect);
+        if cluster.area() <= empty_cluster_threshold {
+            None
+        } else {
+            Some(cluster)
+        }
+    }
+
     fn set_glyph_with_cluster(&mut self, i: usize, cluster: Option<BinaryImage>,
         glyph_library: &GlyphLibrary, stat_tolerance: f64, max_encoding_difference: usize
     ) {
