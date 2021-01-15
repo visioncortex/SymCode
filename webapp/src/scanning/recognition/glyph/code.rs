@@ -1,4 +1,4 @@
-use visioncortex::{BinaryImage, BoundingRect, PointF64};
+use visioncortex::{BinaryImage, BoundingRect, PointF64, PointI32};
 
 use crate::{canvas::Canvas, math::euclid_dist_f64, scanning::{render_vec_image_rect_to_canvas}};
 
@@ -16,26 +16,26 @@ impl GlyphCode {
     pub const CODE_QUIET_WIDTH: usize = 40;
     
     /// Top-left corners of the glyphs, in U-shaped order
-    const ANCHORS: [PointF64; Self::LENGTH] = [
-        PointF64 {
-            x: 40.0,
-            y: 40.0,
+    const ANCHORS: [PointI32; Self::LENGTH] = [
+        PointI32 {
+            x: 40,
+            y: 40,
         },
-        PointF64 {
-            x: 40.0,
-            y: 160.0,
+        PointI32 {
+            x: 40,
+            y: 160,
         },
-        PointF64 {
-            x: 160.0,
-            y: 280.0,
+        PointI32 {
+            x: 160,
+            y: 280,
         },
-        PointF64 {
-            x: 280.0,
-            y: 160.0,
+        PointI32 {
+            x: 280,
+            y: 160,
         },
-        PointF64 {
-            x: 280.0,
-            y: 40.0,
+        PointI32 {
+            x: 280,
+            y: 40,
         },
     ];
 }
@@ -97,7 +97,8 @@ impl GlyphCode {
     }
 
     /// Find the cluster in clusters that is the closest to point, with error smaller than the error_threshold.
-    fn find_closest_cluster(point: &PointF64, clusters: &[(BinaryImage, BoundingRect)], error_threshold: f64) -> Option<BinaryImage> {
+    fn find_closest_cluster(point: &PointI32, clusters: &[(BinaryImage, BoundingRect)], error_threshold: f64) -> Option<BinaryImage> {
+        let point = &point.to_point_f64();
         let eval_error = |p: &PointF64, rect: &BoundingRect| {euclid_dist_f64(&p, &PointF64::new(rect.left as f64, rect.top as f64))};
         
         if clusters.is_empty() {
