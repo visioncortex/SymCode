@@ -1,6 +1,6 @@
 use visioncortex::{BinaryImage, BoundingRect, PointF64, PointI32};
 
-use crate::{canvas::Canvas, math::euclid_dist_f64, scanning::{render_vec_image_rect_to_canvas}};
+use crate::{canvas::Canvas, math::euclid_dist_f64, scanning::{render_bounding_rect_to_canvas, render_bounding_rect_to_canvas_with_color, render_vec_image_rect_to_canvas}};
 
 use super::{GlyphLabel, GlyphLibrary};
 
@@ -129,18 +129,22 @@ impl GlyphCode {
     /// Assign the corresponding glyphs to each anchor.
     pub fn from_rectified_image_by_cropping(image: BinaryImage,
         symbol_size: usize, glyph_library: &GlyphLibrary,
-        stat_tolerance: f64, max_encoding_difference: usize, empty_cluster_threshold: u64
+        stat_tolerance: f64, max_encoding_difference: usize, empty_cluster_threshold: u64,
+        canvas: &Option<Canvas>
     ) -> Self {
         let mut glyph_code = Self::default();
         Self::ANCHORS.iter().enumerate().for_each(|(i, anchor)| {
-            let cluster = Self::crop_cluster_at_anchor(anchor, &image, symbol_size, empty_cluster_threshold);
+            let cluster = Self::crop_cluster_at_anchor(anchor, &image, symbol_size, empty_cluster_threshold, canvas);
             glyph_code.set_glyph_with_cluster(i, cluster, glyph_library, stat_tolerance, max_encoding_difference)
         });
         glyph_code
     }
 
-    fn crop_cluster_at_anchor(anchor: &PointI32, image: &BinaryImage, symbol_size: usize, empty_cluster_threshold: u64) -> Option<BinaryImage> {
+    fn crop_cluster_at_anchor(anchor: &PointI32, image: &BinaryImage, symbol_size: usize, empty_cluster_threshold: u64, canvas: &Option<Canvas>) -> Option<BinaryImage> {
         let rect = BoundingRect::new_x_y_w_h(anchor.x, anchor.y, symbol_size as i32, symbol_size as i32);
+        if let Some(canvas) = canvas {
+            render_bounding_rect_to_canvas(&rect, canvas);
+        }
         let cluster = image.crop_with_rect(rect);
         if cluster.area() <= empty_cluster_threshold {
             None

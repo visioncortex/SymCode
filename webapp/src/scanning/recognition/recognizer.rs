@@ -29,7 +29,8 @@ impl Recognizer {
             glyph_library,
             stat_tolerance,
             max_encoding_difference,
-            empty_cluster_threshold
+            empty_cluster_threshold,
+            debug_canvas
         )
     }
 
