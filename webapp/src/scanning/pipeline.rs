@@ -1,4 +1,4 @@
-pub(crate) trait Processor {
+pub trait ScanningProcessor {
     /// Type definition of input
     type Input;
     /// Type definition of output

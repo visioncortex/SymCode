@@ -2,7 +2,7 @@ use visioncortex::{BinaryImage, BoundingRect, Shape, clusters::{Cluster}};
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{render_binary_image_to_canvas, render_bounding_rect_to_canvas};
+use super::{pipeline::ScanningProcessor, render_binary_image_to_canvas, render_bounding_rect_to_canvas};
 
 
 /// Those whose color and shape are close to an actual Finder
