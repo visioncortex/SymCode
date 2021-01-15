@@ -95,28 +95,31 @@ impl SymcodeScanner {
             return "Too many finder candidates!".into();
         }
         
-        if let Some(rectified_image) = Transformer::rectify_image(raw_frame, finder_candidates, rectify_error_threshold) {
-            if let Some(debug_canvas) = debug_canvas {
-                match render_color_image_to_canvas(&rectified_image, debug_canvas) {
-                    Ok(_) => {},
-                    Err(e) => {return e},
-                }
-            }
-
-            let glyph_code = Recognizer::recognize_glyphs_on_image(
-                rectified_image,
-                &self.glyph_library,
-                self.stat_tolerance,
-                max_encoding_difference,
-                (empty_cluster_threshold * (GlyphCode::GLYPH_SIZE * GlyphCode::GLYPH_SIZE) as f64) as u64,
-                debug_canvas);
-            
-            console_log_util(&format!("{:?}", glyph_code));
-            
-            "Success".into()
-        } else {
-            "Cannot rectify image".into()
+        let rectified_image = Transformer::rectify_image(raw_frame, finder_candidates, rectify_error_threshold);
+        if rectified_image.is_none() {
+            return "Cannot rectify image".into();
         }
+
+        let rectified_image = rectified_image.unwrap();
+
+        if let Some(debug_canvas) = debug_canvas {
+            match render_color_image_to_canvas(&rectified_image, debug_canvas) {
+                Ok(_) => {},
+                Err(e) => {return e},
+            }
+        }
+
+        let glyph_code = Recognizer::recognize_glyphs_on_image(
+            rectified_image,
+            &self.glyph_library,
+            self.stat_tolerance,
+            max_encoding_difference,
+            (empty_cluster_threshold * (GlyphCode::GLYPH_SIZE * GlyphCode::GLYPH_SIZE) as f64) as u64,
+            debug_canvas);
+        
+        console_log_util(&format!("{:?}", glyph_code));
+        
+        "Success".into()
     }
 }
 
