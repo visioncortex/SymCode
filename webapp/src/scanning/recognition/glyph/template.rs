@@ -28,26 +28,31 @@ impl GlyphLibrary {
         self.templates.push(Glyph::from_image_label(image, GlyphLabel::from_usize_representation(label), stat_tolerance));
     }
 
-    pub fn find_most_similar_glyph(&self, image: BinaryImage, stat_tolerance: f64) -> GlyphLabel {
+    pub fn find_most_similar_glyph(&self, image: BinaryImage, stat_tolerance: f64, max_encoding_difference: usize) -> GlyphLabel {
         let size = GlyphCode::GLYPH_SIZE;
         let image = &Sampler::resample_image(&image, size, size);
         let input_encoding = &ShapeEncoding::from_image(image, stat_tolerance);
         console_log_util(&format!("{:?}", input_encoding));
 
-        self.templates.iter()
+        let most_similar_glyph = self.templates.iter()
             .fold( (std::u64::MAX, GlyphLabel::default()),
                 |(min_error, min_label), template| {
-                    if template.encoding.diff(input_encoding) > 0 {
+                    if template.encoding.diff(input_encoding) > max_encoding_difference {
                         return (min_error, min_label);
                     }
                     let error = image_diff_area(&template.image, image);
+                    if template.label == GlyphLabel::LongUD {
+                        console_log_util(&format!("Error with ground-truth template: {}", error));
+                    }
                     if error < min_error {
                         (error, template.label)
                     } else {
                         (min_error, min_label)
                     }
                 }
-            ).1
+            );
+        console_log_util(&most_similar_glyph.0);
+        most_similar_glyph.1
     }
 }
 

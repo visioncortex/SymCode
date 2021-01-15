@@ -58,12 +58,15 @@ impl RawScanner {
             &config.debug_canvas_id,
             config.rectify_error_threshold,
             config.anchor_error_threshold,
-            config.max_finder_candidates
+            config.max_finder_candidates,
+            config.max_encoding_difference
         )
     }
 
     /// Initiate scanning, should return whatever info is needed for decoding
-    pub fn scan_from_canvas_id(&self, canvas_id: &str, debug_canvas_id: &str, rectify_error_threshold: f64, anchor_error_threshold: f64, max_finder_candidates: usize) -> JsValue {
+    pub fn scan_from_canvas_id(&self, canvas_id: &str, debug_canvas_id: &str,
+        rectify_error_threshold: f64, anchor_error_threshold: f64, max_finder_candidates: usize, max_encoding_difference: usize
+    ) -> JsValue {
         if self.glyph_library.is_empty() {
             return "No templates loaded into RawScanner object yet!".into();
         }
@@ -94,7 +97,13 @@ impl RawScanner {
                 }
             }
 
-            let glyph_code = Recognizer::recognize_glyphs_on_image(rectified_image, anchor_error_threshold, &self.glyph_library, self.stat_tolerance, debug_canvas);
+            let glyph_code = Recognizer::recognize_glyphs_on_image(
+                rectified_image,
+                anchor_error_threshold,
+                &self.glyph_library,
+                self.stat_tolerance,
+                max_encoding_difference,
+                debug_canvas);
             
             console_log_util(&format!("{:?}", glyph_code));
             
@@ -113,6 +122,7 @@ pub struct RawScannerConfig {
     rectify_error_threshold: f64,
     anchor_error_threshold: f64,
     max_finder_candidates: usize,
+    max_encoding_difference: usize,
 }
 
 impl Default for RawScannerConfig {
@@ -123,6 +133,7 @@ impl Default for RawScannerConfig {
             rectify_error_threshold: 20.0,
             anchor_error_threshold: 15.0,
             max_finder_candidates: 7,
+            max_encoding_difference: 1,
         }
     }
 }
@@ -162,6 +173,11 @@ impl RawScannerConfig {
 
     pub fn max_finder_candidates(mut self, max_finder_candidates: usize) -> Self {
         self.max_finder_candidates = max_finder_candidates;
+        self
+    }
+
+    pub fn max_encoding_difference(mut self, max_encoding_difference: usize) -> Self {
+        self.max_encoding_difference = max_encoding_difference;
         self
     }
 }

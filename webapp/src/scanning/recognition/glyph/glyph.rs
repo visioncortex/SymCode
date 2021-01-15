@@ -8,7 +8,7 @@ use super::{ShapeEncoding};
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
-#[derive(Clone, Copy, Debug, FromPrimitive)]
+#[derive(Clone, Copy, Debug, FromPrimitive, PartialEq)]
 /// Useful for testing purposes only.
 ///
 /// For a given alphabet image, the index should go from top to bottom, left to right.
