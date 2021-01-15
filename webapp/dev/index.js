@@ -1,6 +1,6 @@
-import { RawScanner, RawScannerConfig, AlphabetReaderParams } from "symcode";
+import { SymcodeScanner, SymcodeScannerConfig, AlphabetReaderParams } from "symcode";
 
-const scanner = RawScanner.new();
+const scanner = SymcodeScanner.new();
 const canvas = document.getElementById('frame');
 const loadBuffer = document.getElementById('loadBuffer');
 const loadBufferCtx = loadBuffer.getContext('2d');
@@ -43,7 +43,7 @@ function scanImageFromSource(source) {
 function scan_from_canvas(canvas_id) {
     return new Promise((resolve) => {
         let startTime = new Date();
-        let config = RawScannerConfig.from_canvas_id(canvas_id);
+        let config = SymcodeScannerConfig.from_canvas_id(canvas_id);
         if (debugging) {
             config = config.debug_canvas('debug');
         }

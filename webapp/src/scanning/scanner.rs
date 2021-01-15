@@ -7,12 +7,12 @@ use crate::{canvas::Canvas, util::console_log_util};
 use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, GlyphLibrary, Recognizer, is_black_hsv, render_color_image_to_canvas, transform::Transformer};
 
 #[wasm_bindgen]
-pub struct RawScanner {
+pub struct SymcodeScanner {
     glyph_library: GlyphLibrary,
     stat_tolerance: f64,
 }
 
-impl Default for RawScanner {
+impl Default for SymcodeScanner {
     fn default() -> Self {
         Self {
             glyph_library: GlyphLibrary::default(),
@@ -22,7 +22,7 @@ impl Default for RawScanner {
 }
 
 #[wasm_bindgen]
-impl RawScanner {
+impl SymcodeScanner {
     pub fn new() -> Self {
         Self::default()
     }
@@ -52,7 +52,7 @@ impl RawScanner {
         AlphabetReader::read_alphabet_to_library(&mut self.glyph_library, image, params, self.stat_tolerance);
     }
 
-    pub fn scan_with_config(&self, config: RawScannerConfig) -> JsValue {
+    pub fn scan_with_config(&self, config: SymcodeScannerConfig) -> JsValue {
         Self::scan_from_canvas_id(
             self,
             &config.canvas_id,
@@ -119,7 +119,7 @@ impl RawScanner {
 
 #[wasm_bindgen]
 #[derive(Debug)]
-pub struct RawScannerConfig {
+pub struct SymcodeScannerConfig {
     canvas_id: String,
     debug_canvas_id: String,
     rectify_error_threshold: f64,
@@ -128,7 +128,7 @@ pub struct RawScannerConfig {
     empty_cluster_threshold: f64,
 }
 
-impl Default for RawScannerConfig {
+impl Default for SymcodeScannerConfig {
     fn default() -> Self {
         Self {
             canvas_id: "frame".into(),
@@ -142,7 +142,7 @@ impl Default for RawScannerConfig {
 }
 
 #[wasm_bindgen]
-impl RawScannerConfig {
+impl SymcodeScannerConfig {
     pub fn new() -> Self {
         Self::default()
     }
