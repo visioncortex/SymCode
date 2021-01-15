@@ -1,6 +1,6 @@
 use std::u64;
 
-use visioncortex::{BinaryImage, ColorImage, PointI32, color_clusters::{Cluster, ClustersView, Runner, RunnerConfig}};
+use visioncortex::{BinaryImage, ColorImage, PointI32, color_clusters::{Cluster, ClustersView, HIERARCHICAL_MAX, Runner, RunnerConfig}};
 
 use crate::{canvas::Canvas, scanning::{is_black_rgb}};
 
@@ -29,6 +29,8 @@ impl Recognizer {
     fn binarize_image_by_clustering(image: ColorImage) -> BinaryImage {
         // Color clustering requires the use of a Runner (it is taken after run())
         let runner = Runner::new(RunnerConfig {
+            diagonal: false,
+            hierarchical: HIERARCHICAL_MAX,
             batch_size: 25600,
             good_min_area: 16 * 16,
             good_max_area: 256 * 256,
