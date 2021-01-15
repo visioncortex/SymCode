@@ -1,6 +1,6 @@
 use visioncortex::{BinaryImage, BoundingRect, Shape, clusters::{Cluster}};
 
-use crate::{canvas::Canvas, util::console_log_util};
+use crate::{canvas::{Canvas}, util::console_log_util};
 
 use super::{pipeline::ScanningProcessor, render_binary_image_to_canvas, render_bounding_rect_to_canvas};
 
@@ -16,22 +16,17 @@ impl FinderCandidate {
     /// Extract the Finder patterns.
     ///
     /// Decision is made based on the shapes of each cluster.
-    pub(crate) fn extract_finder_candidates(frame: BinaryImage, canvas: &Canvas, debug_canvas: &Option<Canvas>) -> Vec<Self> {
+    pub(crate) fn extract_finder_candidates(frame: BinaryImage, canvas: &Option<&Canvas>) -> Vec<Self> {
 
         let clusters = frame.to_clusters(false);
-
-        if let Some(debug_canvas) = debug_canvas {
-            match render_binary_image_to_canvas(&frame, debug_canvas) {
-                Ok(_) => {},
-                Err(_) => console_log_util("Error in rendering first stage clustering."),
-            }
-        }
         
         let finder_candidates: Vec<Self> = clusters.clusters.iter()
             .filter_map(|cluster| Self::from_cluster(cluster))
             .collect();
         
-        Self::render_finder_candidates(canvas, &finder_candidates);
+        if let Some(canvas) = canvas {
+            Self::render_finder_candidates(canvas, &finder_candidates);
+        }
 
         finder_candidates
     }
