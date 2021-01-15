@@ -43,7 +43,7 @@ impl FinderCandidate {
             diagonal: false,
             hierarchical: HIERARCHICAL_MAX,
             batch_size: 25600,
-            good_min_area: 64 * 64,
+            good_min_area: 16 * 16,
             good_max_area: 256 * 256,
             is_same_color_a: 2,
             is_same_color_b: 1,

@@ -153,8 +153,6 @@ function getCameraVideoDimensions() {
 function startStreaming(videoWidth, videoHeight) {
     console.log("Start streaming");
     console.log(videoWidth + " " + videoHeight);
-    canvas.width = inputFrameSize.width;
-    canvas.height = inputFrameSize.height;
     const sx = (videoWidth - inputFrameSize.width) / 2;
     const sy = (videoHeight - inputFrameSize.height) / 2;
 
@@ -162,6 +160,8 @@ function startStreaming(videoWidth, videoHeight) {
 }
 
 function drawFrame(sx, sy) {
+    canvas.width = inputFrameSize.width;
+    canvas.height = inputFrameSize.height;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(camera, sx, sy, inputFrameSize.width, inputFrameSize.height,
                                         0, 0, canvas.width, canvas.height);

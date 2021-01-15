@@ -34,25 +34,20 @@ impl GlyphLibrary {
         let input_encoding = &ShapeEncoding::from_image(image, stat_tolerance);
         console_log_util(&format!("{:?}", input_encoding));
 
-        let most_similar_glyph = self.templates.iter()
+        self.templates.iter()
             .fold( (std::u64::MAX, GlyphLabel::default()),
                 |(min_error, min_label), template| {
                     if template.encoding.diff(input_encoding) > max_encoding_difference {
                         return (min_error, min_label);
                     }
                     let error = image_diff_area(&template.image, image);
-                    if template.label == GlyphLabel::LongUD {
-                        console_log_util(&format!("Error with ground-truth template: {}", error));
-                    }
                     if error < min_error {
                         (error, template.label)
                     } else {
                         (min_error, min_label)
                     }
                 }
-            );
-        console_log_util(&most_similar_glyph.0);
-        most_similar_glyph.1
+            ).1
     }
 }
 
