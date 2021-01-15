@@ -105,7 +105,7 @@ where
 
     let mut group_index = HashMap::new();
     let mut groups = Vec::new();
-    
+
     while let Some(item) = items.pop() {
         let index = items.len();
         let label = forests.find_set(&index).unwrap(); // safe because we already made sets 0..n
@@ -313,7 +313,7 @@ mod tests {
         // {1, 1, 1}, {3, 4}, {7, 7, 8, 9}, {24}
         for mut group in groups {
             println!("{:?}", group);
-            group.sort();
+            group.sort_unstable();
             if group.len() == 4 {
                 assert_eq!(group, [7, 7, 8, 9]);
             } else if group.len() == 3 {
@@ -336,7 +336,7 @@ mod tests {
         // {1, 1, 1}, {3, 4}, {7, 7, 8, 9}, {24}
         for mut group in groups {
             println!("{:?}", group);
-            group.sort();
+            group.sort_unstable();
             if group.len() == 4 {
                 assert_eq!(group, [7, 7, 8, 9]);
             } else if group.len() == 3 {

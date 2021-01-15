@@ -59,11 +59,11 @@ impl<T> Field<T> {
         self.width * y + x
     }
 
-    pub fn iter(&self) -> impl Iterator<Item = &T> + '_ {
+    pub fn iter(&self) -> impl Iterator + '_ {
         self.data.iter()
     }
 
-    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> + '_ {
+    pub fn iter_mut(&mut self) -> impl Iterator + '_ {
         self.data.iter_mut()
     }
 }

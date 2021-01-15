@@ -3,7 +3,7 @@ use std::fmt::Write;
 
 pub use bit_vec::BitVec;
 
-use crate::{BoundingRect, Color, color::ColorType, Field, PointF32, PointF64, PointI32};
+use crate::{BoundingRect, Color, ColorType, Field, PointF32, PointF64, PointI32};
 
 /// Image with 1 bit per pixel
 #[derive(Debug, Clone, Default)]
