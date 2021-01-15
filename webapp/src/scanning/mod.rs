@@ -2,6 +2,7 @@ pub mod recognition;
 pub mod scanner;
 pub mod finder_candidate;
 pub mod transform;
+pub mod pipeline;
 pub mod util;
 
 pub use recognition::*;
