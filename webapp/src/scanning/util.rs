@@ -1,4 +1,4 @@
-use visioncortex::{BinaryImage, BoundingRect, Color, ColorHsv, ColorImage, PointF64, color_clusters::{Cluster, Clusters, HIERARCHICAL_MAX, Runner, RunnerConfig}};
+use visioncortex::{BinaryImage, BoundingRect, Color, ColorHsv, ColorImage, PointF64, color_clusters::Cluster};
 use wasm_bindgen::{Clamped, JsValue};
 use web_sys::{ImageData};
 
@@ -21,23 +21,6 @@ pub(crate) fn is_black_rgb(color: &Color) -> bool {
     let b = color.b as u32;
 
     r*r + g*g + b*b < 3*128*128
-}
-
-pub(crate) fn raw_frame_to_clusters(image: ColorImage) -> Clusters {
-    // Color clustering requires the use of a Runner (it is taken after run())
-    let runner = Runner::new(RunnerConfig {
-        diagonal: false,
-        hierarchical: HIERARCHICAL_MAX,
-        batch_size: 25600,
-        good_min_area: 64 * 64,
-        good_max_area: 256 * 256,
-        is_same_color_a: 2,
-        is_same_color_b: 1,
-        deepen_diff: 64,
-        hollow_neighbours: 1,
-    }, image);
-
-    runner.run() // Performing clustering
 }
 
 pub(crate) fn valid_pointf64_on_image(point: PointF64, image: &ColorImage) -> bool {
