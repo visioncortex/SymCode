@@ -1,4 +1,4 @@
-use visioncortex::{ColorImage, PointF32, PointF64, bilinear_interpolate};
+use visioncortex::{ColorImage, PointF64, bilinear_interpolate};
 
 use crate::{math::PerspectiveTransform, scanning::{FinderCandidate, GlyphCode, valid_pointf64_on_image}};
 
@@ -20,13 +20,11 @@ impl Transformer {
         for x in 0..GlyphCode::CODE_WIDTH {
             for y in 0..GlyphCode::CODE_HEIGHT {
                 // Obtains the sample point in image space
-                let position_in_image_space = image_to_object.transform_inverse(PointF64::new(x as f64, y as f64));
-                let position_in_image_space = PointF32::new(position_in_image_space.x as f32, position_in_image_space.y as f32);
+                let position_in_image_space = 
+                    image_to_object.transform_inverse(PointF64::new(x as f64, y as f64)).to_point_f32();
 
                 // Interpolate the color there
-                rectified_image.set_pixel(x, y,
-                    &bilinear_interpolate(&image, position_in_image_space)
-                );
+                rectified_image.set_pixel(x, y, &image.sample_pixel_at(position_in_image_space));
             }
         }
 

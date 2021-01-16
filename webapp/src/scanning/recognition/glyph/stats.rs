@@ -13,10 +13,10 @@ pub struct ShapeStats {
 impl ShapeStats {
     pub fn from_image(image: &BinaryImage) -> Self {
         // Upscale so that the image can be divided into 4 quadrants
+        let horiz_mid = image.width;
+        let vert_mid = image.height;
         let image = &Sampler::resample_image(image, image.width*2, image.height*2);
         let sampler = Sampler::new(image);
-        let horiz_mid = image.width/2;
-        let vert_mid = image.height/2;
 
         let top_left = sampler.sample(0, 0, horiz_mid, vert_mid);
         let top_right = sampler.sample(horiz_mid, 0, sampler.image.width, vert_mid);

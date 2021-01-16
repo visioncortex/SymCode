@@ -330,6 +330,10 @@ impl ColorImage {
         }
         image
     }
+
+    pub fn sample_pixel_at(&self, p: PointF32) -> Color {
+        bilinear_interpolate(self, p)
+    }
 }
 
 pub fn bilinear_interpolate(im: &ColorImage, p: PointF32) -> Color {
