@@ -1,26 +1,21 @@
-pub trait ScanningProcessor {
+pub trait ScanningProcessor: {
     /// Type definition of input
     type Input;
     /// Type definition of output
     type Output;
     /// Type definition of parameters
     type Params;
+    /// Type definition of debug utilities
+    type Debug;
 
-    /// Create a new Processor instance
-    fn new() -> Self;
+    /// Provide input and params to Processor; returns none for invalid input/params
+    ///
+    /// debug is borrowed because the debug utilities are supposedly shared among processors
+    fn process(input: Self::Input, params: Option<Self::Params>, debug: &Option<Self::Debug>) -> Option<Self::Output>;
 
-    /// Configure parameters; returns true for valid config
-    fn config(&mut self, params: Self::Params) -> bool;
+    /// Validate input
+    fn valid_input(input: &Self::Input) -> bool;
 
-    /// Provide input to Processor; returns true for valid input
-    fn input(&mut self, input: Self::Input) -> bool;
-
-    /// Handover control to Processor to perform one unit of work; returns true when finished
-    fn tick(&mut self) -> bool;
-
-    /// Check progress; returns an integer from 0 to 100 (inclusive)
-    fn progress(&self) -> u32;
-
-    /// Retrieve output from Processor
-    fn output(&mut self) -> Self::Output;
+    /// Validate params
+    fn valid_params(params: &Self::Params) -> bool;
 }
