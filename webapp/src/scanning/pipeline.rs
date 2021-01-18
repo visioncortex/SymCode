@@ -8,10 +8,10 @@ pub trait ScanningProcessor: {
     /// Type definition of debug utilities
     type Debug;
 
-    /// Provide input and params to Processor; returns none for invalid input/params
+    /// Provide input and params to Processor; returns Err(msg) for invalid input/params
     ///
     /// debug is borrowed because the debug utilities are supposedly shared among processors
-    fn process(input: Self::Input, params: Option<Self::Params>, debug: &Option<Self::Debug>) -> Option<Self::Output>;
+    fn process(input: Self::Input, params: Option<Self::Params>, debug: &Option<Self::Debug>) -> Result<Self::Output, String>;
 
     /// Validate input
     fn valid_input(input: &Self::Input) -> bool;
