@@ -4,7 +4,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, GlyphLibrary, Recognizer, binarize_image, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas, render_color_image_to_canvas, transform::Transformer};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, GlyphLibrary, Recognizer, binarize_image, finder_candidate, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas, render_color_image_to_canvas, transform::Transformer};
 
 #[wasm_bindgen]
 pub struct SymcodeScanner {
@@ -86,7 +86,13 @@ impl SymcodeScanner {
         let binary_raw_frame = binarize_image(&raw_frame);
         render_binary_image_to_canvas(&binary_raw_frame, &canvas);
         
-        let finder_candidates = FinderCandidate::process(binary_raw_frame, None, &Some(canvas)).unwrap();
+        let finder_candidates = match FinderCandidate::process(binary_raw_frame, None, &Some(canvas)) {
+            Ok(finder_candidates) => finder_candidates,
+            Err(e) => {
+                console_log_util(&e);
+                panic!();
+            }
+        };
         
         console_log_util(&format!("Extracted {} finder candidates from raw frame.", finder_candidates.len()));
         if finder_candidates.len() > max_finder_candidates {
