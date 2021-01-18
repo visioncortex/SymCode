@@ -76,7 +76,6 @@ impl ScanningProcessor for FinderCandidate {
         }
 
         // Validates input and params
-
         if !Self::valid_input(&input) {
             return Err("Invalid input in FinderCandidates.".into());
         }

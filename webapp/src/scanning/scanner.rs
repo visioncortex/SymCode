@@ -74,7 +74,7 @@ impl SymcodeScanner {
             return "No templates loaded into RawScanner object yet!".into();
         }
         
-        let canvas = &Canvas::new_from_id(canvas_id);
+        let canvas = Canvas::new_from_id(canvas_id);
         let debug_canvas = &(if !debug_canvas_id.is_empty() {
             Some(Canvas::new_from_id(debug_canvas_id))
         } else {
@@ -84,9 +84,9 @@ impl SymcodeScanner {
         let raw_frame = canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32);
         
         let binary_raw_frame = binarize_image(&raw_frame);
-        render_binary_image_to_canvas(&binary_raw_frame, canvas);
+        render_binary_image_to_canvas(&binary_raw_frame, &canvas);
         
-        let finder_candidates = FinderCandidate::process(binary_raw_frame, None, &None).unwrap();
+        let finder_candidates = FinderCandidate::process(binary_raw_frame, None, &Some(canvas)).unwrap();
         
         console_log_util(&format!("Extracted {} finder candidates from raw frame.", finder_candidates.len()));
         if finder_candidates.len() > max_finder_candidates {
