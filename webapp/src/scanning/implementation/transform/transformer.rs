@@ -1,6 +1,6 @@
 use visioncortex::{ColorImage, PointF32, PointF64, PointI32, bilinear_interpolate};
 
-use crate::{math::PerspectiveTransform, scanning::{FinderCandidate, GlyphCode, valid_pointf64_on_image}, util::console_log_util};
+use crate::{math::PerspectiveTransform, scanning::{GlyphCode, valid_pointf64_on_image}, util::console_log_util};
 
 use super::TransformFitter;
 

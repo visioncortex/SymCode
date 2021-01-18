@@ -1,11 +1,11 @@
 use permutator::{Combination, Permutation};
 use visioncortex::{Point2, PointF64};
 
-use crate::{math::{PerspectiveTransform, euclid_dist_f64, normalize_point_f64}, util::console_log_util};
+use crate::{math::{PerspectiveTransform}, util::console_log_util};
 
 use super::SymcodeConfig;
 
-pub trait Transformer {
+pub trait TransformFitter {
     // Input = Vec<Finders>
     // Output = Image
 
@@ -21,7 +21,7 @@ pub trait Transformer {
     /// Given finder points in the object space and the configuration of the Symcode,
     /// calculates the check points which are used to evaluate reprojection error
     fn calculate_check_points(finder_positions_object: &[PointF64], symcode_config: &SymcodeConfig) -> Vec<PointF64>;
-
+    
     /// Given finder candidates positions on the image and finder positions in the object space,
     /// find the "correct" perspective transform that maps the image space to the object space.
     ///
