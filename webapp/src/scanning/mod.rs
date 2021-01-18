@@ -1,4 +1,4 @@
-pub(crate) mod implementation;
+pub mod implementation;
 pub mod finder;
 pub mod scanner;
 pub mod pipeline;

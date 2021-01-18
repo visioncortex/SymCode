@@ -86,20 +86,19 @@ impl SymcodeScanner {
         let binary_raw_frame = binarize_image(&raw_frame);
         render_binary_image_to_canvas(&binary_raw_frame, &canvas);
         
-        let finder_candidates = match FinderCandidate::process(binary_raw_frame, None, &Some(canvas)) {
-            Ok(finder_candidates) => finder_candidates,
+        let finder_positions = match FinderCandidate::process(binary_raw_frame, None, &Some(canvas)) {
+            Ok(finder_positions) => finder_positions,
             Err(e) => {
-                console_log_util(&e);
-                panic!();
+                return e.into();
             }
         };
         
-        console_log_util(&format!("Extracted {} finder candidates from raw frame.", finder_candidates.len()));
-        if finder_candidates.len() > max_finder_candidates {
+        console_log_util(&format!("Extracted {} finder candidates from raw frame.", finder_positions.len()));
+        if finder_positions.len() > max_finder_candidates {
             return "Too many finder candidates!".into();
         }
         
-        let rectified_image = Transformer::rectify_image(raw_frame, finder_candidates, rectify_error_threshold);
+        let rectified_image = Transformer::rectify_image(raw_frame, finder_positions, rectify_error_threshold);
         if rectified_image.is_none() {
             return "Cannot rectify image".into();
         }
