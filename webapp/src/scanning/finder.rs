@@ -20,7 +20,8 @@ pub trait Finder {
         clusters.clusters.iter()
             .filter_map(|cluster| {
                 if Self::shape_is_finder(cluster.to_binary_image()) {
-                    Some(Point2::<T>::new(cluster.rect.left.into(), cluster.rect.top.into()))
+                    let center = cluster.rect.center();
+                    Some(Point2::<T>::new(center.x.into(), center.y.into()))
                 } else {
                     None
                 }
