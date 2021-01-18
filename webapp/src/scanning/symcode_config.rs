@@ -1,3 +1,5 @@
+use visioncortex::PointF64;
+
 pub struct SymcodeConfig {
     pub code_width: usize,
     pub code_height: usize,
@@ -5,5 +7,7 @@ pub struct SymcodeConfig {
     pub glyph_width: usize,
     pub glyph_height: usize,
 
-    pub reprojection_error_threshold: f64,
+    pub finder_positions: Vec<PointF64>,
+
+    pub rectify_error_threshold: f64,
 }

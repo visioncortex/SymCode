@@ -1,15 +1,15 @@
 use visioncortex::{ColorImage, PointF32, PointF64, PointI32, bilinear_interpolate};
 
-use crate::{math::PerspectiveTransform, scanning::{GlyphCode, valid_pointf64_on_image}, util::console_log_util};
+use crate::{math::PerspectiveTransform, scanning::{GlyphCode, SymcodeConfig, TransformFitter, valid_pointf64_on_image}, util::console_log_util};
 
-use super::TransformFitter;
+use super::Fitter;
 
 pub(crate) struct Transformer {}
 
 impl Transformer {
     /// Create an image in object space that is transformed from the most likely PerspectiveTransformation according to the finder candidates
-    pub(crate) fn rectify_image(image: ColorImage, finder_candidates: Vec<PointI32>, transform_error_threshold: f64) -> Option<ColorImage> {
-        let image_to_object = TransformFitter::from_finder_candidates(finder_candidates, transform_error_threshold)?;
+    pub(crate) fn rectify_image(image: ColorImage, finder_candidates: Vec<PointI32>, symcode_config: &SymcodeConfig) -> Option<ColorImage> {
+        let image_to_object = Fitter::fit_transform(finder_candidates, symcode_config)?;
         
         if Self::transform_to_image_out_of_bound(&image, &image_to_object) {
             console_log_util("transform out of bounds");

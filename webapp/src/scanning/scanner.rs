@@ -1,10 +1,11 @@
 use std::u64;
 
+use visioncortex::PointF64;
 use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, GlyphLibrary, Recognizer, binarize_image, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas, render_color_image_to_canvas, transform::Transformer};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, GlyphLibrary, Recognizer, SymcodeConfig, binarize_image, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas, render_color_image_to_canvas, transform::Transformer};
 
 #[wasm_bindgen]
 pub struct SymcodeScanner {
@@ -98,7 +99,21 @@ impl SymcodeScanner {
             return "Too many finder candidates!".into();
         }
         
-        let rectified_image = Transformer::rectify_image(raw_frame, finder_positions, rectify_error_threshold);
+        let symcode_config = &SymcodeConfig {
+            code_width: 400,
+            code_height: 400,
+            glyph_width: 80,
+            glyph_height: 80,
+            finder_positions: vec![
+                PointF64::new(200.0, 80.0),
+                PointF64::new(200.0, 200.0),
+                PointF64::new(80.0, 320.0),
+                PointF64::new(320.0, 320.0)
+            ],
+            rectify_error_threshold,
+        };
+        
+        let rectified_image = Transformer::rectify_image(raw_frame, finder_positions, symcode_config);
         if rectified_image.is_none() {
             return "Cannot rectify image".into();
         }
