@@ -1,9 +1,9 @@
 use permutator::{Combination, Permutation};
-use visioncortex::{Point2, PointF64};
+use visioncortex::{BinaryImage, ColorImage, Point2, PointF32, PointF64, bilinear_interpolate};
 
 use crate::{math::{PerspectiveTransform}, util::console_log_util};
 
-use super::SymcodeConfig;
+use super::{SymcodeConfig, valid_pointf64_on_image};
 
 pub trait TransformFitter {
     // Input = Vec<Finders>
@@ -59,5 +59,56 @@ pub trait TransformFitter {
         } else {
             Some(best_transform)
         }
+    }
+    /// Check if the 4 corners in the object space will map to out-of-bound points in the image space.
+    ///
+    /// Those are points that cannot be sampled.
+    fn transform_to_image_out_of_bound(image: &ColorImage, image_to_object: &PerspectiveTransform, symcode_config: &SymcodeConfig) -> bool {
+        let w = (symcode_config.code_width-1) as f64;
+        let h = (symcode_config.code_height-1) as f64;
+        let points_to_test = [
+            PointF64::new(0.0, 0.0), PointF64::new(w, 0.0),
+            PointF64::new(0.0, h), PointF64::new(w, h),
+        ];
+
+        for &point in points_to_test.iter() {
+            let point_in_image_space = image_to_object.transform_inverse(point);
+            
+            if !valid_pointf64_on_image(point_in_image_space, image) {
+                return true;
+            }
+        }
+        
+        false
+    }
+
+    /// This function will be used to binarize the rectified input image
+    fn binarize_image(image: &ColorImage) -> BinaryImage;
+
+    /// Rectify the input image into object space and binarize it
+    fn rectify_image(image: ColorImage, image_to_object: PerspectiveTransform, symcode_config: &SymcodeConfig) -> Option<BinaryImage> {
+        if Self::transform_to_image_out_of_bound(&image, &image_to_object, symcode_config) {
+            return None;
+        }
+
+        let code_width = symcode_config.code_width;
+        let code_height = symcode_config.code_height;
+
+        let mut rectified_image = ColorImage::new_w_h(code_width, code_height);
+        // For each point in object space
+        for x in 0..code_width {
+            for y in 0..code_height {
+                // Obtains the sample point in image space
+                let position_in_image_space = image_to_object.transform_inverse(PointF64::new(x as f64, y as f64));
+                let position_in_image_space = PointF32::new(position_in_image_space.x as f32, position_in_image_space.y as f32);
+
+                // Interpolate the color there
+                rectified_image.set_pixel(x, y,
+                    &bilinear_interpolate(&image, position_in_image_space)
+                );
+            }
+        }
+
+        Some(Self::binarize_image(&rectified_image))
     }
 }

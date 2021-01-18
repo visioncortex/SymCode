@@ -1,6 +1,6 @@
 use visioncortex::{PointF64};
 
-use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{TransformFitter}};
+use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{TransformFitter, binarize_image}};
 
 pub(crate) struct Fitter;
 
@@ -37,7 +37,11 @@ impl TransformFitter for Fitter {
     /// Use the top of each finder in object space as check points
     fn calculate_check_points(finder_positions_object: &[PointF64], symcode_config: &crate::scanning::SymcodeConfig) -> Vec<PointF64> {
         finder_positions_object.iter()
-            .map(|p| PointF64::new(p.x, p.y - (symcode_config.glyph_height >> 1) as f64))
+            .map(|p| PointF64::new(p.x, p.y - (symcode_config.symbol_height >> 1) as f64))
             .collect()
+    }
+
+    fn binarize_image(image: &visioncortex::ColorImage) -> visioncortex::BinaryImage {
+        binarize_image(image)
     }
 }

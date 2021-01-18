@@ -75,19 +75,26 @@ impl SymcodeScanner {
             return "No templates loaded into RawScanner object yet!".into();
         }
         
-        let canvas = Canvas::new_from_id(canvas_id);
+        let canvas = &Some(Canvas::new_from_id(canvas_id));
         let debug_canvas = &(if !debug_canvas_id.is_empty() {
             Some(Canvas::new_from_id(debug_canvas_id))
         } else {
             None
         });
 
-        let raw_frame = canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32);
+        let raw_frame = if let Some(canvas) = canvas {
+            canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
+        } else {
+            panic!("Cannot read input image from canvas.");
+        };
         
         let binary_raw_frame = binarize_image(&raw_frame);
-        render_binary_image_to_canvas(&binary_raw_frame, &canvas);
+
+        if let Some(canvas) = canvas {
+            render_binary_image_to_canvas(&binary_raw_frame, canvas);
+        }
         
-        let finder_positions = match FinderCandidate::process(binary_raw_frame, None, &Some(canvas)) {
+        let finder_positions = match FinderCandidate::process(binary_raw_frame, None, canvas) {
             Ok(finder_positions) => finder_positions,
             Err(e) => {
                 return e.into();
@@ -102,15 +109,27 @@ impl SymcodeScanner {
         let symcode_config = &SymcodeConfig {
             code_width: 400,
             code_height: 400,
-            glyph_width: 80,
-            glyph_height: 80,
+            symbol_width: 80,
+            symbol_height: 80,
             finder_positions: vec![
                 PointF64::new(200.0, 80.0),
                 PointF64::new(200.0, 200.0),
                 PointF64::new(80.0, 320.0),
                 PointF64::new(320.0, 320.0)
             ],
-            rectify_error_threshold,
+            glyph_anchors: vec![
+                PointF64::new(40.0, 40.0),
+                PointF64::new(40.0, 160.0),
+                PointF64::new(160.0, 280.0),
+                PointF64::new(280.0, 160.0),
+                PointF64::new(280.0, 40.0),
+            ],
+            rectify_error_threshold: 20.0,
+            stat_tolerance: 0.2,
+            max_encoding_difference: 1,
+            empty_cluster_threshold: 0.2,
+            canvas,
+            debug_canvas,
         };
         
         let rectified_image = Transformer::rectify_image(raw_frame, finder_positions, symcode_config);
