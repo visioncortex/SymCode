@@ -86,7 +86,7 @@ impl SymcodeScanner {
         let binary_raw_frame = binarize_image(&raw_frame);
         render_binary_image_to_canvas(&binary_raw_frame, canvas);
         
-        let finder_candidates = FinderCandidate::process(binary_raw_frame, None, debug_canvas).unwrap();
+        let finder_candidates = FinderCandidate::process(binary_raw_frame, None, &None).unwrap();
         
         console_log_util(&format!("Extracted {} finder candidates from raw frame.", finder_candidates.len()));
         if finder_candidates.len() > max_finder_candidates {
