@@ -14,8 +14,8 @@ pub trait ScanningProcessor: {
     fn process(input: Self::Input, params: Option<Self::Params>, debug: &Option<Self::Debug>) -> Result<Self::Output, String>;
 
     /// Validate input
-    fn valid_input(input: &Self::Input) -> bool;
+    fn valid_input(input: &Self::Input) -> bool {true}
 
     /// Validate params
-    fn valid_params(params: &Self::Params) -> bool;
+    fn valid_params(params: &Self::Params) -> bool {true}
 }
