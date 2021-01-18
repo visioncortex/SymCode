@@ -32,7 +32,7 @@ impl TransformFitter {
                 if Self::correct_spatial_arrangement(&src_pts) {
                     //console_log_util(&format!("\n{:?}", src_pts));
                     let transform = PerspectiveTransform::from_point_f64(&src_pts, &Self::DST_PTS);
-                    let error = Self::evaluate_transform(&transform, &src_pts);
+                    let error = Self::evaluate_transform(&transform, &src_pts, &Self::CHECK_PTS);
                     //console_log_util(&(transform.print_coeffs() + " " + &error.to_string()));
                     if error < min_error {
                         best_transform = transform;
@@ -59,21 +59,22 @@ impl TransformFitter {
         clockwise_points_f64(&candidates[2], &candidates[1], &candidates[3])
     }
 
-    /// Test if the four candidates are in the same order as the ones in the object space
-    ///
-    /// Returns the sum of L2-norms of the three errors.
-    fn evaluate_transform(img_to_obj: &PerspectiveTransform, finder_src_pts: &[PointF64]) -> f64 {
+    /// Returns the sum of L2-norms of the variations between vectors from source points to their corresponding check points.
+    fn evaluate_transform(img_to_obj: &PerspectiveTransform, finder_src_points: &[PointF64], check_points: &[PointF64]) -> f64 {
+        if finder_src_points.len() != check_points.len() {
+            panic!("Number of finder source points and number of check points do not agree in transform evaluation.");
+        }
         // Reproject the first check point from obj to img space
-        let first_check_point_img_space = img_to_obj.transform_inverse(Self::CHECK_PTS[0]);
+        let first_check_point_img_space = img_to_obj.transform_inverse(check_points[0]);
 
         // Calculate the vector from the center of the first finder center to the first check point
-        let first_finder_to_check_point = normalize_point_f64(&(first_check_point_img_space - finder_src_pts[0]));
+        let first_finder_to_check_point = normalize_point_f64(&(first_check_point_img_space - finder_src_points[0]));
 
         // Calculate the vectors from the centers of the remaining three finders centers
         // to the remaining check points and Calculate their errors with the above vector
         let mut acc_error = 0.0;
-        finder_src_pts.iter().enumerate().skip(1).for_each(|(i, &finder_src_pt)| {
-            let check_point_img_space = img_to_obj.transform_inverse(Self::CHECK_PTS[i]);
+        finder_src_points.iter().enumerate().skip(1).for_each(|(i, &finder_src_pt)| {
+            let check_point_img_space = img_to_obj.transform_inverse(check_points[i]);
             let finder_to_check_point = normalize_point_f64(&(check_point_img_space - finder_src_pt));
             acc_error += euclid_dist_f64(&first_finder_to_check_point, &finder_to_check_point);
         });

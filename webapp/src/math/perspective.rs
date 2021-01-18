@@ -2,7 +2,7 @@ use visioncortex::PointF64;
 
 use super::Numeric;
 
-pub(crate) struct PerspectiveTransform {
+pub struct PerspectiveTransform {
     src_pts: Vec<f64>,
     dst_pts: Vec<f64>,
     coeffs: Vec<f64>,
