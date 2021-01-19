@@ -1,7 +1,7 @@
 use visioncortex::{BinaryImage, BoundingRect, PointI32};
 use wasm_bindgen::prelude::*;
 
-use super::{GlyphCode, GlyphLibrary};
+use super::GlyphLibrary;
 
 pub struct AlphabetReader {}
 
@@ -21,8 +21,8 @@ impl Default for AlphabetReaderParams {
     fn default() -> Self {
         Self {
             top_left: PointI32::new(0, 0),
-            glyph_width: GlyphCode::GLYPH_SIZE,
-            glyph_height: GlyphCode::GLYPH_SIZE,
+            glyph_width:80,
+            glyph_height: 80,
             offset_x: 115,
             offset_y: 115,
             num_columns: 4,

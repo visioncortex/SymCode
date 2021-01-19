@@ -13,8 +13,7 @@ impl GlyphReader for Recognizer {
     fn find_most_similar_glyph(image: visioncortex::BinaryImage, glyph_library: &Self::Library, symcode_config: &crate::scanning::SymcodeConfig) -> Self::Label {
         glyph_library.find_most_similar_glyph(
             image,
-            symcode_config.stat_tolerance,
-            symcode_config.max_encoding_difference
+            symcode_config
         )
     }
 }
