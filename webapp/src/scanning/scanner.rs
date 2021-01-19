@@ -142,16 +142,6 @@ impl SymcodeScanner {
             }
         };
 
-        // Render rectified image to debug canvas
-        if let Some(symcode_config) = &symcode_config {
-            if let Some(debug_canvas) = &symcode_config.debug_canvas {
-                match render_color_image_to_canvas(&rectified_image.to_color_image(), debug_canvas) {
-                    Ok(_) => {},
-                    Err(e) => {return e},
-                }
-            }
-        }
-
         if let Some(symcode_config) = symcode_config {
             let glyph_code = Recognizer::read_glyphs_from_rectified_image(
                 rectified_image,

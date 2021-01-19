@@ -1,6 +1,6 @@
 use visioncortex::{BinaryImage, ColorImage, PointF64, PointI32};
 
-use crate::{canvas::Canvas, math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{SymcodeConfig, Transformer as TransformerInterface, binarize_image_util, pipeline::ScanningProcessor}};
+use crate::{canvas::Canvas, math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{SymcodeConfig, Transformer as TransformerInterface, binarize_image_util, pipeline::ScanningProcessor, render_color_image_to_canvas}};
 
 /// Implementation of Transformer
 pub(crate) struct Transformer;
@@ -78,6 +78,14 @@ impl ScanningProcessor for Transformer {
 
         // Processing starts
         if let Some(rectified_image) = Self::transform_image(input.raw_image, input.finder_positions_image, params) {
+            // Render rectified image to debug canvas
+            if let Some(debug_canvas) = &params.debug_canvas {
+                match render_color_image_to_canvas(&rectified_image.to_color_image(), debug_canvas) {
+                    Ok(_) => {},
+                    Err(_) => {return Err("Cannot render rectified image to debug canvas.")},
+                }
+            }
+            
             Ok(rectified_image)
         } else {
             Err("Cannot rectify image")
