@@ -1,6 +1,6 @@
-use visioncortex::PointF64;
+use visioncortex::{BinaryImage, ColorImage, PointF64, PointI32};
 
-use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{Transformer as TransformerInterface, binarize_image_util}};
+use crate::{canvas::Canvas, math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{SymcodeConfig, Transformer as TransformerInterface, binarize_image_util, pipeline::ScanningProcessor}};
 
 /// Implementation of Transformer
 pub(crate) struct Transformer;
@@ -44,5 +44,43 @@ impl TransformerInterface for Transformer {
 
     fn binarize_image(image: &visioncortex::ColorImage) -> visioncortex::BinaryImage {
         binarize_image_util(image)
+    }
+}
+
+pub(crate) struct TransformerInput {
+    raw_image: ColorImage,
+    finder_positions_image: Vec<PointI32>,
+}
+
+impl ScanningProcessor for Transformer {
+    type Input = TransformerInput;
+
+    type Output = BinaryImage;
+
+    type Params = SymcodeConfig<'static>;
+
+    type Debug = Canvas;
+
+    fn process(input: Self::Input, params: &Option<Self::Params>, debug: &Option<Self::Debug>) -> Result<Self::Output, String> {
+        // Validates input and params
+        if !Self::valid_input(&input) {
+            return Err("Invalid input in Transformer.".into());
+        }
+
+        let params = match params {
+            Some(params) => params,
+            None => {return Err("Transformer Processor expects params!".into());}
+        };
+
+        if !Self::valid_params(params) {
+            return Err("Invalid params in Transformer.".into());
+        }
+
+        // Processing starts
+        if let Some(rectified_image) = Self::transform_image(input.raw_image, input.finder_positions_image, params) {
+            Ok(rectified_image)
+        } else {
+            Err("Cannot rectify image".into())
+        }
     }
 }
