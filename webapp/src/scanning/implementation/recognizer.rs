@@ -12,13 +12,11 @@ impl GlyphReader for Recognizer {
 
     type Library = GlyphLibrary;
 
-    fn find_most_similar_glyph(image: visioncortex::BinaryImage, glyph_library: *const Self::Library, symcode_config: &crate::scanning::SymcodeConfig) -> Self::Label {
-        unsafe {
-            glyph_library.as_ref().unwrap().find_most_similar_glyph(
-                image,
-                symcode_config
-            )
-        }
+    fn find_most_similar_glyph(image: visioncortex::BinaryImage, glyph_library: &Self::Library, symcode_config: &crate::scanning::SymcodeConfig) -> Self::Label {
+        glyph_library.find_most_similar_glyph(
+            image,
+            symcode_config
+        )
     }
 }
 
@@ -50,6 +48,7 @@ impl ScanningProcessor for Recognizer {
         }
 
         // Processing starts
-        Ok(Self::read_glyphs_from_rectified_image(input.rectified_image, input.glyph_library, params))
+        let glyph_library = unsafe {&*input.glyph_library};
+        Ok(Self::read_glyphs_from_rectified_image(input.rectified_image, glyph_library, params))
     }
 }

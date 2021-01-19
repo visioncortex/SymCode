@@ -26,10 +26,10 @@ pub trait GlyphReader {
     }
 
     /// Finds the most similar glyph in the library based on given params
-    fn find_most_similar_glyph(image: BinaryImage, glyph_library: *const Self::Library, symcode_config: &crate::scanning::SymcodeConfig) -> Self::Label;
+    fn find_most_similar_glyph(image: BinaryImage, glyph_library: &Self::Library, symcode_config: &crate::scanning::SymcodeConfig) -> Self::Label;
 
     /// Read all glyphs at the anchors on the input image
-    fn read_glyphs_from_rectified_image(image: visioncortex::BinaryImage, glyph_library: *const Self::Library, symcode_config: &crate::scanning::SymcodeConfig) -> Vec<Option<Self::Label>> {
+    fn read_glyphs_from_rectified_image(image: visioncortex::BinaryImage, glyph_library: &Self::Library, symcode_config: &crate::scanning::SymcodeConfig) -> Vec<Option<Self::Label>> {
         let absolute_empty_cluster_threshold = (symcode_config.empty_cluster_threshold * (symcode_config.symbol_width * symcode_config.symbol_height) as f64) as u64;
         symcode_config.glyph_anchors.iter()
             .map(|anchor| {
