@@ -39,7 +39,7 @@ impl ScanningProcessor for FinderCandidate {
         let finder_candidates = Self::extract_finder_positions(input);
         console_log_util(&format!("Extracted {} finder candidates from raw frame.", finder_candidates.len()));
 
-        if finder_candidates.len() > params.max_finder_candidates {
+        if finder_candidates.len() > params.max_finder_candidates() {
             Err("Too many finder candidates!")
         } else {
             Ok(finder_candidates)

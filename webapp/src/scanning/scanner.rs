@@ -114,7 +114,7 @@ impl SymcodeScanner {
             ],
             canvas,
             debug_canvas,
-            max_finder_candidates: 7,
+            max_extra_finder_candidates: 7,
             rectify_error_threshold: 20.0,
             stat_tolerance: 0.2,
             max_encoding_difference: 1,
