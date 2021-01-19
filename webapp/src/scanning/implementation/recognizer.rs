@@ -37,16 +37,16 @@ impl ScanningProcessor for Recognizer {
     fn process(input: Self::Input, params: &Option<Self::Params>) -> Result<Self::Output, &str> {
         // Validates input and params
         if !Self::valid_input(&input) {
-            return Err("Invalid input in Transformer.");
+            return Err("Invalid input in Recognizer.");
         }
 
         let params = match params {
             Some(params) => params,
-            None => {return Err("Transformer Processor expects params!");}
+            None => {return Err("Recognizer Processor expects params!");}
         };
 
         if !Self::valid_params(params) {
-            return Err("Invalid params in Transformer.");
+            return Err("Invalid params in Recognizer.");
         }
 
         // Processing starts
