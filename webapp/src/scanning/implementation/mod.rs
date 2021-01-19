@@ -1,7 +1,11 @@
+pub(crate) mod alphabet;
 pub(crate) mod finder_candidate;
-pub(crate) mod recognition;
+pub(crate) mod glyph;
+pub(crate) mod recognizer;
 pub(crate) mod transformer;
 
+pub(crate) use alphabet::*;
 pub(crate) use finder_candidate::*;
-pub(crate) use recognition::*;
-//pub(crate) use transform::*;
+pub(crate) use glyph::*;
+pub(crate) use recognizer::*;
+//pub(crate) use transformer::*;

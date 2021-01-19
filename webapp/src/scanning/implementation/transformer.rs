@@ -2,6 +2,7 @@ use visioncortex::PointF64;
 
 use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{Transformer as TransformerInterface, binarize_image_util}};
 
+/// Implementation of Transformer
 pub(crate) struct Transformer;
 
 impl TransformerInterface for Transformer {
