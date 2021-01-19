@@ -121,7 +121,10 @@ impl SymcodeScanner {
         });
         
         // Stage 1: Locating finder candidates
-        let finder_positions = match FinderCandidate::process(binary_raw_frame, symcode_config) {
+        let finder_positions = match FinderCandidate::process(
+            binary_raw_frame,
+            symcode_config
+        ) {
             Ok(finder_positions) => finder_positions,
             Err(e) => {
                 return e.into();
