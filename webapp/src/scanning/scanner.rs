@@ -1,11 +1,9 @@
-use std::u64;
-
 use visioncortex::PointF64;
 use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, GlyphLibrary, Recognizer, SymcodeConfig, Transformer, binarize_image_util, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas, render_color_image_to_canvas, transform::Transformer as TransformerInterface};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, GlyphReader, Recognizer, SymcodeConfig, Transformer as TransformerInterface, binarize_image_util, implementation::transformer::Transformer, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas, render_color_image_to_canvas};
 
 #[wasm_bindgen]
 pub struct SymcodeScanner {
@@ -132,7 +130,7 @@ impl SymcodeScanner {
             debug_canvas,
         };
         
-        let rectified_image = Transformer::transform_image(raw_frame, finder_positions, symcode_config);
+        let rectified_image = Transformer::transform_image::<i32>(raw_frame, finder_positions, symcode_config);
         if rectified_image.is_none() {
             return "Cannot rectify image".into();
         }
@@ -146,13 +144,11 @@ impl SymcodeScanner {
             }
         }
 
-        let glyph_code = Recognizer::recognize_glyphs_on_image(
+        let glyph_code = Recognizer::read_glyphs_from_rectified_image(
             rectified_image,
             &self.glyph_library,
-            self.stat_tolerance,
-            max_encoding_difference,
-            (empty_cluster_threshold * (GlyphCode::GLYPH_SIZE * GlyphCode::GLYPH_SIZE) as f64) as u64,
-            debug_canvas);
+            symcode_config,
+        );
         
         console_log_util(&format!("{:?}", glyph_code));
         
