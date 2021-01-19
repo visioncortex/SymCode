@@ -3,7 +3,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, GlyphReader, Recognizer, SymcodeConfig, binarize_image_util, implementation::transformer::{Transformer, TransformerInput}, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas, render_color_image_to_canvas};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, GlyphReader, Recognizer, RecognizerInput, SymcodeConfig, binarize_image_util, implementation::transformer::{Transformer, TransformerInput}, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas, render_color_image_to_canvas};
 
 #[wasm_bindgen]
 pub struct SymcodeScanner {
@@ -145,18 +145,22 @@ impl SymcodeScanner {
             }
         };
 
-        if let Some(symcode_config) = symcode_config {
-            let glyph_code = Recognizer::read_glyphs_from_rectified_image(
+        // Stage 3: Recognize the glyphs
+        match Recognizer::process(
+            RecognizerInput {
                 rectified_image,
-                &self.glyph_library,
-                symcode_config,
-            );
-            
-            console_log_util(&format!("{:?}", glyph_code));
-            
-            "Success".into()
-        } else {
-            "Failed".into()
+                glyph_library: &self.glyph_library,
+            },
+            symcode_config
+        ) {
+            Ok(glyph_code) => {
+                console_log_util(&format!("{:?}", glyph_code));
+                
+                return "Success".into();
+            },
+            Err(e) => {
+                return e.into();
+            }
         }
     }
 }

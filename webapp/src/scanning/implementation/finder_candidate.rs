@@ -20,8 +20,6 @@ impl ScanningProcessor for FinderCandidate {
 
     type Params = SymcodeConfig;
 
-    type Debug = Canvas;
-
     fn process(input: Self::Input, params: &Option<Self::Params>) -> Result<Self::Output, &str> {
         // Validates input and params
         if !Self::valid_input(&input) {

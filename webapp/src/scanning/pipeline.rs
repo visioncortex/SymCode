@@ -5,8 +5,6 @@ pub trait ScanningProcessor: {
     type Output;
     /// Type definition of parameters
     type Params;
-    /// Type definition of debug utilities
-    type Debug;
 
     /// Provide input and params to Processor; returns Err(msg) for invalid input/params
     ///
