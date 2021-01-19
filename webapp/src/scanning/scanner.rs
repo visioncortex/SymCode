@@ -92,7 +92,7 @@ impl SymcodeScanner {
             render_binary_image_to_canvas(&binary_raw_frame, canvas);
         }
         
-        let finder_positions = match FinderCandidate::process(binary_raw_frame, &None, canvas) {
+        let finder_positions = match FinderCandidate::process(binary_raw_frame, &None) {
             Ok(finder_positions) => finder_positions,
             Err(e) => {
                 return e.into();

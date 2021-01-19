@@ -48,8 +48,8 @@ impl TransformerInterface for Transformer {
 }
 
 pub(crate) struct TransformerInput {
-    raw_image: ColorImage,
-    finder_positions_image: Vec<PointI32>,
+    pub raw_image: ColorImage,
+    pub finder_positions_image: Vec<PointI32>,
 }
 
 impl ScanningProcessor for Transformer {
@@ -57,11 +57,11 @@ impl ScanningProcessor for Transformer {
 
     type Output = BinaryImage;
 
-    type Params = SymcodeConfig<'static>;
+    type Params = SymcodeConfig;
 
     type Debug = Canvas;
 
-    fn process(input: Self::Input, params: &Option<Self::Params>, debug: &Option<Self::Debug>) -> Result<Self::Output, String> {
+    fn process(input: Self::Input, params: &Option<Self::Params>) -> Result<Self::Output, String> {
         // Validates input and params
         if !Self::valid_input(&input) {
             return Err("Invalid input in Transformer.".into());

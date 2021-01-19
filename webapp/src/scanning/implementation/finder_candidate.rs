@@ -22,7 +22,7 @@ impl ScanningProcessor for FinderCandidate {
 
     type Debug = Canvas;
 
-    fn process(input: Self::Input, params: &Option<Self::Params>, debug: &Option<Self::Debug>) -> Result<Self::Output, String> {
+    fn process(input: Self::Input, params: &Option<Self::Params>) -> Result<Self::Output, String> {
         if params.is_some() {
             console_log_util(&"FinderCandidate Processor expects no params!");
             panic!();
