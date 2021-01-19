@@ -92,7 +92,7 @@ impl SymcodeScanner {
             render_binary_image_to_canvas(&binary_raw_frame, canvas);
         }
         
-        let finder_positions = match FinderCandidate::process(binary_raw_frame, None, canvas) {
+        let finder_positions = match FinderCandidate::process(binary_raw_frame, &None, canvas) {
             Ok(finder_positions) => finder_positions,
             Err(e) => {
                 return e.into();
@@ -104,7 +104,7 @@ impl SymcodeScanner {
             return "Too many finder candidates!".into();
         }
         
-        let symcode_config = &SymcodeConfig {
+        let symcode_config = SymcodeConfig {
             code_width: 400,
             code_height: 400,
             symbol_width: 80,
@@ -130,7 +130,7 @@ impl SymcodeScanner {
             debug_canvas,
         };
         
-        let rectified_image = Transformer::transform_image::<i32>(raw_frame, finder_positions, symcode_config);
+        let rectified_image = Transformer::transform_image::<i32>(raw_frame, finder_positions, &symcode_config);
         if rectified_image.is_none() {
             return "Cannot rectify image".into();
         }
@@ -147,7 +147,7 @@ impl SymcodeScanner {
         let glyph_code = Recognizer::read_glyphs_from_rectified_image(
             rectified_image,
             &self.glyph_library,
-            symcode_config,
+            &symcode_config,
         );
         
         console_log_util(&format!("{:?}", glyph_code));

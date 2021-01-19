@@ -11,7 +11,7 @@ pub trait ScanningProcessor: {
     /// Provide input and params to Processor; returns Err(msg) for invalid input/params
     ///
     /// debug is borrowed because the debug utilities are supposedly shared among processors
-    fn process(input: Self::Input, params: Option<Self::Params>, debug: &Option<Self::Debug>) -> Result<Self::Output, String>;
+    fn process(input: Self::Input, params: &Option<Self::Params>, debug: &Option<Self::Debug>) -> Result<Self::Output, String>;
 
     /// Validate input
     fn valid_input(input: &Self::Input) -> bool {true}

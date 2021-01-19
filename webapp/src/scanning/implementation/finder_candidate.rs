@@ -22,7 +22,7 @@ impl ScanningProcessor for FinderCandidate {
 
     type Debug = Canvas;
 
-    fn process(input: Self::Input, params: Option<Self::Params>, debug: &Option<Self::Debug>) -> Result<Self::Output, String> {
+    fn process(input: Self::Input, params: &Option<Self::Params>, debug: &Option<Self::Debug>) -> Result<Self::Output, String> {
         if params.is_some() {
             console_log_util(&"FinderCandidate Processor expects no params!");
             panic!();
@@ -34,14 +34,12 @@ impl ScanningProcessor for FinderCandidate {
         }
 
         if let Some(params) = params {
-            if !Self::valid_params(&params) {
+            if !Self::valid_params(params) {
                 return Err("Invalid params in FinderCandidates.".into());
             }
         }
 
         // Processing starts
-        let finder_positions = Self::extract_finder_positions(input);
-        
-        Ok(finder_positions)
+        Ok(Self::extract_finder_positions(input))
     }
 }
