@@ -1,56 +1,47 @@
-use visioncortex::{ColorImage, PointF32, PointF64, PointI32, bilinear_interpolate};
+use visioncortex::PointF64;
 
-use crate::{math::PerspectiveTransform, scanning::{GlyphCode, SymcodeConfig, TransformFitter, valid_pointf64_on_image}, util::console_log_util};
+use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{Transformer as TransformerInterface, binarize_image_util}};
 
-use super::Fitter;
+pub(crate) struct Transformer;
 
-pub(crate) struct Transformer {}
-
-impl Transformer {
-    /// Create an image in object space that is transformed from the most likely PerspectiveTransformation according to the finder candidates
-    pub(crate) fn rectify_image(image: ColorImage, finder_candidates: Vec<PointI32>, symcode_config: &SymcodeConfig) -> Option<ColorImage> {
-        let image_to_object = Fitter::fit_transform(finder_candidates, symcode_config)?;
-        
-        if Self::transform_to_image_out_of_bound(&image, &image_to_object) {
-            console_log_util("transform out of bounds");
-            return None;
-        }
-
-        let mut rectified_image = ColorImage::new_w_h(GlyphCode::CODE_WIDTH, GlyphCode::CODE_HEIGHT);
-        // For each point in object space
-        for x in 0..GlyphCode::CODE_WIDTH {
-            for y in 0..GlyphCode::CODE_HEIGHT {
-                // Obtains the sample point in image space
-                let position_in_image_space = 
-                    image_to_object.transform_inverse(PointF64::new(x as f64, y as f64)).to_point_f32();
-
-                // Interpolate the color there
-                rectified_image.set_pixel(x, y, &image.sample_pixel_at(position_in_image_space));
-            }
-        }
-
-        Some(rectified_image)
+impl TransformerInterface for Transformer {
+    fn correct_spatial_arrangement(finder_positions_image: &[PointF64]) -> bool {
+        clockwise_points_f64(&finder_positions_image[0], &finder_positions_image[1], &finder_positions_image[2]) &&
+        clockwise_points_f64(&finder_positions_image[0], &finder_positions_image[3], &finder_positions_image[1]) &&
+        clockwise_points_f64(&finder_positions_image[2], &finder_positions_image[1], &finder_positions_image[3])
     }
 
-    /// Check if the 4 corners in the object space will map to out-of-bound points in the image space.
-    ///
-    /// Those are points that cannot be sampled.
-    fn transform_to_image_out_of_bound(image: &ColorImage, image_to_object: &PerspectiveTransform) -> bool {
-        let w = (GlyphCode::CODE_WIDTH-1) as f64;
-        let h = (GlyphCode::CODE_HEIGHT-1) as f64;
-        let points_to_test = [
-            PointF64::new(0.0, 0.0), PointF64::new(w, 0.0),
-            PointF64::new(0.0, h), PointF64::new(w, h),
-        ];
-
-        for &point in points_to_test.iter() {
-            let point_in_image_space = image_to_object.transform_inverse(point);
-            
-            if !valid_pointf64_on_image(point_in_image_space, image) {
-                return true;
-            }
+    fn evaluate_transform(img_to_obj: &PerspectiveTransform, finder_src_points: &[PointF64], check_points: &[PointF64]) -> f64 {
+        if finder_src_points.len() != check_points.len() {
+            panic!("Number of finder source points and number of check points do not agree in transform evaluation.");
         }
-        
-        false
+        // Reproject the first check point from obj to img space
+        let first_check_point_img_space = img_to_obj.transform_inverse(check_points[0]);
+
+        // Calculate the vector from the center of the first finder center to the first check point
+        let first_finder_to_check_point = normalize_point_f64(&(first_check_point_img_space - finder_src_points[0]));
+
+        // Calculate the vectors from the centers of the remaining three finders centers
+        // to the remaining check points and Calculate their errors with the above vector
+        let mut acc_error = 0.0;
+        finder_src_points.iter().enumerate().skip(1).for_each(|(i, &finder_src_pt)| {
+            let check_point_img_space = img_to_obj.transform_inverse(check_points[i]);
+            let finder_to_check_point = normalize_point_f64(&(check_point_img_space - finder_src_pt));
+            acc_error += euclid_dist_f64(&first_finder_to_check_point, &finder_to_check_point);
+        });
+
+        // Return the sum of the norms of the errors
+        acc_error
+    }
+
+    /// Use the top of each finder in object space as check points
+    fn calculate_check_points(finder_positions_object: &[PointF64], symcode_config: &crate::scanning::SymcodeConfig) -> Vec<PointF64> {
+        finder_positions_object.iter()
+            .map(|p| PointF64::new(p.x, p.y - (symcode_config.symbol_height >> 1) as f64))
+            .collect()
+    }
+
+    fn binarize_image(image: &visioncortex::ColorImage) -> visioncortex::BinaryImage {
+        binarize_image_util(image)
     }
 }

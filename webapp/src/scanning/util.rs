@@ -4,7 +4,7 @@ use web_sys::{ImageData};
 
 use crate::canvas::Canvas;
 
-pub(crate) fn binarize_image(color_image: &ColorImage) -> BinaryImage {
+pub(crate) fn binarize_image_util(color_image: &ColorImage) -> BinaryImage {
     color_image.to_binary_image(|c| is_black_rgb(&c))
 }
 

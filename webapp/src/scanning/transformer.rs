@@ -5,9 +5,9 @@ use crate::{math::{PerspectiveTransform}, util::console_log_util};
 
 use super::{SymcodeConfig, valid_pointf64_on_image};
 
-pub trait TransformFitter {
+pub trait Transformer {
     // Input = Vec<Finders>
-    // Output = PerspectiveTransform
+    // Output = (rectified) BinaryImage
 
     /// Given a slice of PointF64 which are the potential finder points.
     ///
@@ -86,7 +86,8 @@ pub trait TransformFitter {
     fn binarize_image(image: &ColorImage) -> BinaryImage;
 
     /// Rectify the input image into object space and binarize it
-    fn rectify_image(image: ColorImage, image_to_object: PerspectiveTransform, symcode_config: &SymcodeConfig) -> Option<BinaryImage> {
+    fn transform_image<T: std::marker::Copy + Into<f64>>(image: ColorImage, finder_positions_image: Vec<Point2<T>>, symcode_config: &SymcodeConfig) -> Option<BinaryImage> {
+        let image_to_object = Self::fit_transform(finder_positions_image, symcode_config)?;
         if Self::transform_to_image_out_of_bound(&image, &image_to_object, symcode_config) {
             return None;
         }

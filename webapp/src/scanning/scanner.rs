@@ -5,7 +5,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, GlyphLibrary, Recognizer, SymcodeConfig, binarize_image, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas, render_color_image_to_canvas, transform::Transformer};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphCode, GlyphLibrary, Recognizer, SymcodeConfig, Transformer, binarize_image_util, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas, render_color_image_to_canvas, transform::Transformer as TransformerInterface};
 
 #[wasm_bindgen]
 pub struct SymcodeScanner {
@@ -88,7 +88,7 @@ impl SymcodeScanner {
             panic!("Cannot read input image from canvas.");
         };
         
-        let binary_raw_frame = binarize_image(&raw_frame);
+        let binary_raw_frame = binarize_image_util(&raw_frame);
 
         if let Some(canvas) = canvas {
             render_binary_image_to_canvas(&binary_raw_frame, canvas);
@@ -132,7 +132,7 @@ impl SymcodeScanner {
             debug_canvas,
         };
         
-        let rectified_image = Transformer::rectify_image(raw_frame, finder_positions, symcode_config);
+        let rectified_image = Transformer::transform_image(raw_frame, finder_positions, symcode_config);
         if rectified_image.is_none() {
             return "Cannot rectify image".into();
         }
@@ -140,7 +140,7 @@ impl SymcodeScanner {
         let rectified_image = rectified_image.unwrap();
 
         if let Some(debug_canvas) = debug_canvas {
-            match render_color_image_to_canvas(&rectified_image, debug_canvas) {
+            match render_color_image_to_canvas(&rectified_image.to_color_image(), debug_canvas) {
                 Ok(_) => {},
                 Err(e) => {return e},
             }
