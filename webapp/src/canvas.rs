@@ -10,8 +10,8 @@ pub struct Canvas {
 }
 
 impl Canvas {
-    pub fn new_from_id(canvas_id: &str) -> Canvas {
-        let html_canvas = document().get_element_by_id(canvas_id).unwrap();
+    pub fn new_from_id(canvas_id: &str) -> Option<Canvas> {
+        let html_canvas = document().get_element_by_id(canvas_id)?;
         let html_canvas: HtmlCanvasElement = html_canvas
             .dyn_into::<HtmlCanvasElement>()
             .map_err(|_| ())
@@ -24,10 +24,12 @@ impl Canvas {
             .dyn_into::<CanvasRenderingContext2d>()
             .unwrap();
 
-        Canvas {
-            html_canvas,
-            cctx,
-        }
+        Some(
+            Canvas {
+                html_canvas,
+                cctx,
+            }
+        )
     }
 
     pub fn get_rendering_context_2d(&self) -> &CanvasRenderingContext2d {

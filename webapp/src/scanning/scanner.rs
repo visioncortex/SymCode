@@ -35,7 +35,10 @@ impl SymcodeScanner {
 
     /// Takes the id of the canvas element storing the template image, and the usize representation of the glyph label
     pub fn load_template_from_canvas_id(&mut self, canvas_id: &str) {
-        let canvas = &Canvas::new_from_id(canvas_id);
+        let canvas = &match Canvas::new_from_id(canvas_id) {
+            Some(c) => c,
+            None => panic!("Canvas with id ".to_owned() + canvas_id + " is not found!"),
+        };
         let image = canvas
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
             .to_binary_image(|c| is_black_hsv(&c.to_hsv()));
@@ -44,7 +47,10 @@ impl SymcodeScanner {
 
     /// Takes the id of the canvas element storing the alphabet.
     pub fn load_alphabet_from_canvas_id(&mut self, canvas_id: &str, params: AlphabetReaderParams) {
-        let canvas = &Canvas::new_from_id(canvas_id);
+        let canvas = &match Canvas::new_from_id(canvas_id) {
+            Some(c) => c,
+            None => panic!("Canvas with id ".to_owned() + canvas_id + " is not found!"),
+        };
         let image = canvas
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
             .to_binary_image(|c| is_black_hsv(&c.to_hsv()));
@@ -56,26 +62,21 @@ impl SymcodeScanner {
             self,
             &config.canvas_id,
             &config.debug_canvas_id,
-            config.rectify_error_threshold,
-            config.max_finder_candidates,
-            config.max_encoding_difference,
-            config.empty_cluster_threshold,
         )
     }
 
-    /// Initiate scanning, should return whatever info is needed for decoding
-    #[allow(clippy::too_many_arguments)]
-    pub fn scan_from_canvas_id(&self, canvas_id: &str, debug_canvas_id: &str,
-        rectify_error_threshold: f64, max_finder_candidates: usize,
-        max_encoding_difference: usize, empty_cluster_threshold: f64
+    pub fn scan_from_canvas_id(&self, canvas_id: &str, debug_canvas_id: &str
     ) -> JsValue {
         if self.glyph_library.is_empty() {
             return "No templates loaded into RawScanner object yet!".into();
         }
         
-        let canvas = Some(Canvas::new_from_id(canvas_id));
+        let canvas = Some(match Canvas::new_from_id(canvas_id) {
+            Some(c) => c,
+            None => panic!("Canvas with id ".to_owned() + canvas_id + " is not found!"),
+        });
         let debug_canvas = if !debug_canvas_id.is_empty() {
-            Some(Canvas::new_from_id(debug_canvas_id))
+            Canvas::new_from_id(debug_canvas_id)
         } else {
             None
         };
