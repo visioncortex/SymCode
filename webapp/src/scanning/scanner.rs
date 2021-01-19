@@ -7,6 +7,7 @@ use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary,
 #[wasm_bindgen]
 pub struct SymcodeScanner {
     glyph_library: GlyphLibrary,
+    /// Used only in building the library, but not in scanning
     stat_tolerance: f64,
 }
 
