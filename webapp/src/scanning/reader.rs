@@ -14,7 +14,7 @@ pub trait GlyphReader {
 
     fn crop_at_anchor(anchor: &PointF64, image: &BinaryImage, symcode_config: &SymcodeConfig, absolute_empty_cluster_threshold: u64) -> Option<BinaryImage> {
         let rect = BoundingRect::new_x_y_w_h(anchor.x as i32, anchor.y as i32, symcode_config.symbol_width as i32, symcode_config.symbol_height as i32);
-        if let Some(canvas) = symcode_config.debug_canvas {
+        if let Some(canvas) = &symcode_config.debug_canvas {
             render_bounding_rect_to_canvas(&rect, canvas);
         }
         let cluster = image.crop_with_rect(rect);

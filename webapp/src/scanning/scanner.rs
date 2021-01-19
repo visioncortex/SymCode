@@ -3,7 +3,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, GlyphReader, Recognizer, SymcodeConfig, Transformer as TransformerInterface, binarize_image_util, implementation::transformer::Transformer, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas, render_color_image_to_canvas};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, GlyphReader, Recognizer, SymcodeConfig, binarize_image_util, implementation::transformer::{Transformer, TransformerInput}, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas, render_color_image_to_canvas};
 
 #[wasm_bindgen]
 pub struct SymcodeScanner {
@@ -73,14 +73,14 @@ impl SymcodeScanner {
             return "No templates loaded into RawScanner object yet!".into();
         }
         
-        let canvas = &Some(Canvas::new_from_id(canvas_id));
-        let debug_canvas = &(if !debug_canvas_id.is_empty() {
+        let canvas = Some(Canvas::new_from_id(canvas_id));
+        let debug_canvas = if !debug_canvas_id.is_empty() {
             Some(Canvas::new_from_id(debug_canvas_id))
         } else {
             None
-        });
+        };
 
-        let raw_frame = if let Some(canvas) = canvas {
+        let raw_frame = if let Some(canvas) = &canvas {
             canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
         } else {
             panic!("Cannot read input image from canvas.");
@@ -88,7 +88,7 @@ impl SymcodeScanner {
         
         let binary_raw_frame = binarize_image_util(&raw_frame);
 
-        if let Some(canvas) = canvas {
+        if let Some(canvas) = &canvas {
             render_binary_image_to_canvas(&binary_raw_frame, canvas);
         }
         
@@ -104,7 +104,7 @@ impl SymcodeScanner {
             return "Too many finder candidates!".into();
         }
         
-        let symcode_config = SymcodeConfig {
+        let symcode_config = &Some(SymcodeConfig {
             code_width: 400,
             code_height: 400,
             symbol_width: 80,
@@ -128,31 +128,43 @@ impl SymcodeScanner {
             empty_cluster_threshold: 0.2,
             canvas,
             debug_canvas,
-        };
+        });
         
-        let rectified_image = Transformer::transform_image::<i32>(raw_frame, finder_positions, &symcode_config);
-        if rectified_image.is_none() {
-            return "Cannot rectify image".into();
-        }
+        let rectified_image = match Transformer::process(
+            TransformerInput {
+                raw_image: raw_frame,
+                finder_positions_image: finder_positions,
+            },
+            symcode_config
+        ) {
+            Ok(rectified_image) => rectified_image,
+            Err(e) => {
+                return e.into();
+            }
+        };
 
-        let rectified_image = rectified_image.unwrap();
-
-        if let Some(debug_canvas) = debug_canvas {
-            match render_color_image_to_canvas(&rectified_image.to_color_image(), debug_canvas) {
-                Ok(_) => {},
-                Err(e) => {return e},
+        if let Some(symcode_config) = &symcode_config {
+            if let Some(debug_canvas) = &symcode_config.debug_canvas {
+                match render_color_image_to_canvas(&rectified_image.to_color_image(), debug_canvas) {
+                    Ok(_) => {},
+                    Err(e) => {return e},
+                }
             }
         }
 
-        let glyph_code = Recognizer::read_glyphs_from_rectified_image(
-            rectified_image,
-            &self.glyph_library,
-            &symcode_config,
-        );
-        
-        console_log_util(&format!("{:?}", glyph_code));
-        
-        "Success".into()
+        if let Some(symcode_config) = symcode_config {
+            let glyph_code = Recognizer::read_glyphs_from_rectified_image(
+                rectified_image,
+                &self.glyph_library,
+                symcode_config,
+            );
+            
+            console_log_util(&format!("{:?}", glyph_code));
+            
+            "Success".into()
+        } else {
+            "Failed".into()
+        }
     }
 }
 
