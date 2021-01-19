@@ -61,26 +61,26 @@ impl ScanningProcessor for Transformer {
 
     type Debug = Canvas;
 
-    fn process(input: Self::Input, params: &Option<Self::Params>) -> Result<Self::Output, String> {
+    fn process(input: Self::Input, params: &Option<Self::Params>) -> Result<Self::Output, &str> {
         // Validates input and params
         if !Self::valid_input(&input) {
-            return Err("Invalid input in Transformer.".into());
+            return Err("Invalid input in Transformer.");
         }
 
         let params = match params {
             Some(params) => params,
-            None => {return Err("Transformer Processor expects params!".into());}
+            None => {return Err("Transformer Processor expects params!");}
         };
 
         if !Self::valid_params(params) {
-            return Err("Invalid params in Transformer.".into());
+            return Err("Invalid params in Transformer.");
         }
 
         // Processing starts
         if let Some(rectified_image) = Self::transform_image(input.raw_image, input.finder_positions_image, params) {
             Ok(rectified_image)
         } else {
-            Err("Cannot rectify image".into())
+            Err("Cannot rectify image")
         }
     }
 }

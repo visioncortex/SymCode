@@ -22,19 +22,19 @@ impl ScanningProcessor for FinderCandidate {
 
     type Debug = Canvas;
 
-    fn process(input: Self::Input, params: &Option<Self::Params>) -> Result<Self::Output, String> {
+    fn process(input: Self::Input, params: &Option<Self::Params>) -> Result<Self::Output, &str> {
         // Validates input and params
         if !Self::valid_input(&input) {
-            return Err("Invalid input in FinderCandidates.".into());
+            return Err("Invalid input in FinderCandidates.");
         }
 
         let params = match params {
             Some(params) => params,
-            None => {return Err("FinderCandidates Processor expects params!".into());}
+            None => {return Err("FinderCandidates Processor expects params!");}
         };
 
         if !Self::valid_params(params) {
-            return Err("Invalid params in FinderCandidates.".into());
+            return Err("Invalid params in FinderCandidates.");
         }
 
         // Processing starts
@@ -42,7 +42,7 @@ impl ScanningProcessor for FinderCandidate {
         console_log_util(&format!("Extracted {} finder candidates from raw frame.", finder_candidates.len()));
 
         if finder_candidates.len() > params.max_finder_candidates {
-            Err("Too many finder candidates!".into())
+            Err("Too many finder candidates!")
         } else {
             Ok(finder_candidates)
         }
