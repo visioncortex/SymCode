@@ -1,6 +1,6 @@
 use visioncortex::{BinaryImage, PointI32, Shape};
 
-use crate::{canvas::{Canvas}, scanning::{SymcodeConfig, finder::Finder, pipeline::ScanningProcessor}, util::console_log_util};
+use crate::{scanning::{SymcodeConfig, finder::Finder, pipeline::ScanningProcessor}, util::console_log_util};
 
 
 /// Specific implementation of Finder

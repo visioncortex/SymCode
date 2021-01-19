@@ -68,4 +68,66 @@ impl SymcodeConfig {
     pub fn new() -> Self {
         Self::default()
     }
+
+    pub fn from_canvas_id(canvas_id: &str) -> Self {
+        Self::default()
+            .canvas(canvas_id)
+    }
+
+    // Can't use macros inside wasm_bindgen impls
+
+    pub fn canvas(mut self, canvas_id: &str) -> Self {
+        self.canvas = Canvas::new_from_id(canvas_id);
+        self
+    }
+
+    pub fn debug_canvas(mut self, debug_canvas_id: &str) -> Self {
+        self.debug_canvas = Canvas::new_from_id(debug_canvas_id);
+        self
+    }
+
+    pub fn code_width(mut self, code_width: usize) -> Self {
+        self.code_width = code_width;
+        self
+    }
+
+    pub fn code_height(mut self, code_height: usize) -> Self {
+        self.code_height = code_height;
+        self
+    }
+
+    pub fn symbol_width(mut self, symbol_width: usize) -> Self {
+        self.symbol_width = symbol_width;
+        self
+    }
+
+    pub fn symbol_height(mut self, symbol_height: usize) -> Self {
+        self.symbol_height = symbol_height;
+        self
+    }
+
+    pub fn max_extra_finder_candidates(mut self, max_extra_finder_candidates: usize) -> Self {
+        self.max_extra_finder_candidates = max_extra_finder_candidates;
+        self
+    }
+
+    pub fn rectify_error_threshold(mut self, rectify_error_threshold: f64) -> Self {
+        self.rectify_error_threshold = rectify_error_threshold;
+        self
+    }
+
+    pub fn stat_tolerance(mut self, stat_tolerance: f64) -> Self {
+        self.stat_tolerance = stat_tolerance;
+        self
+    }
+
+    pub fn max_encoding_difference(mut self, max_encoding_difference: usize) -> Self {
+        self.max_encoding_difference = max_encoding_difference;
+        self
+    }
+
+    pub fn empty_cluster_threshold(mut self, empty_cluster_threshold: f64) -> Self {
+        self.empty_cluster_threshold = empty_cluster_threshold;
+        self
+    }
 }

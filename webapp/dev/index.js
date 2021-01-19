@@ -1,4 +1,4 @@
-import { SymcodeScanner, SymcodeScannerConfig, AlphabetReaderParams } from "symcode";
+import { SymcodeScanner, SymcodeConfig, AlphabetReaderParams } from "symcode";
 
 const scanner = SymcodeScanner.new();
 const canvas = document.getElementById('frame');
@@ -43,7 +43,7 @@ function scanImageFromSource(source) {
 function scan_from_canvas(canvas_id) {
     return new Promise((resolve) => {
         let startTime = new Date();
-        let config = SymcodeScannerConfig.from_canvas_id(canvas_id);
+        let config = SymcodeConfig.from_canvas_id(canvas_id);
         if (debugging) {
             config = config.debug_canvas('debug');
         }

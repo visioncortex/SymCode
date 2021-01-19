@@ -1,6 +1,6 @@
 use visioncortex::{BinaryImage, ColorImage, PointF64, PointI32};
 
-use crate::{canvas::Canvas, math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{SymcodeConfig, Transformer as TransformerInterface, binarize_image_util, pipeline::ScanningProcessor, render_color_image_to_canvas}};
+use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{SymcodeConfig, Transformer as TransformerInterface, binarize_image_util, pipeline::ScanningProcessor, render_color_image_to_canvas}};
 
 /// Implementation of Transformer
 pub(crate) struct Transformer;
