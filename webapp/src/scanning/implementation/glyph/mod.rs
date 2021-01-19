@@ -1,11 +1,11 @@
 pub mod code;
 pub mod glyph;
-pub mod shape_encoding;
+pub mod trace;
 pub mod stats;
 pub mod library;
 
 pub use code::*;
 pub use glyph::*;
-pub use shape_encoding::*;
+pub use trace::*;
 pub use stats::*;
 pub use library::*;
