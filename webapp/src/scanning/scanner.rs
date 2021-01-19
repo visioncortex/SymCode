@@ -92,18 +92,7 @@ impl SymcodeScanner {
             render_binary_image_to_canvas(&binary_raw_frame, canvas);
         }
         
-        let finder_positions = match FinderCandidate::process(binary_raw_frame, &None) {
-            Ok(finder_positions) => finder_positions,
-            Err(e) => {
-                return e.into();
-            }
-        };
-        
-        console_log_util(&format!("Extracted {} finder candidates from raw frame.", finder_positions.len()));
-        if finder_positions.len() > max_finder_candidates {
-            return "Too many finder candidates!".into();
-        }
-        
+        // Currently hard-coded configuration (specific to the current design of Symcode)
         let symcode_config = &Some(SymcodeConfig {
             code_width: 400,
             code_height: 400,
@@ -122,14 +111,24 @@ impl SymcodeScanner {
                 PointF64::new(280.0, 160.0),
                 PointF64::new(280.0, 40.0),
             ],
+            canvas,
+            debug_canvas,
+            max_finder_candidates: 7,
             rectify_error_threshold: 20.0,
             stat_tolerance: 0.2,
             max_encoding_difference: 1,
             empty_cluster_threshold: 0.2,
-            canvas,
-            debug_canvas,
         });
         
+        // Stage 1: Locating finder candidates
+        let finder_positions = match FinderCandidate::process(binary_raw_frame, symcode_config) {
+            Ok(finder_positions) => finder_positions,
+            Err(e) => {
+                return e.into();
+            }
+        };
+        
+        // Stage 2: Rectify the raw image using the correct perspective transform
         let rectified_image = match Transformer::process(
             TransformerInput {
                 raw_image: raw_frame,
@@ -143,6 +142,7 @@ impl SymcodeScanner {
             }
         };
 
+        // Render rectified image to debug canvas
         if let Some(symcode_config) = &symcode_config {
             if let Some(debug_canvas) = &symcode_config.debug_canvas {
                 match render_color_image_to_canvas(&rectified_image.to_color_image(), debug_canvas) {

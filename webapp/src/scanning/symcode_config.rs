@@ -16,6 +16,7 @@ pub struct SymcodeConfig {
     pub canvas: Option<Canvas>,
     pub debug_canvas: Option<Canvas>,
 
+    pub max_finder_candidates: usize,
     pub rectify_error_threshold: f64,
     pub stat_tolerance: f64,
     pub max_encoding_difference: usize,
