@@ -33,12 +33,8 @@ impl ScanningProcessor for Recognizer {
 
     type Params = SymcodeConfig;
 
-    fn process(input: Self::Input, params: &Option<Self::Params>) -> Result<Self::Output, &str> {
+    fn process(input: Self::Input, params: &Self::Params) -> Result<Self::Output, &str> {
         Self::valid_input_and_params(&input, params)?;
-
-        let params = if let Some(params) = params {params} else {
-            return Err("Recognizer Processor expects params.");
-        };
 
         // Processing starts
         let glyph_library = unsafe {&*input.glyph_library};

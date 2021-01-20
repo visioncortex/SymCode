@@ -1,7 +1,6 @@
 import { SymcodeScanner, SymcodeConfig, AlphabetReaderParams } from "symcode";
 import CONFIG from "./config";
 
-const scanner = SymcodeScanner.new();
 const canvas = document.getElementById('frame');
 const loadBuffer = document.getElementById('loadBuffer');
 const loadBufferCtx = loadBuffer.getContext('2d');
@@ -16,6 +15,7 @@ let debugging = true;
 let finishScanning = false;
 
 const config = SymcodeConfig.from_json_string(JSON.stringify(CONFIG.SYMCODE_CONFIG));
+const scanner = SymcodeScanner.from_config(config);
 
 const inputFrameSize = {
     width: 350,
@@ -38,15 +38,15 @@ function scanImageFromSource(source) {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
-        scan_from_canvas('frame');
+        scan();
     };
 }
 
 // Returns true if a Symcode is recognized and decoded
-function scan_from_canvas(canvas_id) {
+function scan() {
     return new Promise((resolve) => {
         let startTime = new Date();
-        const result = scanner.scan_with_config(config);
+        const result = scanner.scan();
         console.log(result);
         console.log("Scanning finishes in " + (new Date() - startTime) + " ms.");
         resolve(result.localeCompare("Success") == 0);
@@ -164,7 +164,7 @@ function drawFrame(sx, sy) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(camera, sx, sy, inputFrameSize.width, inputFrameSize.height,
                                         0, 0, canvas.width, canvas.height);
-    scan_from_canvas('frame')
+    scan('frame')
         .then((successful) => {
             if (!successful) {
                 sleep(1/fps)

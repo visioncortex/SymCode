@@ -60,12 +60,8 @@ impl ScanningProcessor for TransformFitter {
 
     type Params = SymcodeConfig;
 
-    fn process(input: Self::Input, params: &Option<Self::Params>) -> Result<Self::Output, &str> {
+    fn process(input: Self::Input, params: &Self::Params) -> Result<Self::Output, &str> {
         Self::valid_input_and_params(&input, params)?;
-
-        let params = if let Some(params) = params {params} else {
-            return Err("Transformer Processor expects params.");
-        };
 
         // Processing starts
         Self::fit_transform(input.raw_image_width, input.raw_image_height, input.finder_positions_image, params)

@@ -5,31 +5,18 @@ use crate::{canvas::Canvas, util::console_log_util};
 use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, pipeline::ScanningProcessor};
 
 #[wasm_bindgen]
+#[derive(Default)]
 pub struct SymcodeScanner {
     glyph_library: GlyphLibrary,
-    /// Used only in building the library, but not in scanning
-    stat_tolerance: f64,
-}
-
-impl Default for SymcodeScanner {
-    fn default() -> Self {
-        Self {
-            glyph_library: GlyphLibrary::default(),
-            stat_tolerance: 0.2,
-        }
-    }
+    config: SymcodeConfig,
 }
 
 #[wasm_bindgen]
 impl SymcodeScanner {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn from_stat_tolerance(stat_tolerance: f64) -> Self {
+    pub fn from_config(config: SymcodeConfig) -> Self {
         Self {
             glyph_library: GlyphLibrary::default(),
-            stat_tolerance,
+            config,
         }
     }
 
@@ -42,7 +29,7 @@ impl SymcodeScanner {
         let image = canvas
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
             .to_binary_image(|c| is_black_hsv(&c.to_hsv()));
-        self.glyph_library.add_template(image, self.stat_tolerance);
+        self.glyph_library.add_template(image, self.config.stat_tolerance);
     }
 
     /// Takes the id of the canvas element storing the alphabet.
@@ -54,13 +41,15 @@ impl SymcodeScanner {
         let image = canvas
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
             .to_binary_image(|c| is_black_hsv(&c.to_hsv()));
-        AlphabetReader::read_alphabet_to_library(&mut self.glyph_library, image, params, self.stat_tolerance);
+        AlphabetReader::read_alphabet_to_library(&mut self.glyph_library, image, params, self.config.stat_tolerance);
     }
 
-    pub fn scan_with_config(&self, symcode_config: SymcodeConfig) -> JsValue {
+    pub fn scan(&self) -> JsValue {
         if self.glyph_library.is_empty() {
             return "No templates loaded into the SymcodeScanner instance yet!".into();
         }
+
+        let symcode_config = &self.config;
 
         // Stage 0: Prepare the raw input
         let raw_frame = if let Some(canvas) = &symcode_config.canvas {
@@ -68,9 +57,6 @@ impl SymcodeScanner {
         } else {
             return "Cannot read input image from canvas.".into();
         };
-
-        // Wrap the config in a option so that it can be flexibly reused by the components later on
-        let symcode_config = &Some(symcode_config);
         
         // Stage 1: Locate finder candidates
         let finder_positions = match FinderCandidate::process(

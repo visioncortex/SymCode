@@ -39,10 +39,8 @@ impl ScanningProcessor for FinderCandidate {
 
     type Params = SymcodeConfig;
 
-    fn process(input: Self::Input, params: &Option<Self::Params>) -> Result<Self::Output, &str> {
+    fn process(input: Self::Input, params: &Self::Params) -> Result<Self::Output, &str> {
         Self::valid_input_and_params(&input, params)?;
-
-        let params = params.as_ref().unwrap();
 
         // Get the reference to the input raw frame
         let raw_frame = unsafe {&*input};
@@ -64,11 +62,7 @@ impl ScanningProcessor for FinderCandidate {
         }
     }
 
-    fn valid_input_and_params(input: &Self::Input, params: &Option<Self::Params>) -> Result<(), &'static str> {
-        let params = if let Some(params) = params {params} else {
-            return Err("FinderCandidates Processor expects params.");
-        };
-
+    fn valid_input_and_params(input: &Self::Input, params: &Self::Params) -> Result<(), &'static str> {
         if params.finder_positions.len() < 4 {
             return Err("Number of finder candidates specified in FinderCandidates' params is less than 4.");
         }
