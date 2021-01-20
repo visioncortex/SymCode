@@ -1,6 +1,6 @@
 use visioncortex::{BinaryImage, ColorImage, PointI32, Shape};
 
-use crate::{scanning::{SymcodeConfig, binarize_image_util, finder::Finder, pipeline::ScanningProcessor, render_binary_image_to_canvas}, util::console_log_util};
+use crate::{scanning::{SymcodeConfig, binarize_image_util, finder::Finder, pipeline::ScanningProcessor, render_binary_image_to_canvas, valid_pointf64_on_image}, util::console_log_util};
 
 /// Specific implementation of Finder
 pub(crate) struct FinderCandidate;
@@ -73,7 +73,12 @@ impl ScanningProcessor for FinderCandidate {
             return Err("Number of finder candidates specified in FinderCandidates' params is less than 4.");
         }
 
-        // Each finder position cannot be out of 
+        // Each finder position cannot be out of boundary of the code
+        for &finder in params.finder_positions.iter() {
+            if !valid_pointf64_on_image(finder, params.code_width, params.code_height) {
+                return Err("A finder is out of the boundary in the object space.");
+            }
+        }
 
         Ok(())
     }
