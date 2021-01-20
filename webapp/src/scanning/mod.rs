@@ -3,7 +3,7 @@ pub mod finder;
 pub mod reader;
 pub mod scanner;
 pub mod symcode_config;
-pub mod transformer;
+pub mod fitter;
 pub mod pipeline;
 pub mod util;
 
@@ -12,5 +12,5 @@ pub use finder::*;
 pub use reader::*;
 pub use scanner::*;
 pub use symcode_config::*;
-pub use transformer::*;
+pub use fitter::*;
 pub(crate) use util::*;

@@ -1,11 +1,11 @@
 use visioncortex::{PointF64, PointI32};
 
-use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{SymcodeConfig, Transformer as TransformerInterface, pipeline::ScanningProcessor}};
+use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{SymcodeConfig, Fitter, pipeline::ScanningProcessor}};
 
 /// Implementation of Transformer
-pub(crate) struct Transformer;
+pub(crate) struct TransformFitter;
 
-impl Transformer {
+impl TransformFitter {
     /// Use the top of each finder in object space as check points
     fn calculate_check_points(symcode_config: &crate::scanning::SymcodeConfig) -> Vec<PointF64> {
         symcode_config.finder_positions.iter()
@@ -14,7 +14,7 @@ impl Transformer {
     }
 }
 
-impl TransformerInterface for Transformer {
+impl Fitter for TransformFitter {
     fn correct_spatial_arrangement(finder_positions_image: &[PointF64]) -> bool {
         clockwise_points_f64(&finder_positions_image[0], &finder_positions_image[1], &finder_positions_image[2]) &&
         clockwise_points_f64(&finder_positions_image[0], &finder_positions_image[3], &finder_positions_image[1]) &&
@@ -47,14 +47,14 @@ impl TransformerInterface for Transformer {
     }
 }
 
-pub struct TransformerInput {
+pub struct TransformFitterInput {
     pub finder_positions_image: Vec<PointI32>,
     pub raw_image_width: usize,
     pub raw_image_height: usize,
 }
 
-impl ScanningProcessor for Transformer {
-    type Input = TransformerInput;
+impl ScanningProcessor for TransformFitter {
+    type Input = TransformFitterInput;
 
     type Output = PerspectiveTransform;
 

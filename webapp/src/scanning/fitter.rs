@@ -5,7 +5,7 @@ use crate::{math::{PerspectiveTransform}};
 
 use super::{SymcodeConfig, valid_pointf64_on_image};
 
-pub trait Transformer {
+pub trait Fitter {
     // Input = Vec<Finders>
     // Output = (rectified) BinaryImage
 

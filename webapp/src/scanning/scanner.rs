@@ -2,7 +2,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, implementation::transformer::{Transformer, TransformerInput}, is_black_hsv, pipeline::ScanningProcessor};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, pipeline::ScanningProcessor};
 
 #[wasm_bindgen]
 pub struct SymcodeScanner {
@@ -59,17 +59,17 @@ impl SymcodeScanner {
 
     pub fn scan_with_config(&self, symcode_config: SymcodeConfig) -> JsValue {
         if self.glyph_library.is_empty() {
-            return "No templates loaded into RawScanner object yet!".into();
+            return "No templates loaded into the SymcodeScanner instance yet!".into();
         }
 
         // Stage 0: Prepare the raw input
         let raw_frame = if let Some(canvas) = &symcode_config.canvas {
             canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
         } else {
-            panic!("Cannot read input image from canvas.");
+            return "Cannot read input image from canvas.".into();
         };
 
-        // Wrap the config in a option so that it can be flexibly reused by other components later on
+        // Wrap the config in a option so that it can be flexibly reused by the components later on
         let symcode_config = &Some(symcode_config);
         
         // Stage 1: Locate finder candidates
@@ -84,8 +84,8 @@ impl SymcodeScanner {
         };
         
         // Stage 2: Fit a perspective transform from the image space to the object space
-        let image_to_object = match Transformer::process(
-            TransformerInput {
+        let image_to_object = match TransformFitter::process(
+            TransformFitterInput {
                 finder_positions_image: finder_positions,
                 raw_image_width: raw_frame.width,
                 raw_image_height: raw_frame.height,
