@@ -49,7 +49,7 @@ function scan_from_canvas(canvas_id) {
         }
         const result = scanner.scan_with_config(config);
         console.log(result);
-        console.log("Scanning finishes in " + (new Date() - startTime) / 1000 + " seconds.");
+        console.log("Scanning finishes in " + (new Date() - startTime) + " ms.");
         resolve(result.localeCompare("Success") == 0);
     });
 }
