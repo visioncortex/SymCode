@@ -18,7 +18,7 @@ pub trait Transformer {
 
     /// Defines the metric of evaluating a transform with the potential finder points.
     /// Returns the error of the input transform, it should be the smallest when the finders are in the correct positions.
-    fn evaluate_transform(img_to_obj: &PerspectiveTransform, finder_src_points: &[PointF64], symcode_config: &SymcodeConfig) -> f64;
+    fn evaluate_transform(img_to_obj: &PerspectiveTransform, finder_positions_image: &[PointF64], symcode_config: &SymcodeConfig) -> f64;
     
     /// Given finder candidates positions on the image and finder positions in the object space,
     /// find the "correct" perspective transform that maps the image space to the object space.
