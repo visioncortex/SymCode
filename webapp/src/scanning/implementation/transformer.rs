@@ -1,6 +1,6 @@
-use visioncortex::{BinaryImage, ColorImage, PointF64, PointI32};
+use visioncortex::{PointF64, PointI32};
 
-use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{SymcodeConfig, Transformer as TransformerInterface, binarize_image_util, pipeline::ScanningProcessor, render_color_image_to_canvas}};
+use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{SymcodeConfig, Transformer as TransformerInterface, pipeline::ScanningProcessor}};
 
 /// Implementation of Transformer
 pub(crate) struct Transformer;
@@ -45,21 +45,18 @@ impl TransformerInterface for Transformer {
         // Return the sum of the norms of the errors
         acc_error
     }
-
-    fn binarize_image(image: &visioncortex::ColorImage) -> visioncortex::BinaryImage {
-        binarize_image_util(image)
-    }
 }
 
-pub(crate) struct TransformerInput {
-    pub raw_image: ColorImage,
+pub struct TransformerInput {
     pub finder_positions_image: Vec<PointI32>,
+    pub raw_image_width: usize,
+    pub raw_image_height: usize,
 }
 
 impl ScanningProcessor for Transformer {
     type Input = TransformerInput;
 
-    type Output = BinaryImage;
+    type Output = PerspectiveTransform;
 
     type Params = SymcodeConfig;
 
@@ -79,14 +76,6 @@ impl ScanningProcessor for Transformer {
         }
 
         // Processing starts
-        let rectified_image = Self::transform_image(input.raw_image, input.finder_positions_image, params)?;
-        // Render rectified image to debug canvas
-        if let Some(debug_canvas) = &params.debug_canvas {
-            if render_color_image_to_canvas(&rectified_image.to_color_image(), debug_canvas).is_err() {
-                return Err("Cannot render rectified image to debug canvas.");
-            }
-        }
-        
-        Ok(rectified_image)
+        Self::fit_transform(input.raw_image_width, input.raw_image_height, input.finder_positions_image, params)
     }
 }

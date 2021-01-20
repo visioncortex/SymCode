@@ -2,7 +2,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, binarize_image_util, implementation::transformer::{Transformer, TransformerInput}, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, implementation::transformer::{Transformer, TransformerInput}, is_black_hsv, pipeline::ScanningProcessor};
 
 #[wasm_bindgen]
 pub struct SymcodeScanner {
@@ -83,15 +83,16 @@ impl SymcodeScanner {
             }
         };
         
-        // Stage 2: Rectify the raw image using the correct perspective transform
-        let rectified_image = match Transformer::process(
+        // Stage 2: Fit a perspective transform from the image space to the object space
+        let image_to_object = match Transformer::process(
             TransformerInput {
-                raw_image: raw_frame,
                 finder_positions_image: finder_positions,
+                raw_image_width: raw_frame.width,
+                raw_image_height: raw_frame.height,
             },
             symcode_config
         ) {
-            Ok(rectified_image) => rectified_image,
+            Ok(image_to_object) => image_to_object,
             Err(e) => {
                 return ("Failed at Stage 2: ".to_owned() + e).into();
             }
@@ -100,7 +101,8 @@ impl SymcodeScanner {
         // Stage 3: Recognize the glyphs
         match Recognizer::process(
             RecognizerInput {
-                rectified_image,
+                raw_frame,
+                image_to_object,
                 glyph_library: &self.glyph_library,
             },
             symcode_config
@@ -111,7 +113,7 @@ impl SymcodeScanner {
                 "Success".into()
             },
             Err(e) => {
-                return ("Failed at Stage 3: ".to_owned() + e).into();
+                ("Failed at Stage 3: ".to_owned() + e).into()
             }
         }
     }

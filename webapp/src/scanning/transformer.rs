@@ -1,5 +1,5 @@
 use permutator::{Combination, Permutation};
-use visioncortex::{BinaryImage, ColorImage, Point2, PointF32, PointF64, bilinear_interpolate};
+use visioncortex::{Point2,  PointF64};
 
 use crate::{math::{PerspectiveTransform}};
 
@@ -19,12 +19,34 @@ pub trait Transformer {
     /// Defines the metric of evaluating a transform with the potential finder points.
     /// Returns the error of the input transform, it should be the smallest when the finders are in the correct positions.
     fn evaluate_transform(img_to_obj: &PerspectiveTransform, finder_positions_image: &[PointF64], symcode_config: &SymcodeConfig) -> f64;
+
+    /// Check if the 4 corners in the object space will map to out-of-bound points in the image space.
+    ///
+    /// Those are points that cannot be sampled.
+    fn transform_to_image_out_of_bound(image_width: usize, image_height: usize, image_to_object: &PerspectiveTransform, symcode_config: &SymcodeConfig) -> bool {
+        let w = (symcode_config.code_width-1) as f64;
+        let h = (symcode_config.code_height-1) as f64;
+        let points_to_test = [
+            PointF64::new(0.0, 0.0), PointF64::new(w, 0.0),
+            PointF64::new(0.0, h), PointF64::new(w, h),
+        ];
+
+        for &point in points_to_test.iter() {
+            let point_in_image_space = image_to_object.transform_inverse(point);
+            
+            if !valid_pointf64_on_image(point_in_image_space, image_width, image_height) {
+                return true;
+            }
+        }
+        
+        false
+    }
     
     /// Given finder candidates positions on the image and finder positions in the object space,
     /// find the "correct" perspective transform that maps the image space to the object space.
     ///
     /// symcode_config is used to evaluate the potential transforms.
-    fn fit_transform<T>(finder_positions_image: Vec<Point2<T>>, symcode_config: &SymcodeConfig) -> Result<PerspectiveTransform, &str>
+    fn fit_transform<T>(image_width: usize, image_height: usize, finder_positions_image: Vec<Point2<T>>, symcode_config: &SymcodeConfig) -> Result<PerspectiveTransform, &str>
     where T: Copy + Into<f64>
     {
         let dst_pts = &symcode_config.finder_positions;
@@ -50,60 +72,15 @@ pub trait Transformer {
             });
         });
         if min_error > symcode_config.rectify_error_threshold {
-            Err("Minimum transform error is larger than rectify error threshold")
+           return Err("Minimum transform error is larger than rectify error threshold");
+        }
+        // Check if a "best" transform was found
+        let best_transform = best_transform?;
+        // Check if it maps a point to out of bound
+        if Self::transform_to_image_out_of_bound(image_width, image_height, &best_transform, symcode_config) {
+            Err("Transform to image out of bound.")
         } else {
-            best_transform
+            Ok(best_transform)
         }
-    }
-    /// Check if the 4 corners in the object space will map to out-of-bound points in the image space.
-    ///
-    /// Those are points that cannot be sampled.
-    fn transform_to_image_out_of_bound(image: &ColorImage, image_to_object: &PerspectiveTransform, symcode_config: &SymcodeConfig) -> bool {
-        let w = (symcode_config.code_width-1) as f64;
-        let h = (symcode_config.code_height-1) as f64;
-        let points_to_test = [
-            PointF64::new(0.0, 0.0), PointF64::new(w, 0.0),
-            PointF64::new(0.0, h), PointF64::new(w, h),
-        ];
-
-        for &point in points_to_test.iter() {
-            let point_in_image_space = image_to_object.transform_inverse(point);
-            
-            if !valid_pointf64_on_image(point_in_image_space, image) {
-                return true;
-            }
-        }
-        
-        false
-    }
-
-    /// This function will be used to binarize the rectified input image
-    fn binarize_image(image: &ColorImage) -> BinaryImage;
-
-    /// Rectify the input image into object space and binarize it
-    fn transform_image<T: std::marker::Copy + Into<f64>>(image: ColorImage, finder_positions_image: Vec<Point2<T>>, symcode_config: &SymcodeConfig) -> Result<BinaryImage, &str> {
-        let image_to_object = Self::fit_transform(finder_positions_image, symcode_config)?;
-        if Self::transform_to_image_out_of_bound(&image, &image_to_object, symcode_config) {
-            return Err("Transform to image out of bound.");
-        }
-
-        let code_width = symcode_config.code_width;
-        let code_height = symcode_config.code_height;
-
-        let mut rectified_image = ColorImage::new_w_h(code_width, code_height);
-        // For each point in object space
-        for x in 0..code_width {
-            for y in 0..code_height {
-                // Obtains the sample point in image space
-                let position_in_image_space = image_to_object.transform_inverse(PointF64::new(x as f64, y as f64)).to_point_f32();
-
-                // Interpolate the color there
-                rectified_image.set_pixel(x, y,
-                    &bilinear_interpolate(&image, position_in_image_space)
-                );
-            }
-        }
-
-        Ok(Self::binarize_image(&rectified_image))
     }
 }

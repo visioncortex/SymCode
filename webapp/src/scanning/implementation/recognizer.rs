@@ -1,6 +1,6 @@
-use visioncortex::BinaryImage;
+use visioncortex::{ColorImage};
 
-use crate::scanning::{GlyphReader, SymcodeConfig, pipeline::ScanningProcessor};
+use crate::{math::PerspectiveTransform, scanning::{GlyphReader, SymcodeConfig, pipeline::ScanningProcessor}};
 
 use super::{GlyphLabel, GlyphLibrary};
 
@@ -21,7 +21,8 @@ impl GlyphReader for Recognizer {
 }
 
 pub struct RecognizerInput {
-    pub rectified_image: BinaryImage,
+    pub raw_frame: ColorImage,
+    pub image_to_object: PerspectiveTransform,
     pub glyph_library: *const GlyphLibrary,
 }
 
@@ -49,6 +50,6 @@ impl ScanningProcessor for Recognizer {
 
         // Processing starts
         let glyph_library = unsafe {&*input.glyph_library};
-        Ok(Self::read_glyphs_from_rectified_image(input.rectified_image, glyph_library, params))
+        Ok(Self::read_glyphs_from_raw_frame(input.raw_frame, input.image_to_object, glyph_library, params))
     }
 }

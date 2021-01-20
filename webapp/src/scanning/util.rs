@@ -27,9 +27,9 @@ pub(crate) fn is_black_rgb(color: &Color) -> bool {
     r*r + g*g + b*b < 3*128*128
 }
 
-pub(crate) fn valid_pointf64_on_image(point: PointF64, image: &ColorImage) -> bool {
-    let w_upper = (image.width - 1) as f64;
-    let h_upper = (image.height - 1) as f64;
+pub(crate) fn valid_pointf64_on_image(point: PointF64, image_width: usize, image_height: usize) -> bool {
+    let w_upper = (image_width - 1) as f64;
+    let h_upper = (image_height - 1) as f64;
 
     0.0 <= point.x && point.x <= w_upper &&
     0.0 <= point.y && point.y <= h_upper
