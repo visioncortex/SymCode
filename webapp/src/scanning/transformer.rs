@@ -52,7 +52,7 @@ pub trait Transformer {
         if min_error > symcode_config.rectify_error_threshold {
             Err("Minimum transform error is larger than rectify error threshold")
         } else {
-            Ok(best_transform?)
+            best_transform
         }
     }
     /// Check if the 4 corners in the object space will map to out-of-bound points in the image space.
@@ -95,8 +95,7 @@ pub trait Transformer {
         for x in 0..code_width {
             for y in 0..code_height {
                 // Obtains the sample point in image space
-                let position_in_image_space = image_to_object.transform_inverse(PointF64::new(x as f64, y as f64));
-                let position_in_image_space = PointF32::new(position_in_image_space.x as f32, position_in_image_space.y as f32);
+                let position_in_image_space = image_to_object.transform_inverse(PointF64::new(x as f64, y as f64)).to_point_f32();
 
                 // Interpolate the color there
                 rectified_image.set_pixel(x, y,
