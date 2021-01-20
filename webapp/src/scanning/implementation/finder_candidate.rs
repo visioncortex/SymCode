@@ -1,12 +1,16 @@
-use visioncortex::{BinaryImage, PointI32, Shape};
+use visioncortex::{BinaryImage, ColorImage, PointI32, Shape};
 
-use crate::{scanning::{SymcodeConfig, finder::Finder, pipeline::ScanningProcessor}, util::console_log_util};
+use crate::{scanning::{SymcodeConfig, binarize_image_util, finder::Finder, pipeline::ScanningProcessor, render_binary_image_to_canvas}, util::console_log_util};
 
 
 /// Specific implementation of Finder
 pub(crate) struct FinderCandidate;
 
 impl Finder for FinderCandidate {
+    fn binarize_input_image(image: &ColorImage) -> BinaryImage {
+        binarize_image_util(image)
+    }
+
     fn shape_is_finder(image: BinaryImage) -> bool {
         Shape::from(image).is_circle()
     }
@@ -14,7 +18,7 @@ impl Finder for FinderCandidate {
 
 // FinderCandidate as a pipeline component
 impl ScanningProcessor for FinderCandidate {
-    type Input = BinaryImage;
+    type Input = *const ColorImage;
 
     type Output = Vec<PointI32>;
 
@@ -35,8 +39,17 @@ impl ScanningProcessor for FinderCandidate {
             return Err("Invalid params in FinderCandidates.");
         }
 
+        // Get the reference to the input raw frame
+        let raw_frame = unsafe {&*input};
+        // Binarize
+        let binary_raw_frame = binarize_image_util(raw_frame);
+        // Take a look
+        if let Some(canvas) = &params.canvas {
+            render_binary_image_to_canvas(&binary_raw_frame, canvas);
+        }
+
         // Processing starts
-        let finder_candidates = Self::extract_finder_positions(input);
+        let finder_candidates = Self::extract_finder_positions(binary_raw_frame);
         console_log_util(&format!("Extracted {} finder candidates from raw frame.", finder_candidates.len()));
 
         if finder_candidates.len() > params.max_finder_candidates() {

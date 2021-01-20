@@ -1,9 +1,12 @@
-use visioncortex::{BinaryImage, PointI32};
+use visioncortex::{BinaryImage, ColorImage, PointI32};
 
 pub trait Finder {
     // Input = Image
     // Output = Vec<Point2>
 
+    /// Binarize the input image so that binary clustering can be applied on it.
+    fn binarize_input_image(image: &ColorImage) -> BinaryImage;
+    
     /// Returns true iff the input image has the shape of a valid finder.
     ///
     /// Note that perspective distortion has to be taken into account.

@@ -68,18 +68,13 @@ impl SymcodeScanner {
         } else {
             panic!("Cannot read input image from canvas.");
         };
-        let binary_raw_frame = binarize_image_util(&raw_frame);
-        // Take a look
-        if let Some(canvas) = &symcode_config.canvas {
-            render_binary_image_to_canvas(&binary_raw_frame, canvas);
-        }
 
         // Wrap the config in a option so that it can be flexibly reused by other components later on
         let symcode_config = &Some(symcode_config);
         
         // Stage 1: Locate finder candidates
         let finder_positions = match FinderCandidate::process(
-            binary_raw_frame,
+            &raw_frame,
             symcode_config
         ) {
             Ok(finder_positions) => finder_positions,
