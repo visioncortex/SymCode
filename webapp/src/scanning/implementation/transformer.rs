@@ -5,6 +5,15 @@ use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, 
 /// Implementation of Transformer
 pub(crate) struct Transformer;
 
+impl Transformer {
+    /// Use the top of each finder in object space as check points
+    fn calculate_check_points(symcode_config: &crate::scanning::SymcodeConfig) -> Vec<PointF64> {
+        symcode_config.finder_positions.iter()
+            .map(|p| PointF64::new(p.x, p.y - (symcode_config.symbol_height >> 1) as f64))
+            .collect()
+    }
+}
+
 impl TransformerInterface for Transformer {
     fn correct_spatial_arrangement(finder_positions_image: &[PointF64]) -> bool {
         clockwise_points_f64(&finder_positions_image[0], &finder_positions_image[1], &finder_positions_image[2]) &&
@@ -12,7 +21,9 @@ impl TransformerInterface for Transformer {
         clockwise_points_f64(&finder_positions_image[2], &finder_positions_image[1], &finder_positions_image[3])
     }
 
-    fn evaluate_transform(img_to_obj: &PerspectiveTransform, finder_src_points: &[PointF64], check_points: &[PointF64]) -> f64 {
+    fn evaluate_transform(img_to_obj: &PerspectiveTransform, finder_src_points: &[PointF64], symcode_config: &SymcodeConfig) -> f64 {
+        let check_points = &Self::calculate_check_points(symcode_config);
+        
         if finder_src_points.len() != check_points.len() {
             panic!("Number of finder source points and number of check points do not agree in transform evaluation.");
         }
@@ -33,13 +44,6 @@ impl TransformerInterface for Transformer {
 
         // Return the sum of the norms of the errors
         acc_error
-    }
-
-    /// Use the top of each finder in object space as check points
-    fn calculate_check_points(finder_positions_object: &[PointF64], symcode_config: &crate::scanning::SymcodeConfig) -> Vec<PointF64> {
-        finder_positions_object.iter()
-            .map(|p| PointF64::new(p.x, p.y - (symcode_config.symbol_height >> 1) as f64))
-            .collect()
     }
 
     fn binarize_image(image: &visioncortex::ColorImage) -> visioncortex::BinaryImage {
