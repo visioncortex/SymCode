@@ -1,4 +1,5 @@
 import { SymcodeScanner, SymcodeConfig, AlphabetReaderParams } from "symcode";
+import CONFIG from "./config";
 
 const scanner = SymcodeScanner.new();
 const canvas = document.getElementById('frame');
@@ -13,6 +14,8 @@ const numTemplates = 4;
 
 let debugging = true;
 let finishScanning = false;
+
+const config = SymcodeConfig.from_json_string(JSON.stringify(CONFIG.SYMCODE_CONFIG));
 
 const inputFrameSize = {
     width: 350,
@@ -43,10 +46,6 @@ function scanImageFromSource(source) {
 function scan_from_canvas(canvas_id) {
     return new Promise((resolve) => {
         let startTime = new Date();
-        let config = SymcodeConfig.from_canvas_id(canvas_id);
-        if (debugging) {
-            config = config.debug_canvas('debug');
-        }
         const result = scanner.scan_with_config(config);
         console.log(result);
         console.log("Scanning finishes in " + (new Date() - startTime) + " ms.");

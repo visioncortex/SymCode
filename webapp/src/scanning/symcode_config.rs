@@ -162,3 +162,34 @@ impl SymcodeConfig {
         }
     }
 }
+
+#[wasm_bindgen]
+impl SymcodeConfig {
+    pub fn from_json_string(json_string: &str) -> Self {
+        let json: serde_json::Value = serde_json::from_str(json_string).unwrap();
+
+        let finder_positions: Vec<PointF64> = json["finder_positions"].as_array().unwrap().iter().map(|p| {
+            PointF64::new(p["x"].as_f64().unwrap(), p["y"].as_f64().unwrap())
+        }).collect();
+
+        let glyph_anchors: Vec<PointF64> = json["glyph_anchors"].as_array().unwrap().iter().map(|p| {
+            PointF64::new(p["x"].as_f64().unwrap(), p["y"].as_f64().unwrap())
+        }).collect();
+
+        Self {
+            code_width: json["code_width"].as_i64().unwrap() as usize,
+            code_height: json["code_height"].as_i64().unwrap() as usize,
+            symbol_width: json["symbol_width"].as_i64().unwrap() as usize,
+            symbol_height: json["symbol_height"].as_i64().unwrap() as usize,
+            finder_positions,
+            glyph_anchors,
+            canvas: Canvas::new_from_id(json["canvas"].as_str().unwrap()),
+            debug_canvas: Canvas::new_from_id(json["debug_canvas"].as_str().unwrap()),
+            max_extra_finder_candidates: json["max_extra_finder_candidates"].as_i64().unwrap() as usize,
+            rectify_error_threshold: json["rectify_error_threshold"].as_f64().unwrap(),
+            stat_tolerance: json["stat_tolerance"].as_f64().unwrap(),
+            max_encoding_difference: json["max_encoding_difference"].as_i64().unwrap() as usize,
+            empty_cluster_threshold: json["empty_cluster_threshold"].as_f64().unwrap(),
+        }
+    }
+}
