@@ -35,18 +35,14 @@ impl ScanningProcessor for Recognizer {
 
     fn process(input: Self::Input, params: &Option<Self::Params>) -> Result<Self::Output, &str> {
         // Validates input and params
-        if !Self::valid_input(&input) {
-            return Err("Invalid input in Recognizer.");
-        }
+        Self::valid_input(&input)?;
 
         let params = match params {
             Some(params) => params,
             None => {return Err("Recognizer Processor expects params!");}
         };
 
-        if !Self::valid_params(params) {
-            return Err("Invalid params in Recognizer.");
-        }
+        Self::valid_params(params)?;
 
         // Processing starts
         let glyph_library = unsafe {&*input.glyph_library};

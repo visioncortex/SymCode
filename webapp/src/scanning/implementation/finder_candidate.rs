@@ -41,18 +41,14 @@ impl ScanningProcessor for FinderCandidate {
 
     fn process(input: Self::Input, params: &Option<Self::Params>) -> Result<Self::Output, &str> {
         // Validates input and params
-        if !Self::valid_input(&input) {
-            return Err("Invalid input in FinderCandidates.");
-        }
+        Self::valid_input(&input)?;
 
         let params = match params {
             Some(params) => params,
             None => {return Err("FinderCandidates Processor expects params!");}
         };
 
-        if !Self::valid_params(params) {
-            return Err("Invalid params in FinderCandidates.");
-        }
+        Self::valid_params(params)?;
 
         // Get the reference to the input raw frame
         let raw_frame = unsafe {&*input};

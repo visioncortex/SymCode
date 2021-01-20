@@ -62,18 +62,14 @@ impl ScanningProcessor for TransformFitter {
 
     fn process(input: Self::Input, params: &Option<Self::Params>) -> Result<Self::Output, &str> {
         // Validates input and params
-        if !Self::valid_input(&input) {
-            return Err("Invalid input in Transformer.");
-        }
+        Self::valid_input(&input)?;
 
         let params = match params {
             Some(params) => params,
             None => {return Err("Transformer Processor expects params!");}
         };
 
-        if !Self::valid_params(params) {
-            return Err("Invalid params in Transformer.");
-        }
+        Self::valid_params(params)?;
 
         // Processing starts
         Self::fit_transform(input.raw_image_width, input.raw_image_height, input.finder_positions_image, params)
