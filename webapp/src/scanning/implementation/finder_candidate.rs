@@ -2,17 +2,32 @@ use visioncortex::{BinaryImage, ColorImage, PointI32, Shape};
 
 use crate::{scanning::{SymcodeConfig, binarize_image_util, finder::Finder, pipeline::ScanningProcessor, render_binary_image_to_canvas}, util::console_log_util};
 
-
 /// Specific implementation of Finder
 pub(crate) struct FinderCandidate;
 
-impl Finder for FinderCandidate {
-    fn binarize_input_image(image: &ColorImage) -> BinaryImage {
-        binarize_image_util(image)
-    }
-
+impl FinderCandidate {
     fn shape_is_finder(image: BinaryImage) -> bool {
         Shape::from(image).is_circle()
+    }
+}
+
+impl Finder for FinderCandidate {
+    type FrameInput = BinaryImage;
+
+    type FinderElement = PointI32;
+
+    fn extract_finder_positions(image: Self::FrameInput) -> Vec<Self::FinderElement> {
+        let clusters = image.to_clusters(false);
+        
+        clusters.clusters.iter()
+            .filter_map(|cluster| {
+                if Self::shape_is_finder(cluster.to_binary_image()) {
+                    Some(cluster.rect.center())
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 }
 
