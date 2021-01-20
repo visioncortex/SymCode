@@ -79,18 +79,14 @@ impl ScanningProcessor for Transformer {
         }
 
         // Processing starts
-        if let Some(rectified_image) = Self::transform_image(input.raw_image, input.finder_positions_image, params) {
-            // Render rectified image to debug canvas
-            if let Some(debug_canvas) = &params.debug_canvas {
-                match render_color_image_to_canvas(&rectified_image.to_color_image(), debug_canvas) {
-                    Ok(_) => {},
-                    Err(_) => {return Err("Cannot render rectified image to debug canvas.")},
-                }
+        let rectified_image = Self::transform_image(input.raw_image, input.finder_positions_image, params)?;
+        // Render rectified image to debug canvas
+        if let Some(debug_canvas) = &params.debug_canvas {
+            if render_color_image_to_canvas(&rectified_image.to_color_image(), debug_canvas).is_err() {
+                return Err("Cannot render rectified image to debug canvas.");
             }
-            
-            Ok(rectified_image)
-        } else {
-            Err("Cannot rectify image")
         }
+        
+        Ok(rectified_image)
     }
 }

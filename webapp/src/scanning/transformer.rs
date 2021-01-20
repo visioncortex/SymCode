@@ -1,7 +1,7 @@
 use permutator::{Combination, Permutation};
 use visioncortex::{BinaryImage, ColorImage, Point2, PointF32, PointF64, bilinear_interpolate};
 
-use crate::{math::{PerspectiveTransform}, util::console_log_util};
+use crate::{math::{PerspectiveTransform}};
 
 use super::{SymcodeConfig, valid_pointf64_on_image};
 
@@ -24,18 +24,17 @@ pub trait Transformer {
     /// find the "correct" perspective transform that maps the image space to the object space.
     ///
     /// symcode_config is used to evaluate the potential transforms.
-    fn fit_transform<T>(finder_positions_image: Vec<Point2<T>>, symcode_config: &SymcodeConfig) -> Option<PerspectiveTransform>
+    fn fit_transform<T>(finder_positions_image: Vec<Point2<T>>, symcode_config: &SymcodeConfig) -> Result<PerspectiveTransform, &str>
     where T: Copy + Into<f64>
     {
         let dst_pts = &symcode_config.finder_positions;
         let num_finders = dst_pts.len();
 
         if finder_positions_image.len() < num_finders {
-            console_log_util(&"Fitter error: Not enough finder candidates in this frame.");
-            return None;
+            return Err("Fitter error: Not enough finder candidates in this frame.");
         }
         
-        let mut best_transform = None;
+        let mut best_transform = Err("No spatial arrangement for the finder candidates is correct");
         let mut min_error = std::f64::MAX;
         finder_positions_image.combination(num_finders).for_each(|mut c| {
             c.permutation().for_each(|src_pts| {
@@ -44,16 +43,16 @@ pub trait Transformer {
                     let transform = PerspectiveTransform::from_point_f64(&src_pts, dst_pts);
                     let error = Self::evaluate_transform(&transform, &src_pts, symcode_config);
                     if error < min_error {
-                        best_transform = Some(transform);
+                        best_transform = Ok(transform);
                         min_error = error;
                     }
                 }
             });
         });
         if min_error > symcode_config.rectify_error_threshold {
-            None
+            Err("Minimum transform error is larger than rectify error threshold")
         } else {
-            Some(best_transform?)
+            Ok(best_transform?)
         }
     }
     /// Check if the 4 corners in the object space will map to out-of-bound points in the image space.
@@ -82,10 +81,10 @@ pub trait Transformer {
     fn binarize_image(image: &ColorImage) -> BinaryImage;
 
     /// Rectify the input image into object space and binarize it
-    fn transform_image<T: std::marker::Copy + Into<f64>>(image: ColorImage, finder_positions_image: Vec<Point2<T>>, symcode_config: &SymcodeConfig) -> Option<BinaryImage> {
+    fn transform_image<T: std::marker::Copy + Into<f64>>(image: ColorImage, finder_positions_image: Vec<Point2<T>>, symcode_config: &SymcodeConfig) -> Result<BinaryImage, &str> {
         let image_to_object = Self::fit_transform(finder_positions_image, symcode_config)?;
         if Self::transform_to_image_out_of_bound(&image, &image_to_object, symcode_config) {
-            return None;
+            return Err("Transform to image out of bound.");
         }
 
         let code_width = symcode_config.code_width;
@@ -106,6 +105,6 @@ pub trait Transformer {
             }
         }
 
-        Some(Self::binarize_image(&rectified_image))
+        Ok(Self::binarize_image(&rectified_image))
     }
 }
