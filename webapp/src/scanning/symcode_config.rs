@@ -58,8 +58,14 @@ impl Default for SymcodeConfig {
 }
 
 impl SymcodeConfig {
+    #[inline]
     pub fn max_finder_candidates(&self) -> usize {
         self.finder_positions.len() + self.max_extra_finder_candidates
+    }
+
+    #[inline]
+    pub fn absolute_empty_cluster_threshold(&self) -> u64 {
+        (self.empty_cluster_threshold * (self.symbol_width * self.symbol_height) as f64) as u64
     }
 }
 

@@ -16,7 +16,7 @@ pub trait GlyphReader {
 
     /// Assuming the perspective transform done in the previous stage is accurate,
     /// the areas at the anchors should be where the glyphs are.
-    fn crop_at_anchor(anchor: &PointF64, image: &ColorImage, image_to_object: &PerspectiveTransform, symcode_config: &SymcodeConfig, absolute_empty_cluster_threshold: u64) -> Option<BinaryImage> {
+    fn crop_at_anchor(anchor: &PointF64, image: &ColorImage, image_to_object: &PerspectiveTransform, symcode_config: &SymcodeConfig) -> Option<BinaryImage> {
         let width = symcode_config.symbol_width;
         let height = symcode_config.symbol_height;
         let mut crop = BinaryImage::new_w_h(width, height);
@@ -27,7 +27,7 @@ pub trait GlyphReader {
                 crop.set_pixel(x, y, is_black_rgb(&interpolated_color));
             }
         }
-        if crop.area() <= absolute_empty_cluster_threshold {
+        if crop.area() <= symcode_config.absolute_empty_cluster_threshold() {
             None
         } else {
             Some(crop)
@@ -39,10 +39,9 @@ pub trait GlyphReader {
 
     /// Read all glyphs at the anchors on the input image
     fn read_glyphs_from_raw_frame(image: ColorImage, image_to_object: PerspectiveTransform, glyph_library: &Self::Library, symcode_config: &crate::scanning::SymcodeConfig) -> Vec<Option<Self::Label>> {
-        let absolute_empty_cluster_threshold = (symcode_config.empty_cluster_threshold * (symcode_config.symbol_width * symcode_config.symbol_height) as f64) as u64;
         symcode_config.glyph_anchors.iter()
             .map(|anchor| {
-                let crop = Self::crop_at_anchor(anchor, &image, &image_to_object, symcode_config, absolute_empty_cluster_threshold)?;
+                let crop = Self::crop_at_anchor(anchor, &image, &image_to_object, symcode_config)?;
                 Some(Self::find_most_similar_glyph(crop, glyph_library, symcode_config))
             })
             .collect()
