@@ -3,6 +3,8 @@ use wasm_bindgen::prelude::*;
 
 use crate::canvas::Canvas;
 
+use super::valid_pointf64_on_image;
+
 #[wasm_bindgen]
 pub struct SymcodeConfig {
     pub code_width: usize,
@@ -135,5 +137,28 @@ impl SymcodeConfig {
     pub fn empty_cluster_threshold(mut self, empty_cluster_threshold: f64) -> Self {
         self.empty_cluster_threshold = empty_cluster_threshold;
         self
+    }
+}
+
+#[wasm_bindgen]
+impl SymcodeConfig {
+    pub fn add_finder_position(&mut self, x: f64, y: f64) -> String {
+        let finder_position = PointF64::new(x, y);
+        if valid_pointf64_on_image(finder_position, self.code_width, self.code_height) {
+            self.finder_positions.push(finder_position);
+            format!("Finder ({}, {}) added.", x, y)
+        } else {
+            format!("Finder ({}, {}) is not within the boundary of the code.", x, y)
+        }
+    }
+
+    pub fn add_glyph_anchor(&mut self, x: f64, y: f64) -> String {
+        let glyph_anchor = PointF64::new(x, y);
+        if valid_pointf64_on_image(glyph_anchor, self.code_width, self.code_height) {
+            self.glyph_anchors.push(glyph_anchor);
+            format!("Glyph anchor ({}, {}) added.", x, y)
+        } else {
+            format!("Glyph anchor ({}, {}) is not within the boundary of the code.", x, y)
+        }
     }
 }
