@@ -35,7 +35,7 @@ pub trait Transformer {
             return None;
         }
         
-        let mut best_transform = PerspectiveTransform::default();
+        let mut best_transform = None;
         let mut min_error = std::f64::MAX;
         finder_positions_image.combination(num_finders).for_each(|mut c| {
             c.permutation().for_each(|src_pts| {
@@ -44,7 +44,7 @@ pub trait Transformer {
                     let transform = PerspectiveTransform::from_point_f64(&src_pts, dst_pts);
                     let error = Self::evaluate_transform(&transform, &src_pts, symcode_config);
                     if error < min_error {
-                        best_transform = transform;
+                        best_transform = Some(transform);
                         min_error = error;
                     }
                 }
@@ -53,7 +53,7 @@ pub trait Transformer {
         if min_error > symcode_config.rectify_error_threshold {
             None
         } else {
-            Some(best_transform)
+            Some(best_transform?)
         }
     }
     /// Check if the 4 corners in the object space will map to out-of-bound points in the image space.
