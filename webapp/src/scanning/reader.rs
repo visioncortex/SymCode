@@ -1,6 +1,6 @@
 use std::u64;
 
-use visioncortex::{BinaryImage, ColorImage, PointF64, bilinear_interpolate};
+use visioncortex::{BinaryImage, ColorImage, PointF64, PointI32, bilinear_interpolate};
 
 use crate::math::PerspectiveTransform;
 
@@ -39,17 +39,18 @@ pub trait GlyphReader {
 
     /// Read all glyphs at the anchors on the input image
     fn read_glyphs_from_raw_frame(image: ColorImage, image_to_object: PerspectiveTransform, glyph_library: &Self::Library, symcode_config: &crate::scanning::SymcodeConfig) -> Vec<Option<Self::Label>> {
-        let mut rectified_image = BinaryImage::new_w_h(symcode_config.code_width, symcode_config.code_height);
-        let result = symcode_config.glyph_anchors.iter()
-            .map(|anchor| {
+        const DEBUG_OFFSET: usize = 20;
+        let mut debug_code_image = BinaryImage::new_w_h(DEBUG_OFFSET + (symcode_config.symbol_width + DEBUG_OFFSET) * symcode_config.glyph_anchors.len(), symcode_config.symbol_height + 2*DEBUG_OFFSET);
+        let result = symcode_config.glyph_anchors.iter().enumerate()
+            .map(|(i, anchor)| {
                 let crop = Self::crop_at_anchor(anchor, &image, &image_to_object, symcode_config)?;
-                rectified_image.paste_from(&crop, anchor.to_point_i32());
+                debug_code_image.paste_from(&crop, PointI32::new((DEBUG_OFFSET + i*(symcode_config.symbol_width + DEBUG_OFFSET)) as i32, DEBUG_OFFSET as i32));
                 Some(Self::find_most_similar_glyph(crop, glyph_library, symcode_config))
             })
             .collect();
 
         if let Some(debug_canvas) = &symcode_config.debug_canvas {
-            render_binary_image_to_canvas(&rectified_image, debug_canvas);
+            render_binary_image_to_canvas(&debug_code_image, debug_canvas);
         }
         
         result
