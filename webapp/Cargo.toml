@@ -24,6 +24,7 @@ permutator = "0.4.0"
 image = "0.23.10"
 num-traits = "0.2"
 num-derive = "0.3"
+rand = { version = "0.7.3", features = ["wasm-bindgen"] }
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires

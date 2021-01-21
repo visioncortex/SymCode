@@ -23,6 +23,8 @@ const inputFrameSize = {
 };
 const fps = 60;
 
+document.getElementById('generate').addEventListener('click', function (e) { scanner.generate_symcode_to_canvas() });
+
 document.getElementById('imageInput').addEventListener('change', function (e) { scanImageFromSource(this.files[0]) });
 
 document.addEventListener('load', loadAlphabet());
@@ -161,7 +163,7 @@ function drawFrame(sx, sy) {
                                         0, 0, canvas.width, canvas.height);
     scan('frame')
         .then((successful) => {
-            if (!successful) {
+            if (!successful && !finishScanning) {
                 sleep(1/fps)
                     .then(() => drawFrame(sx, sy))
             } else {

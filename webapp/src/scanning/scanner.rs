@@ -1,8 +1,9 @@
+use visioncortex::{BinaryImage, PointI32, Shape};
 use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, pipeline::ScanningProcessor};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, glyph, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas};
 
 #[wasm_bindgen]
 #[derive(Default)]
@@ -104,5 +105,38 @@ impl SymcodeScanner {
                 "Failed at Stage 3: ".to_owned() + e
             }
         }
+    }
+
+    pub fn generate_symcode_to_canvas(&self) {
+        let canvas = self.config.canvas.as_ref().unwrap();
+        let symcode = self.generate_symcode();
+
+        if render_binary_image_to_canvas(&symcode, canvas).is_err() {
+            console_log_util("Cannot render generated symcode to canvas.");
+        }
+    }
+
+    fn generate_symcode(&self) -> BinaryImage {
+        let mut symcode = BinaryImage::new_w_h(self.config.code_width, self.config.code_height);
+
+        // Put in the finders
+        let finder_image = Shape::circle(self.config.symbol_width, self.config.symbol_height).image;
+        self.config.finder_positions.iter().for_each(|finder_center| {
+            let top_left = finder_center.to_point_i32() - PointI32::new((self.config.symbol_width >> 1) as i32, (self.config.symbol_height >> 1) as i32);
+            symcode.paste_from(&finder_image, top_left);
+        });
+
+        // Put in the glyphs
+        self.config.glyph_anchors.iter().for_each(|glyph_top_left| {
+            let glyph_index: usize = rand::random();
+            let glyph_index = glyph_index % (self.glyph_library.len() + 1);
+
+            // if glyph_index == glyph_library.len(), this will return None
+            if let Some(glyph_image) = self.glyph_library.get_glyph_image_at(glyph_index) {
+                symcode.paste_from(glyph_image, glyph_top_left.to_point_i32());
+            }
+        });
+
+        symcode
     }
 }
