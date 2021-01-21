@@ -41,7 +41,9 @@ impl SymcodeScanner {
         let image = canvas
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
             .to_binary_image(|c| is_black_hsv(&c.to_hsv()));
-        AlphabetReader::read_alphabet_to_library(&mut self.glyph_library, image, params, self.config.stat_tolerance);
+        if let Some(e) = AlphabetReader::read_alphabet_to_library(&mut self.glyph_library, image, params, self.config.stat_tolerance).err() {
+            console_log_util(e);
+        }
     }
 
     pub fn scan(&self) -> JsValue {

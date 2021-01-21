@@ -1,4 +1,4 @@
-use visioncortex::{BinaryImage, BoundingRect, Color, ColorHsv, ColorImage, PointF64};
+use visioncortex::{BinaryImage, BoundingRect, Color, ColorHsv, ColorImage, PointF64, PointI32};
 use wasm_bindgen::{Clamped, JsValue};
 use web_sys::{ImageData};
 
@@ -25,6 +25,14 @@ pub(crate) fn is_black_rgb(color: &Color) -> bool {
     let b = color.b as u32;
 
     r*r + g*g + b*b < 3*128*128
+}
+
+pub(crate) fn valid_pointi32_on_image(point: PointI32, image_width: usize, image_height: usize) -> bool {
+    let w_upper = (image_width - 1) as i32;
+    let h_upper = (image_height - 1) as i32;
+
+    0 <= point.x && point.x <= w_upper &&
+    0 <= point.y && point.y <= h_upper
 }
 
 pub(crate) fn valid_pointf64_on_image(point: PointF64, image_width: usize, image_height: usize) -> bool {
