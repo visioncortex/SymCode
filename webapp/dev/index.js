@@ -1,20 +1,18 @@
-import { SymcodeScanner, SymcodeConfig, AlphabetReaderParams } from "symcode";
-import CONFIG from "./config";
+import { SymcodeScanner, SymcodeConfig } from "symcode";
+import { SYMCODE_CONFIG } from "./config";
+import { loadAlphabet } from "./load";
 
 const canvas = document.getElementById('frame');
-const loadBuffer = document.getElementById('loadBuffer');
-const loadBufferCtx = loadBuffer.getContext('2d');
 const debugCanvas = document.getElementById('debug');
 const ctx = canvas.getContext('2d');
 const camera = document.getElementById('camera');
 const cameraButton = document.getElementById('cameraButton');
 const img = new Image();
-const numTemplates = 4;
 
 let debugging = true;
 let finishScanning = false;
 
-const scannerConfig = SymcodeConfig.from_json_string(JSON.stringify(CONFIG.SYMCODE_CONFIG));
+const scannerConfig = SymcodeConfig.from_json_string(JSON.stringify(SYMCODE_CONFIG));
 const scanner = SymcodeScanner.from_config(scannerConfig);
 
 const inputFrameSize = {
@@ -23,7 +21,7 @@ const inputFrameSize = {
 };
 const fps = 60;
 
-function loadingCompletes() {
+export function loadingCompletes() {
     console.log("Template loading completes.");
     scanImageFromSource("assets/prototype_4/3.png");
 }
@@ -64,7 +62,7 @@ document.getElementById('generate').addEventListener('click', function (e) {
 
 document.getElementById('imageInput').addEventListener('change', function (e) { scanImageFromSource(this.files[0]) });
 
-document.addEventListener('load', loadAlphabet());
+document.addEventListener('load', loadAlphabet(scanner));
 
 function scanImageFromSource(source) {
     img.src = source instanceof File ? URL.createObjectURL(source) : source;
@@ -82,47 +80,6 @@ function scanImageFromSource(source) {
         } catch (e) {
             handleError(e);
         }
-    };
-}
-
-function loadAllTemplates() {
-    loadTemplateByIndex(1);
-}
-
-function loadTemplateByIndex(index) {
-    if (index > numTemplates) {
-        loadingCompletes();
-        return;
-    }
-    const path = "assets/glyph_templates/" + index + ".jpg";
-    img.src = path;
-    img.onload = function () {
-        loadBuffer.width = img.naturalWidth;
-        loadBuffer.height = img.naturalHeight;
-
-        loadBufferCtx.clearRect(0, 0, loadBuffer.width, loadBuffer.height);
-        loadBufferCtx.drawImage(img, 0, 0);
-
-        scanner.load_template_from_canvas_id('loadBuffer');
-
-        loadTemplateByIndex(index + 1);
-    };
-}
-
-function loadAlphabet() {
-    const path = "assets/alphabet/alphabet2.jpg";
-    const params = AlphabetReaderParams.from_json_string(JSON.stringify(CONFIG.ALPHABET_CONFIG));
-    img.src = path;
-    img.onload = function () {
-        loadBuffer.width = img.naturalWidth;
-        loadBuffer.height = img.naturalHeight;
-
-        loadBufferCtx.clearRect(0, 0, loadBuffer.width, loadBuffer.height);
-        loadBufferCtx.drawImage(img, 0, 0);
-
-        scanner.load_alphabet_from_canvas_id('loadBuffer', params);
-
-        loadingCompletes();
     };
 }
 
