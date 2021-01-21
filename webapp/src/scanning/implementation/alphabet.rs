@@ -98,7 +98,7 @@ impl AlphabetReader {
                 library.add_template(glyph_image, stat_tolerance);
             }
         }
-        //crate::util::console_log_util(&format!("{:?}", library));
+        //crate::util::console_log_util(&library.print_label_and_trace());
         Ok(())
     }
 }

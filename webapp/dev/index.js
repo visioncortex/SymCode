@@ -35,9 +35,9 @@ document.getElementById('generate').addEventListener('click', function (e) {
         .then((result) => {
             console.log("Recognition result: " + result);
             if (result.localeCompare(groundTruthCode) == 0) {
-                console.log("Generated code is correctly recognized.");
+                console.log("%c Generated code is correctly recognized.", "color: #00ff00;");
             } else {
-                console.log("Generated code is INCORRECTLY recognized.");
+                console.log("%c Generated code is INCORRECTLY recognized.", "color: #ff3300;");
             }
         })
         .catch((e) => {
@@ -141,7 +141,7 @@ cameraButton.onclick = function() {
     navigator.mediaDevices
         .getUserMedia(constraints)
         .then(handleSuccess)
-        .catch(handleError);
+        .catch((e) => console.error(e));
 }
 
 function handleSuccess(stream) {
@@ -151,10 +151,6 @@ function handleSuccess(stream) {
         .then(({width, height}) => {
             startStreaming(width, height);
         });
-}
-
-function handleError(error) {
-    console.error("Error: ", error);
 }
 
 function getCameraVideoDimensions() {
