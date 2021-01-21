@@ -28,19 +28,19 @@ pub(crate) fn is_black_rgb(color: &Color) -> bool {
 }
 
 pub(crate) fn valid_pointi32_on_image(point: PointI32, image_width: usize, image_height: usize) -> bool {
-    let w_upper = (image_width - 1) as i32;
-    let h_upper = (image_height - 1) as i32;
+    let w_upper = image_width as i32;
+    let h_upper = image_height as i32;
 
-    0 <= point.x && point.x <= w_upper &&
-    0 <= point.y && point.y <= h_upper
+    0 <= point.x && point.x < w_upper &&
+    0 <= point.y && point.y < h_upper
 }
 
 pub(crate) fn valid_pointf64_on_image(point: PointF64, image_width: usize, image_height: usize) -> bool {
-    let w_upper = (image_width - 1) as f64;
-    let h_upper = (image_height - 1) as f64;
+    let w_upper = image_width as f64;
+    let h_upper = image_height as f64;
 
-    0.0 <= point.x && point.x <= w_upper &&
-    0.0 <= point.y && point.y <= h_upper
+    0.0 <= point.x && point.x < w_upper &&
+    0.0 <= point.y && point.y < h_upper
 }
 
 pub(crate) fn image_diff_area(img1: &BinaryImage, img2: &BinaryImage) -> u64 {
