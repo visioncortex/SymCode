@@ -44,7 +44,7 @@ impl GlyphLibrary {
     pub fn find_most_similar_glyph(&self, image: BinaryImage, symcode_config: &SymcodeConfig) -> GlyphLabel {
         let image = &Sampler::resample_image(&image, symcode_config.symbol_width, symcode_config.symbol_height);
         let input_encoding = &ShapeEncoding::from_image(image, symcode_config.stat_tolerance);
-        console_log_util(&format!("{:?}", input_encoding));
+        //console_log_util(&format!("{:?}", input_encoding));
 
         self.templates.iter()
             .fold( (std::u64::MAX, GlyphLabel::Invalid),
