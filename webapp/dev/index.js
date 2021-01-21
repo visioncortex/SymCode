@@ -28,21 +28,38 @@ function loadingCompletes() {
     scanImageFromSource("assets/prototype_4/3.png");
 }
 
+const ERROR_COLOR = "color: #ff5050;";
+
+function handleError(e) {
+    console.log("%c" + e, ERROR_COLOR);
+}
+
+// Returns true if a Symcode is recognized and decoded
+function scan() {
+    try {
+        let startTime = new Date();
+        const result = scanner.scan();
+        console.log("Scanning finishes in " + (new Date() - startTime) + " ms.");
+        return result;
+    } catch (e) {
+        throw e;
+    }
+}
+
 document.getElementById('generate').addEventListener('click', function (e) {
     let groundTruthCode = scanner.generate_symcode_to_canvas();
     console.log("Generated code: " + groundTruthCode);
-    scan()
-        .then((result) => {
-            console.log("Recognition result: " + result);
-            if (result.localeCompare(groundTruthCode) == 0) {
-                console.log("%c Generated code is correctly recognized.", "color: #00ff00;");
-            } else {
-                console.log("%c Generated code is INCORRECTLY recognized.", "color: #ff3300;");
-            }
-        })
-        .catch((e) => {
-            console.log(e);
-        });
+    try {
+        const result = scan();
+        console.log("Recognition result: " + result);
+        if (result.localeCompare(groundTruthCode) == 0) {
+            console.log("%c Generated code is correctly recognized.", "color: #00ff00;");
+        } else {
+            console.log("%c Generated code is INCORRECTLY recognized.", ERROR_COLOR);
+        }
+    } catch (e) {
+        handleError(e);
+    }
 });
 
 document.getElementById('imageInput').addEventListener('change', function (e) { scanImageFromSource(this.files[0]) });
@@ -60,28 +77,12 @@ function scanImageFromSource(source) {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
-        scan()
-            .then((result) => {
-                console.log("Recognition result: " + result);
-            })
-            .catch((e) => {
-                console.log(e);
-            });
-    };
-}
-
-// Returns true if a Symcode is recognized and decoded
-function scan() {
-    return new Promise((resolve) => {
         try {
-            let startTime = new Date();
-            const result = scanner.scan();
-            console.log("Scanning finishes in " + (new Date() - startTime) + " ms.");
-            resolve(result);
+            console.log("Recognition result: " + scan());
         } catch (e) {
-            throw e;
+            handleError(e);
         }
-    });
+    };
 }
 
 function loadAllTemplates() {
@@ -140,11 +141,11 @@ function stopCamera() {
 cameraButton.onclick = function() {
     navigator.mediaDevices
         .getUserMedia(constraints)
-        .then(handleSuccess)
+        .then(handleGetCameraSuccess)
         .catch((e) => console.error(e));
 }
 
-function handleSuccess(stream) {
+function handleGetCameraSuccess(stream) {
     //camera.style.display = "block";
     camera.srcObject = stream;
     getCameraVideoDimensions()
@@ -173,7 +174,10 @@ function startStreaming(videoWidth, videoHeight) {
     const sy = (videoHeight - inputFrameSize.height) / 2;
 
     finishScanning = false;
-    drawFrame(sx, sy);
+    while (!finishScanning) {
+        drawFrame(sx, sy);
+        sleep(1/fps);
+    }
 }
 
 function drawFrame(sx, sy) {
@@ -182,19 +186,13 @@ function drawFrame(sx, sy) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(camera, sx, sy, inputFrameSize.width, inputFrameSize.height,
                                         0, 0, canvas.width, canvas.height);
-    scan()
-        .then((result) => {
-            console.log("Recognition result: " + result);
-            stopCamera();
-            return;
-        })
-        .catch((e) => {
-            console.log(e);
-            if (!finishScanning) {
-                sleep(1/fps)
-                    .then(() => drawFrame(sx, sy))
-            }
-        });
+    try {
+        console.log("Recognition result: " + scan());
+        stopCamera();
+        finishScanning = true;
+    } catch (e) {
+        handleError(e);
+    }
 }
 
 function sleep(s) {
