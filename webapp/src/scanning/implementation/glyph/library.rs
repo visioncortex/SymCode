@@ -26,11 +26,11 @@ impl GlyphLibrary {
         self.templates.len()
     }
 
-    pub fn get_glyph_image_at(&self, i: usize) -> Option<&BinaryImage> {
+    pub fn get_glyph_at(&self, i: usize) -> Option<&Glyph> {
         if i >= self.templates.len() {
             None
         } else {
-            Some(&self.templates[i].image)
+            Some(&self.templates[i])
         }
     }
 
