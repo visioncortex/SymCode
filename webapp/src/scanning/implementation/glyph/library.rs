@@ -34,6 +34,13 @@ impl GlyphLibrary {
         }
     }
 
+    pub fn print_label_and_trace(&self) -> String {
+        let list: Vec<String> = self.templates.iter().map(|glyph| {
+            format!("{:?}: {:?}\n", glyph.label, glyph.encoding.bits)
+        }).collect();
+        list.join("")
+    }
+
     /// Takes the binary image of the template and the usize representation of the label
     pub fn add_template(&mut self, image: BinaryImage, stat_tolerance: f64) {
         let label = GlyphLabel::from_usize_representation(self.templates.len() + 1);
