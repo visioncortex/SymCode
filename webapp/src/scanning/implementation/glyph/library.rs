@@ -21,6 +21,19 @@ impl GlyphLibrary {
     pub fn is_empty(&self) -> bool {
         self.templates.is_empty()
     }
+
+    pub fn len(&self) -> usize {
+        self.templates.len()
+    }
+
+    pub fn get_glyph_image_at(&self, i: usize) -> Option<&BinaryImage> {
+        if i >= self.templates.len() {
+            None
+        } else {
+            Some(&self.templates[i].image)
+        }
+    }
+
     /// Takes the binary image of the template and the usize representation of the label
     pub fn add_template(&mut self, image: BinaryImage, stat_tolerance: f64) {
         let label = GlyphLabel::from_usize_representation(self.templates.len() + 1);
