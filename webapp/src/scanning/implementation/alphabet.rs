@@ -9,8 +9,8 @@ pub struct AlphabetReader {}
 pub struct AlphabetReaderParams {
     // top-left point of the top-left glyph
     pub(crate) top_left: PointI32,
-    pub(crate) glyph_width: usize,
-    pub(crate) glyph_height: usize,
+    pub(crate) symbol_width: usize,
+    pub(crate) symbol_height: usize,
     pub(crate) offset_x: usize,
     pub(crate) offset_y: usize,
     pub(crate) num_columns: usize,
@@ -21,8 +21,8 @@ impl Default for AlphabetReaderParams {
     fn default() -> Self {
         Self {
             top_left: PointI32::new(0, 0),
-            glyph_width:80,
-            glyph_height: 80,
+            symbol_width:80,
+            symbol_height: 80,
             offset_x: 115,
             offset_y: 115,
             num_columns: 4,
@@ -44,9 +44,9 @@ impl AlphabetReaderParams {
         self
     }
 
-    pub fn glyph_size(mut self, width: usize, height: usize) -> Self {
-        self.glyph_width = width;
-        self.glyph_height = height;
+    pub fn symbol_size(mut self, width: usize, height: usize) -> Self {
+        self.symbol_width = width;
+        self.symbol_height = height;
         self
     }
 
@@ -69,7 +69,7 @@ impl AlphabetReader {
             for j in 0..params.num_columns {
                 let offset = PointI32::new((j * params.offset_x) as i32, (i * params.offset_y) as i32);
                 let top_left = params.top_left + offset;
-                let rect = BoundingRect::new_x_y_w_h(top_left.x, top_left.y, params.glyph_width as i32, params.glyph_height as i32);
+                let rect = BoundingRect::new_x_y_w_h(top_left.x, top_left.y, params.symbol_width as i32, params.symbol_height as i32);
 
                 let glyph_image = image.crop_with_rect(rect);
                 library.add_template(glyph_image, stat_tolerance);

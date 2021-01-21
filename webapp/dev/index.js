@@ -78,10 +78,10 @@ function loadTemplateByIndex(index) {
 }
 
 function loadAlphabet() {
-    const path = "assets/alphabet.jpg";
+    const path = "assets/alphabet/alphabet.jpg";
     const params = AlphabetReaderParams.new()
         .top_left(53, 53)
-        .glyph_size(80, 80)
+        .symbol_size(80, 80)
         .offset(111, 112)
         .matrix_size(4, 4)
     ;
