@@ -28,7 +28,22 @@ function loadingCompletes() {
     scanImageFromSource("assets/prototype_4/3.png");
 }
 
-document.getElementById('generate').addEventListener('click', function (e) { scanner.generate_symcode_to_canvas() });
+document.getElementById('generate').addEventListener('click', function (e) {
+    let groundTruthCode = scanner.generate_symcode_to_canvas();
+    console.log("Generated code: " + groundTruthCode);
+    scan()
+        .then((result) => {
+            console.log("Recognition result: " + result);
+            if (result.localeCompare(groundTruthCode) == 0) {
+                console.log("Generated code is correctly recognized.");
+            } else {
+                console.log("Generated code is INCORRECTLY recognized.");
+            }
+        })
+        .catch((e) => {
+            console.log(e);
+        });
+});
 
 document.getElementById('imageInput').addEventListener('change', function (e) { scanImageFromSource(this.files[0]) });
 
@@ -45,18 +60,27 @@ function scanImageFromSource(source) {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
-        scan();
+        scan()
+            .then((result) => {
+                console.log("Recognition result: " + result);
+            })
+            .catch((e) => {
+                console.log(e);
+            });
     };
 }
 
 // Returns true if a Symcode is recognized and decoded
 function scan() {
     return new Promise((resolve) => {
-        let startTime = new Date();
-        const result = scanner.scan();
-        console.log(result);
-        console.log("Scanning finishes in " + (new Date() - startTime) + " ms.");
-        resolve(result);
+        try {
+            let startTime = new Date();
+            const result = scanner.scan();
+            console.log("Scanning finishes in " + (new Date() - startTime) + " ms.");
+            resolve(result);
+        } catch (e) {
+            throw e;
+        }
     });
 }
 
@@ -164,12 +188,15 @@ function drawFrame(sx, sy) {
                                         0, 0, canvas.width, canvas.height);
     scan()
         .then((result) => {
-            if (result.localeCompare("Success") != 0 && !finishScanning) {
+            console.log("Recognition result: " + result);
+            stopCamera();
+            return;
+        })
+        .catch((e) => {
+            console.log(e);
+            if (!finishScanning) {
                 sleep(1/fps)
                     .then(() => drawFrame(sx, sy))
-            } else {
-                stopCamera();
-                return;
             }
         });
 }
