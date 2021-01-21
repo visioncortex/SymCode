@@ -7,7 +7,7 @@ use super::ShapeStats;
 
 #[derive(Debug)]
 pub struct ShapeEncoding {
-    bits: BitVec,
+    pub bits: BitVec,
 }
 
 impl Default for ShapeEncoding {
