@@ -4,7 +4,7 @@ use visioncortex::{BinaryImage, ColorImage, PointF64, bilinear_interpolate};
 
 use crate::math::PerspectiveTransform;
 
-use super::{SymcodeConfig, is_black_rgb};
+use super::{SymcodeConfig, is_black_rgb, render_binary_image_to_canvas};
 
 pub trait GlyphReader {
     // Input = BinaryImage, Library
@@ -39,11 +39,19 @@ pub trait GlyphReader {
 
     /// Read all glyphs at the anchors on the input image
     fn read_glyphs_from_raw_frame(image: ColorImage, image_to_object: PerspectiveTransform, glyph_library: &Self::Library, symcode_config: &crate::scanning::SymcodeConfig) -> Vec<Option<Self::Label>> {
-        symcode_config.glyph_anchors.iter()
+        let mut rectified_image = BinaryImage::new_w_h(symcode_config.code_width, symcode_config.code_height);
+        let result = symcode_config.glyph_anchors.iter()
             .map(|anchor| {
                 let crop = Self::crop_at_anchor(anchor, &image, &image_to_object, symcode_config)?;
+                rectified_image.paste_from(&crop, anchor.to_point_i32());
                 Some(Self::find_most_similar_glyph(crop, glyph_library, symcode_config))
             })
-            .collect()
+            .collect();
+
+        if let Some(debug_canvas) = &symcode_config.debug_canvas {
+            render_binary_image_to_canvas(&rectified_image, debug_canvas);
+        }
+        
+        result
     }
 }
