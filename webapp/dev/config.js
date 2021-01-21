@@ -27,12 +27,12 @@ export default {
     },
     
     ALPHABET_CONFIG: {
-        top_left: {x: 53, y: 53},
+        top_left: {x: 49, y: 49},
         symbol_width: 80,
         symbol_height: 80,
-        offset_x: 111,
-        offset_y: 112,
+        offset_x: 115,
+        offset_y: 116,
         num_columns: 4,
-        num_rows: 4,
+        num_rows: 8,
     }
 };

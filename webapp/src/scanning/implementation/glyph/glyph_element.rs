@@ -31,10 +31,30 @@ pub enum GlyphLabel {
     SmallDoubleDU,
     SmallDoubleLR,
 
+    DoubleTallDiamond,
+    StackedFatDiamond,
+    FourTriangles,
+    FourKites,
+
+    ArrowRR,
+    ArrowDD,
+    ArrowLL,
+    ArrowUU,
+
+    ArrowRL,
+    ArrowDU,
+    FatDiamond,
+    TallDiamond,
+
     SmallTripleU,
     SmallTripleR,
     SmallTripleD,
     SmallTripleL,
+
+    TriforceD,
+    TriforceL,
+    TriforceU,
+    TriforceR,
 }
 
 impl Default for GlyphLabel {

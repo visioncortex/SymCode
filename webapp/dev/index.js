@@ -78,7 +78,7 @@ function loadTemplateByIndex(index) {
 }
 
 function loadAlphabet() {
-    const path = "assets/alphabet/alphabet.jpg";
+    const path = "assets/alphabet/alphabet2.jpg";
     const params = AlphabetReaderParams.from_json_string(JSON.stringify(CONFIG.ALPHABET_CONFIG));
     img.src = path;
     img.onload = function () {
