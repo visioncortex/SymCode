@@ -2,7 +2,7 @@ use std::u64;
 
 use visioncortex::{BinaryImage, ColorImage, PointF64, PointI32, bilinear_interpolate};
 
-use crate::math::PerspectiveTransform;
+use crate::{math::PerspectiveTransform, util::console_log_util};
 
 use super::{SymcodeConfig, is_black_rgb, render_binary_image_to_canvas};
 
@@ -50,7 +50,9 @@ pub trait GlyphReader {
             .collect();
 
         if let Some(debug_canvas) = &symcode_config.debug_canvas {
-            render_binary_image_to_canvas(&debug_code_image, debug_canvas);
+            if render_binary_image_to_canvas(&debug_code_image, debug_canvas).is_err() {
+                console_log_util("Cannot render debug code image.");
+            }
         }
         
         result

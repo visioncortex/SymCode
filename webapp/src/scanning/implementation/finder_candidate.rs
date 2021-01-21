@@ -48,7 +48,9 @@ impl ScanningProcessor for FinderCandidate {
         let binary_raw_frame = binarize_image_util(raw_frame);
         // Take a look
         if let Some(canvas) = &params.canvas {
-            render_binary_image_to_canvas(&binary_raw_frame, canvas);
+            if render_binary_image_to_canvas(&binary_raw_frame, canvas).is_err() {
+                console_log_util("Cannot render binarized raw frame.");
+            }
         }
 
         // Processing starts
