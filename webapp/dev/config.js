@@ -24,5 +24,15 @@ export default {
         stat_tolerance: 0.2,
         max_encoding_difference: 1,
         empty_cluster_threshold: 0.2,
+    },
+    
+    ALPHABET_CONFIG: {
+        top_left: {x: 53, y: 53},
+        symbol_width: 80,
+        symbol_height: 80,
+        offset_x: 111,
+        offset_y: 112,
+        num_columns: 4,
+        num_rows: 4,
     }
 };

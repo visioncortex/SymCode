@@ -14,8 +14,8 @@ const numTemplates = 4;
 let debugging = true;
 let finishScanning = false;
 
-const config = SymcodeConfig.from_json_string(JSON.stringify(CONFIG.SYMCODE_CONFIG));
-const scanner = SymcodeScanner.from_config(config);
+const scannerConfig = SymcodeConfig.from_json_string(JSON.stringify(CONFIG.SYMCODE_CONFIG));
+const scanner = SymcodeScanner.from_config(scannerConfig);
 
 const inputFrameSize = {
     width: 350,
@@ -79,12 +79,7 @@ function loadTemplateByIndex(index) {
 
 function loadAlphabet() {
     const path = "assets/alphabet/alphabet.jpg";
-    const params = AlphabetReaderParams.new()
-        .top_left(53, 53)
-        .symbol_size(80, 80)
-        .offset(111, 112)
-        .matrix_size(4, 4)
-    ;
+    const params = AlphabetReaderParams.from_json_string(JSON.stringify(CONFIG.ALPHABET_CONFIG));
     img.src = path;
     img.onload = function () {
         loadBuffer.width = img.naturalWidth;

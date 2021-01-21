@@ -63,6 +63,23 @@ impl AlphabetReaderParams {
     }
 }
 
+#[wasm_bindgen]
+impl AlphabetReaderParams {
+    pub fn from_json_string(json_string: &str) -> Self {
+        let json: serde_json::Value = serde_json::from_str(json_string).unwrap();
+
+        Self {
+            top_left: PointI32::new(json["top_left"]["x"].as_i64().unwrap() as i32, json["top_left"]["y"].as_i64().unwrap() as i32),
+            symbol_width: json["symbol_width"].as_i64().unwrap() as usize,
+            symbol_height: json["symbol_height"].as_i64().unwrap() as usize,
+            offset_x: json["offset_x"].as_i64().unwrap() as usize,
+            offset_y: json["offset_y"].as_i64().unwrap() as usize,
+            num_columns: json["num_columns"].as_i64().unwrap() as usize,
+            num_rows: json["num_rows"].as_i64().unwrap() as usize,
+        }
+    }
+}
+
 impl AlphabetReader {
     pub fn read_alphabet_to_library(library: &mut GlyphLibrary, image: BinaryImage, params: AlphabetReaderParams, stat_tolerance: f64) {
         for i in 0..params.num_rows {
