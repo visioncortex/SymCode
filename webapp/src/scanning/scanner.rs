@@ -47,9 +47,9 @@ impl SymcodeScanner {
         }
     }
 
-    pub fn scan(&self) -> String {
+    pub fn scan(&self) -> Result<String, JsValue> {
         if self.glyph_library.is_empty() {
-            return "No templates loaded into the SymcodeScanner instance yet!".into();
+            return Err("No templates loaded into the SymcodeScanner instance yet!".into());
         }
 
         let symcode_config = &self.config;
@@ -58,7 +58,7 @@ impl SymcodeScanner {
         let raw_frame = if let Some(canvas) = &symcode_config.canvas {
             canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
         } else {
-            return "Cannot read input image from canvas.".into();
+            return Err("Cannot read input image from canvas.".into());
         };
         
         // Stage 1: Locate finder candidates
@@ -68,7 +68,7 @@ impl SymcodeScanner {
         ) {
             Ok(finder_positions) => finder_positions,
             Err(e) => {
-                return "Failed at Stage 1: ".to_owned() + e;
+                return Err(("Failed at Stage 1: ".to_owned() + e).into());
             }
         };
         
@@ -83,7 +83,7 @@ impl SymcodeScanner {
         ) {
             Ok(image_to_object) => image_to_object,
             Err(e) => {
-                return "Failed at Stage 2: ".to_owned() + e;
+                return Err(("Failed at Stage 2: ".to_owned() + e).into());
             }
         };
 
@@ -97,12 +97,10 @@ impl SymcodeScanner {
             symcode_config
         ) {
             Ok(glyph_code) => {
-                console_log_util(&format!("{:?}", glyph_code));
-                
-                "Success".into()
+                Ok(format!("{:?}", glyph_code))
             },
             Err(e) => {
-                "Failed at Stage 3: ".to_owned() + e
+                Err(("Failed at Stage 3: ".to_owned() + e).into())
             }
         }
     }
