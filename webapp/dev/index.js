@@ -23,6 +23,11 @@ const inputFrameSize = {
 };
 const fps = 60;
 
+function loadingCompletes() {
+    console.log("Template loading completes.");
+    scanImageFromSource("assets/streaming_test/test2.png");
+}
+
 document.getElementById('generate').addEventListener('click', function (e) { scanner.generate_symcode_to_canvas() });
 
 document.getElementById('imageInput').addEventListener('change', function (e) { scanImageFromSource(this.files[0]) });
@@ -94,11 +99,6 @@ function loadAlphabet() {
 
         loadingCompletes();
     };
-}
-
-function loadingCompletes() {
-    console.log("Template loading completes.");
-    scanImageFromSource("assets/streaming_test/test2.png");
 }
 
 const constraints = {
