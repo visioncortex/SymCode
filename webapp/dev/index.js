@@ -56,7 +56,7 @@ function scan() {
         const result = scanner.scan();
         console.log(result);
         console.log("Scanning finishes in " + (new Date() - startTime) + " ms.");
-        resolve(result.localeCompare("Success") == 0);
+        resolve(result);
     });
 }
 
@@ -152,6 +152,7 @@ function startStreaming(videoWidth, videoHeight) {
     const sx = (videoWidth - inputFrameSize.width) / 2;
     const sy = (videoHeight - inputFrameSize.height) / 2;
 
+    finishScanning = false;
     drawFrame(sx, sy);
 }
 
@@ -161,9 +162,9 @@ function drawFrame(sx, sy) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(camera, sx, sy, inputFrameSize.width, inputFrameSize.height,
                                         0, 0, canvas.width, canvas.height);
-    scan('frame')
-        .then((successful) => {
-            if (!successful && !finishScanning) {
+    scan()
+        .then((result) => {
+            if (result.localeCompare("Success") != 0 && !finishScanning) {
                 sleep(1/fps)
                     .then(() => drawFrame(sx, sy))
             } else {
