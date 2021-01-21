@@ -46,7 +46,7 @@ impl SymcodeScanner {
         }
     }
 
-    pub fn scan(&self) -> JsValue {
+    pub fn scan(&self) -> String {
         if self.glyph_library.is_empty() {
             return "No templates loaded into the SymcodeScanner instance yet!".into();
         }
@@ -67,7 +67,7 @@ impl SymcodeScanner {
         ) {
             Ok(finder_positions) => finder_positions,
             Err(e) => {
-                return ("Failed at Stage 1: ".to_owned() + e).into();
+                return "Failed at Stage 1: ".to_owned() + e;
             }
         };
         
@@ -82,7 +82,7 @@ impl SymcodeScanner {
         ) {
             Ok(image_to_object) => image_to_object,
             Err(e) => {
-                return ("Failed at Stage 2: ".to_owned() + e).into();
+                return "Failed at Stage 2: ".to_owned() + e;
             }
         };
 
@@ -101,7 +101,7 @@ impl SymcodeScanner {
                 "Success".into()
             },
             Err(e) => {
-                ("Failed at Stage 3: ".to_owned() + e).into()
+                "Failed at Stage 3: ".to_owned() + e
             }
         }
     }
