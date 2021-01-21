@@ -3,7 +3,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, glyph, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas};
 
 #[wasm_bindgen]
 #[derive(Default)]
@@ -107,16 +107,18 @@ impl SymcodeScanner {
         }
     }
 
-    pub fn generate_symcode_to_canvas(&self) {
+    pub fn generate_symcode_to_canvas(&self) -> String {
         let canvas = self.config.canvas.as_ref().unwrap();
-        let symcode = self.generate_symcode();
+        let (symcode, ground_truth_code) = self.generate_symcode();
 
         if render_binary_image_to_canvas(&symcode, canvas).is_err() {
             console_log_util("Cannot render generated symcode to canvas.");
         }
+
+        ground_truth_code
     }
 
-    fn generate_symcode(&self) -> BinaryImage {
+    fn generate_symcode(&self) -> (BinaryImage, String) {
         let mut symcode = BinaryImage::new_w_h(self.config.code_width, self.config.code_height);
 
         // Put in the finders
@@ -127,16 +129,20 @@ impl SymcodeScanner {
         });
 
         // Put in the glyphs
+        let mut ground_truth_code = vec![];
         self.config.glyph_anchors.iter().for_each(|glyph_top_left| {
             let glyph_index: usize = rand::random();
             let glyph_index = glyph_index % (self.glyph_library.len() + 1);
 
             // if glyph_index == glyph_library.len(), this will return None
-            if let Some(glyph_image) = self.glyph_library.get_glyph_image_at(glyph_index) {
-                symcode.paste_from(glyph_image, glyph_top_left.to_point_i32());
+            if let Some(glyph) = self.glyph_library.get_glyph_at(glyph_index) {
+                ground_truth_code.push(Some(glyph.label));
+                symcode.paste_from(&glyph.image, glyph_top_left.to_point_i32());
+            } else {
+                ground_truth_code.push(None);
             }
         });
 
-        symcode
+        (symcode, format!("{:?}", ground_truth_code))
     }
 }
