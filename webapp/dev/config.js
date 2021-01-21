@@ -22,7 +22,7 @@ export default {
         max_extra_finder_candidates: 3,
         rectify_error_threshold: 20.0,
         stat_tolerance: 0.2,
-        max_encoding_difference: 1,
+        max_encoding_difference: 0,
         empty_cluster_threshold: 0.2,
     },
     
