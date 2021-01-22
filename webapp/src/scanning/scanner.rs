@@ -56,14 +56,7 @@ impl SymcodeScanner {
 
         // Stage 0: Prepare the raw input
         let raw_frame = if let Some(canvas) = &Canvas::new_from_id(canvas_id) {
-            let frame = canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32);
-            
-            // Take a look
-            if render_color_image_to_canvas(&frame, canvas).is_err() {
-                console_log_util("Cannot render binarized raw frame.");
-            }
-
-            frame
+            canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
         } else {
             return Err("Cannot read input image from canvas.".into());
         };
