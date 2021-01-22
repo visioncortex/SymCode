@@ -753,32 +753,6 @@ function init() {
 
   var texdim = images[0].width;
 
-  document.getElementById('cb_blur').addEventListener('change', function(e) {
-    options.whiteout_alpha = this.checked ? 0.3 : 1;
-  }, false);
-
-  document.getElementById('sb_subdiv_factor').addEventListener('change',
-                                                               function(e) {
-    options.subdivide_factor = document.getElementById('sb_subdiv_factor').value;
-    start_spinning();
-  }, false);
-
-  document.getElementById('cb_wireframe').addEventListener('change', function(e) {
-    options.wireframe = this.checked ? true : false;
-    draw();
-  }, false);
-
-  document.getElementById('cb_draw_quad').addEventListener('change', function(e) {
-    options.draw_quad = this.checked ? true : false;
-    draw();
-  }, false);
-
-  document.getElementById('sb_nonadaptive_depth').addEventListener('change',
-                                                                 function(e) {
-    options.nonadaptive_depth = parseInt(document.getElementById('sb_nonadaptive_depth').value);
-    start_spinning();
-  }, false);
-
   start_spinning();
 }
 
