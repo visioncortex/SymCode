@@ -265,9 +265,25 @@ function draw() {
   }
 }
 
+function rotateObjectRandom() {
+    const getRandomDegree = () => (Math.random() * 90 - 45);
+    let x_deg = getRandomDegree();
+    let y_deg = getRandomDegree();
+    let z_deg = getRandomDegree();
+    rotateObjectXYZ(x_deg, y_deg, z_deg);
+}
+
+function rotateObjectXYZ(x_deg, y_deg, z_deg) {
+    let x_rad = x_deg * Math.PI / 180;
+    let y_rad = y_deg * Math.PI / 180;
+    let z_rad = z_deg * Math.PI / 180;
+    rotateObject({x:x_rad, y:0, z:0});
+    rotateObject({x:0, y:y_rad, z:0});
+    rotateObject({x:0, y:0, z:z_rad});
+}
+
 function rotateObject(scaled_axis) {
-  var angle =
-      Math.asin(Math.sqrt(jsgl.dotProduct(scaled_axis, scaled_axis)));
+  var angle = Math.sqrt(jsgl.dotProduct(scaled_axis, scaled_axis));
   if (angle > Math.PI / 8) {
     angle = Math.PI / 8;
   }
@@ -296,9 +312,7 @@ function init(canvas_id) {
 
   requestAnimationFrame(() => {
 
-    rotateObject({x:1, y:0, z:0});
-    rotateObject({x:0, y:-1, z:0});
-    rotateObject({x:0, y:0, z:1});
+    rotateObjectRandom();
 
     draw();
   });
