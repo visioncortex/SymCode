@@ -16,6 +16,7 @@ pub trait Trace {
     }
 }
 
+#[derive(Debug)]
 pub struct GlyphTrace {
     pub bits: BitVec,
 }

@@ -4,7 +4,7 @@ use visioncortex::{BinaryImage, ColorImage, Sampler};
 
 use crate::{scanning::{SymcodeConfig, image_diff_area, is_black_hsv}, util::console_log_util};
 
-use super::{Glyph, GlyphLabel, LayerTrace, Trace};
+use super::{Glyph, GlyphLabel, GlyphTrace, Trace};
 
 #[derive(Debug)]
 pub struct GlyphLibrary {
@@ -51,7 +51,7 @@ impl GlyphLibrary {
 
     pub fn find_most_similar_glyph(&self, image: BinaryImage, symcode_config: &SymcodeConfig) -> GlyphLabel {
         let image = &Sampler::resample_image(&image, symcode_config.symbol_width, symcode_config.symbol_height);
-        let input_encoding = &LayerTrace::from_image(image, symcode_config.stat_tolerance);
+        let input_encoding = &GlyphTrace::from_image(image, symcode_config.stat_tolerance);
         //console_log_util(&format!("{:?}", input_encoding));
 
         self.templates.iter()

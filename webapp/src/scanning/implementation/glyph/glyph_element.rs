@@ -3,7 +3,7 @@ use visioncortex::BinaryImage;
 
 use crate::util::console_log_util;
 
-use super::{LayerTrace};
+use super::{GlyphTrace};
 
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
@@ -79,7 +79,7 @@ impl GlyphLabel {
 pub struct Glyph {
     pub image: BinaryImage,
     pub label: GlyphLabel,
-    pub encoding: LayerTrace,
+    pub encoding: GlyphTrace,
 }
 
 impl Debug for Glyph {
@@ -93,7 +93,7 @@ impl Debug for Glyph {
 
 impl Glyph {
     pub fn from_image_label(image: BinaryImage, label: GlyphLabel, stat_tolerance: f64) -> Self {
-        let encoding = LayerTrace::from_image(&image, stat_tolerance);
+        let encoding = GlyphTrace::from_image(&image, stat_tolerance);
         Self {
             image,
             label,
