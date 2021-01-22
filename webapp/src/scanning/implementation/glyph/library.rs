@@ -42,10 +42,11 @@ impl GlyphLibrary {
     }
 
     /// Takes the binary image of the template and the usize representation of the label
-    pub fn add_template(&mut self, image: BinaryImage, stat_tolerance: f64) {
+    pub fn add_template(&mut self, image: BinaryImage, symcode_config: &SymcodeConfig) {
+        let image = Sampler::resample_image(&image.crop(), symcode_config.symbol_width, symcode_config.symbol_height);
         let label = GlyphLabel::from_usize_representation(self.templates.len() + 1);
         //console_log_util(&format!("{:?}\n{}", label, image.to_string()));
-        self.templates.push(Glyph::from_image_label(image, label, stat_tolerance));
+        self.templates.push(Glyph::from_image_label(image, label, symcode_config.stat_tolerance));
     }
 
     pub fn find_most_similar_glyph(&self, image: BinaryImage, symcode_config: &SymcodeConfig) -> GlyphLabel {

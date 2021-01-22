@@ -30,7 +30,7 @@ impl SymcodeScanner {
         let image = canvas
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
             .to_binary_image(|c| is_black_hsv(&c.to_hsv()));
-        self.glyph_library.add_template(image, self.config.stat_tolerance);
+        self.glyph_library.add_template(image, &self.config);
     }
 
     /// Takes the id of the canvas element storing the alphabet.
@@ -42,7 +42,7 @@ impl SymcodeScanner {
         let image = canvas
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
             .to_binary_image(|c| is_black_hsv(&c.to_hsv()));
-        if let Some(e) = AlphabetReader::read_alphabet_to_library(&mut self.glyph_library, image, params, self.config.stat_tolerance).err() {
+        if let Some(e) = AlphabetReader::read_alphabet_to_library(&mut self.glyph_library, image, params, &self.config).err() {
             console_log_util(e);
         }
     }
