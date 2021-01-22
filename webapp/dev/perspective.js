@@ -317,12 +317,12 @@ function init(canvas_id) {
 
 // Awesome cubemaps: http://www.humus.name/index.php?page=Textures&&start=32
 
-export function ready_perspective_with_image_src(canvas_id, src) {
+export function generate_perspective_with_image_src(canvas_id, src) {
     return new Promise(resolve => {
         images.push(new Image());
         images[0].onload = function () {
-            init(canvas_id);
-            resolve();
+            init(canvas_id)
+                .then(resolve);
         };
         images[0].src = src;
     });

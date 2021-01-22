@@ -1,7 +1,7 @@
 import { SymcodeScanner, SymcodeConfig } from "symcode";
 import { SYMCODE_CONFIG } from "./config";
 import { loadAlphabet, loadBuffer } from "./load";
-import { ready_perspective_with_image_src } from "./perspective";
+import { generate_perspective_with_image_src } from "./perspective";
 
 const canvas = document.getElementById('frame');
 const debugCanvas = document.getElementById('debug');
@@ -48,8 +48,8 @@ document.getElementById('generate').addEventListener('click', function (e) {
         return;
     }
     console.log("Generated code: " + groundTruthCode);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ready_perspective_with_image_src("frame", loadBuffer.toDataURL())
+    ctx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
+    generate_perspective_with_image_src("frame", loadBuffer.toDataURL())
         .then(() => {
             scan()
                 .then((result) => {
