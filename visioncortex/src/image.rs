@@ -166,7 +166,7 @@ impl BinaryImage {
         image
     }
 
-    pub fn rotate(&mut self, angle: f64) -> BinaryImage {
+    pub fn rotate(&self, angle: f64) -> BinaryImage {
         let rotated_width = (self.width as f64 * angle.cos().abs() + self.height as f64 * angle.sin().abs()).round() as usize;
         let rotated_height = (self.width as f64 * angle.sin().abs() + self.height as f64 * angle.cos().abs()).round() as usize;
         let mut rotated_image = BinaryImage::new_w_h(rotated_width, rotated_height);

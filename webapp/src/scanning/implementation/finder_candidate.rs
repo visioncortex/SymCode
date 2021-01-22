@@ -7,7 +7,18 @@ pub(crate) struct FinderCandidate;
 
 impl FinderCandidate {
     fn shape_is_finder(image: BinaryImage) -> bool {
-        Shape::from(image).is_circle()
+        for i in 0..6 {
+            let angle = i as f64 * std::f64::consts::PI / 6.0;
+            let rotated_image = if i > 0 {
+                image.rotate(angle)
+            } else {
+                image.clone()
+            };
+            if Shape::from(rotated_image).is_circle() {
+                return true;
+            }
+        }
+        false
     }
 }
 
