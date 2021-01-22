@@ -42,7 +42,13 @@ function handleSuccess(msg) {
 }
 
 document.getElementById('generate').addEventListener('click', function (e) {
-    let groundTruthCode = scanner.generate_symcode_to_canvas();
+    let groundTruthCode = "";
+    try {
+        groundTruthCode = scanner.generate_symcode_to_canvas();
+    } catch (e) {
+        handleError(e);
+        return;
+    }
     console.log("Generated code: " + groundTruthCode);
     scan()
         .then((result) => {
