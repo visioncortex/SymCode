@@ -3,7 +3,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, pipeline::ScanningProcessor, render_binary_image_to_canvas, render_color_image_to_canvas};
 
 #[wasm_bindgen]
 #[derive(Default)]
@@ -47,7 +47,7 @@ impl SymcodeScanner {
         }
     }
 
-    pub fn scan(&self) -> Result<String, JsValue> {
+    pub fn scan_from_canvas_id(&self, canvas_id: &str) -> Result<String, JsValue> {
         if self.glyph_library.is_empty() {
             return Err("No templates loaded into the SymcodeScanner instance yet!".into());
         }
@@ -55,8 +55,15 @@ impl SymcodeScanner {
         let symcode_config = &self.config;
 
         // Stage 0: Prepare the raw input
-        let raw_frame = if let Some(canvas) = &symcode_config.canvas {
-            canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
+        let raw_frame = if let Some(canvas) = &Canvas::new_from_id(canvas_id) {
+            let frame = canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32);
+            
+            // Take a look
+            if render_color_image_to_canvas(&frame, canvas).is_err() {
+                console_log_util("Cannot render binarized raw frame.");
+            }
+
+            frame
         } else {
             return Err("Cannot read input image from canvas.".into());
         };
@@ -105,15 +112,19 @@ impl SymcodeScanner {
         }
     }
 
-    pub fn generate_symcode_to_canvas(&self) -> String {
-        let canvas = self.config.canvas.as_ref().unwrap();
+    pub fn generate_symcode_to_canvas(&self, canvas_id: &str) -> Result<String, JsValue> {
+        let canvas = if let Some(canvas) = Canvas::new_from_id(canvas_id) {
+            canvas
+        } else {
+            return Err("Code generation: Canvas does not exist.".into());
+        };
         let (symcode, ground_truth_code) = self.generate_symcode();
 
-        if render_binary_image_to_canvas(&symcode, canvas).is_err() {
-            console_log_util("Cannot render generated symcode to canvas.");
+        if render_binary_image_to_canvas(&symcode, &canvas).is_err() {
+            return Err("Cannot render generated symcode to canvas.".into());
         }
 
-        ground_truth_code
+        Ok(ground_truth_code)
     }
 
     fn generate_symcode(&self) -> (BinaryImage, String) {

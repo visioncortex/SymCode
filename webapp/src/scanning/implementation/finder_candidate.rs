@@ -1,6 +1,6 @@
 use visioncortex::{BinaryImage, ColorImage, PointI32, Shape};
 
-use crate::{scanning::{SymcodeConfig, binarize_image_util, finder::Finder, pipeline::ScanningProcessor, render_binary_image_to_canvas, valid_pointf64_on_image}, util::console_log_util};
+use crate::{scanning::{SymcodeConfig, binarize_image_util, finder::Finder, pipeline::ScanningProcessor, valid_pointf64_on_image}};
 
 /// Specific implementation of Finder
 pub(crate) struct FinderCandidate;
@@ -46,12 +46,6 @@ impl ScanningProcessor for FinderCandidate {
         let raw_frame = unsafe {&*input};
         // Binarize
         let binary_raw_frame = binarize_image_util(raw_frame);
-        // Take a look
-        if let Some(canvas) = &params.canvas {
-            if render_binary_image_to_canvas(&binary_raw_frame, canvas).is_err() {
-                console_log_util("Cannot render binarized raw frame.");
-            }
-        }
 
         // Processing starts
         let finder_candidates = Self::extract_finder_positions(binary_raw_frame);

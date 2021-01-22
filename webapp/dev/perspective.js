@@ -229,7 +229,6 @@ function draw() {
   // Draw.
   var im_width = images[0].width;
   var im_height = images[0].height;
-  console.log(im_width + " " + im_height);
   var verts = [
 	  {x:-1, y:-1, z: 0, u:0, v:0},
 	  {x: 1, y:-1, z: 0, u:im_width, v:0},

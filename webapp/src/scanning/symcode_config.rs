@@ -18,7 +18,6 @@ pub struct SymcodeConfig {
     /// The top-left corners of the glyphs
     pub(crate) glyph_anchors: Vec<PointF64>,
 
-    pub(crate) canvas: Option<Canvas>,
     pub(crate) debug_canvas: Option<Canvas>,
 
     pub max_extra_finder_candidates: usize,
@@ -48,7 +47,6 @@ impl Default for SymcodeConfig {
                 PointF64::new(280.0, 160.0),
                 PointF64::new(280.0, 40.0),
             ],
-            canvas: Canvas::new_from_id("frame"),
             debug_canvas: None,
             max_extra_finder_candidates: 3,
             rectify_error_threshold: 20.0,
@@ -77,17 +75,7 @@ impl SymcodeConfig {
         Self::default()
     }
 
-    pub fn from_canvas_id(canvas_id: &str) -> Self {
-        Self::default()
-            .canvas(canvas_id)
-    }
-
     // Can't use macros inside wasm_bindgen impls
-
-    pub fn canvas(mut self, canvas_id: &str) -> Self {
-        self.canvas = Canvas::new_from_id(canvas_id);
-        self
-    }
 
     pub fn debug_canvas(mut self, debug_canvas_id: &str) -> Self {
         self.debug_canvas = Canvas::new_from_id(debug_canvas_id);
@@ -183,7 +171,6 @@ impl SymcodeConfig {
             symbol_height: json["symbol_height"].as_i64().unwrap() as usize,
             finder_positions,
             glyph_anchors,
-            canvas: Canvas::new_from_id(json["canvas"].as_str().unwrap()),
             debug_canvas: Canvas::new_from_id(json["debug_canvas"].as_str().unwrap()),
             max_extra_finder_candidates: json["max_extra_finder_candidates"].as_i64().unwrap() as usize,
             rectify_error_threshold: json["rectify_error_threshold"].as_f64().unwrap(),

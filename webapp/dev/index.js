@@ -88,7 +88,7 @@ function scan() {
     return new Promise((resolve) => {
         try {
             let startTime = new Date();
-            const result = scanner.scan();
+            const result = scanner.scan_from_canvas_id("frame");
             handleSuccess("Scanning finishes in " + (new Date() - startTime) + " ms.");
             resolve(result);
         } catch (e) {
