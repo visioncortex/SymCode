@@ -730,8 +730,8 @@ function stop_spinning() {
   }
 }
 
-function init() {
-  canvas_elem = document.getElementById('testCanvas');
+function init(canvas_id) {
+  canvas_elem = document.getElementById(canvas_id);
   canvas_elem.addEventListener('mousedown', mousedown, false);
   canvas_elem.addEventListener('mousemove', mousemove, false);
   canvas_elem.addEventListener('mouseup', mouseup, false);
@@ -757,19 +757,19 @@ function init() {
 }
 
 var loaded_count = 0;
-function image_loaded() {
+function image_loaded(canvas_id) {
   loaded_count++;
   if (loaded_count == 1) {
-    init();
+    init(canvas_id);
   }
 }
 
 // Awesome cubemaps: http://www.humus.name/index.php?page=Textures&&start=32
 
-export function ready_perspective_with_image_src(src) {
+export function ready_perspective_with_image_src(canvas_id, src) {
     window.addEventListener('load', function() {
         images.push(new Image());
-        images[0].onload = image_loaded;
+        images[0].onload = image_loaded(canvas_id);
         images[0].src = src;
       }, false);
 }

@@ -13,7 +13,7 @@ const img = new Image();
 let debugging = true;
 let finishScanning = false;
 
-ready_perspective_with_image_src("assets/prototype_4/3.png");
+ready_perspective_with_image_src("testCanvas", "assets/prototype_4/4.png");
 
 const scannerConfig = SymcodeConfig.from_json_string(JSON.stringify(SYMCODE_CONFIG));
 const scanner = SymcodeScanner.from_config(scannerConfig);
