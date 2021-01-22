@@ -30,7 +30,7 @@ var mouse_grab_point = null;
 var mouse_is_down = false;
 var horizontal_fov_radians = Math.PI / 2;
 var object_omega = {x: 2.6, y: 2.6, z: 0};
-var target_distance = 1.5;
+var target_distance = 1.9;
 var zoom_in_pressed = false;
 var zoom_out_pressed = false;
 var last_spin_time = 0;
@@ -491,11 +491,11 @@ function drawPerspectiveQuad(c3d, v0, v1, v2, v3, depth_count) {
 }
 
 function draw() {
-  // Clear with white.
+  // Clear canvas.
   var ctx = c3d.canvas_ctx_;
 
   ctx.globalAlpha = options.whiteout_alpha;
-  ctx.fillStyle = '#FFFFFF';
+  ctx.fillStyle = '#000000';
   ctx.fillRect(0, 0, canvas_elem.width, canvas_elem.height);
   ctx.globalAlpha = 1;
 
