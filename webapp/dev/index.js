@@ -3,9 +3,9 @@ import { SYMCODE_CONFIG } from "./config";
 import { loadAlphabet, loadBuffer } from "./load";
 import { generate_perspective_with_image_src } from "./perspective";
 
-const canvas = document.getElementById('frame');
+const frameCanvas = document.getElementById('frame');
 const debugCanvas = document.getElementById('debug');
-const ctx = canvas.getContext('2d');
+const ctx = frameCanvas.getContext('2d');
 const camera = document.getElementById('camera');
 const cameraButton = document.getElementById('cameraButton');
 const img = new Image();
@@ -72,10 +72,10 @@ document.addEventListener('load', loadAlphabet(scanner));
 
 function scanImageFromSource(source) {
     img.onload = function () {
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
+        frameCanvas.width = img.naturalWidth;
+        frameCanvas.height = img.naturalHeight;
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
         ctx.drawImage(img, 0, 0);
         scan()
             .then((result) => {
@@ -183,11 +183,11 @@ function startStreaming(videoWidth, videoHeight) {
 }
 
 function drawFrame(sx, sy) {
-    canvas.width = inputFrameSize.width;
-    canvas.height = inputFrameSize.height;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    frameCanvas.width = inputFrameSize.width;
+    frameCanvas.height = inputFrameSize.height;
+    ctx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
     ctx.drawImage(camera, sx, sy, inputFrameSize.width, inputFrameSize.height,
-                                        0, 0, canvas.width, canvas.height);
+                                        0, 0, frameCanvas.width, frameCanvas.height);
     scan()
         .then((result) => {
             console.log("Recognition result: " + result);
