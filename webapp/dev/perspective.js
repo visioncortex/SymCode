@@ -269,7 +269,6 @@ function rotateObjectRandom() {
     let x_deg = getRandom(-45, 45);
     let y_deg = getRandom(-45, 45);
     let z_deg = getRandom(0, 360);
-    console.log(x_deg + " " + y_deg + " " + z_deg);
     rotateObjectXYZ(x_deg, y_deg, z_deg);
 }
 
@@ -284,9 +283,6 @@ function rotateObjectXYZ(x_deg, y_deg, z_deg) {
 
 function rotateObject(scaled_axis) {
   var angle = Math.sqrt(jsgl.dotProduct(scaled_axis, scaled_axis));
-  if (angle > Math.PI / 8) {
-    angle = Math.PI / 8;
-  }
 
   var axis = jsgl.vectorNormalize(scaled_axis);
   var mat = jsgl.makeRotateAxisAngle(axis, angle);
@@ -310,9 +306,8 @@ function init(canvas_id) {
   camera_mat = jsgl.makeOrientationAffine(
 	  {x:0, y:0, z: -0.2 - target_distance}, {x:0, y:0, z:1}, {x:0, y:-1, z:0});
 
-  //rotateObjectRandom();
-  rotateObjectXYZ(0,0,180);
-  setTimeout(draw, 15);
+  rotateObjectRandom();
+  requestAnimationFrame(draw);
 }
 
 // Awesome cubemaps: http://www.humus.name/index.php?page=Textures&&start=32
