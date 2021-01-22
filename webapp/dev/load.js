@@ -2,7 +2,7 @@ import { AlphabetReaderParams } from "symcode";
 import { ALPHABET_CONFIG } from "./config";
 import { loadingCompletes } from "./index";
 
-const loadBuffer = document.getElementById('loadBuffer');
+export const loadBuffer = document.getElementById('loadBuffer');
 const loadBufferCtx = loadBuffer.getContext('2d');
 const img = new Image();
 

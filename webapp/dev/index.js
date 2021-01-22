@@ -1,6 +1,6 @@
 import { SymcodeScanner, SymcodeConfig } from "symcode";
 import { SYMCODE_CONFIG } from "./config";
-import { loadAlphabet } from "./load";
+import { loadAlphabet, loadBuffer } from "./load";
 import { ready_perspective_with_image_src } from "./perspective";
 
 const canvas = document.getElementById('frame');
@@ -10,10 +10,7 @@ const camera = document.getElementById('camera');
 const cameraButton = document.getElementById('cameraButton');
 const img = new Image();
 
-let debugging = true;
 let finishScanning = false;
-
-ready_perspective_with_image_src("testCanvas", "assets/prototype_4/4.png");
 
 const scannerConfig = SymcodeConfig.from_json_string(JSON.stringify(SYMCODE_CONFIG));
 const scanner = SymcodeScanner.from_config(scannerConfig);
@@ -44,23 +41,27 @@ function handleSuccess(msg) {
 document.getElementById('generate').addEventListener('click', function (e) {
     let groundTruthCode = "";
     try {
-        groundTruthCode = scanner.generate_symcode_to_canvas();
+        groundTruthCode = scanner.generate_symcode_to_canvas("loadBuffer");
     } catch (e) {
         handleError(e);
         return;
     }
     console.log("Generated code: " + groundTruthCode);
-    scan()
-        .then((result) => {
-            console.log("Recognition result: " + result);
-            if (result.localeCompare(groundTruthCode) == 0) {
-                handleSuccess("Generated code is correctly recognized.");
-            } else {
-                handleError("Generated code is INCORRECTLY recognized.");
-            }
-        })
-        .catch((e) => {
-            handleError(e);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ready_perspective_with_image_src("frame", loadBuffer.toDataURL())
+        .then(() => {
+            scan()
+                .then((result) => {
+                    console.log("Recognition result: " + result);
+                    if (result.localeCompare(groundTruthCode) == 0) {
+                        handleSuccess("Generated code is correctly recognized.");
+                    } else {
+                        handleError("Generated code is INCORRECTLY recognized.");
+                    }
+                })
+                .catch((e) => {
+                    handleError(e);
+                });
         });
 });
 
@@ -69,13 +70,9 @@ document.getElementById('imageInput').addEventListener('change', function (e) { 
 document.addEventListener('load', loadAlphabet(scanner));
 
 function scanImageFromSource(source) {
-    img.src = source instanceof File ? URL.createObjectURL(source) : source;
     img.onload = function () {
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
-
-        debugCanvas.width = canvas.width;
-        debugCanvas.height = canvas.height;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
@@ -87,6 +84,7 @@ function scanImageFromSource(source) {
                 handleError(e);
             });
     };
+    img.src = source instanceof File ? URL.createObjectURL(source) : source;
 }
 
 // Returns true if a Symcode is recognized and decoded

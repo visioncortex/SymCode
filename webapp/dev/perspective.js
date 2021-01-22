@@ -291,31 +291,39 @@ function rotateObject(scaled_axis) {
 }
 
 function init(canvas_id) {
-  canvas_elem = document.getElementById(canvas_id);
-  var ctx = canvas_elem.getContext('2d');
-
-  c3d = new jsgl.Context(ctx);
-
-  temp_mat0 = jsgl.makeIdentityAffine();
-  temp_mat1 = jsgl.makeIdentityAffine();
-  temp_mat2 = jsgl.makeIdentityAffine();
-  proj_mat = jsgl.makeWindowProjection(
-	  canvas_elem.width, canvas_elem.height, horizontal_fov_radians);
-  object_mat = jsgl.makeOrientationAffine(
-	  {x:0, y:0, z:0}, {x:1, y:0, z:0}, {x:0, y:1, z:0});
-  camera_mat = jsgl.makeOrientationAffine(
-	  {x:0, y:0, z: -0.2 - target_distance}, {x:0, y:0, z:1}, {x:0, y:-1, z:0});
-
-  rotateObjectRandom();
-  requestAnimationFrame(draw);
+    return new Promise(resolve => {
+        canvas_elem = document.getElementById(canvas_id);
+        var ctx = canvas_elem.getContext('2d');
+    
+        c3d = new jsgl.Context(ctx);
+    
+        temp_mat0 = jsgl.makeIdentityAffine();
+        temp_mat1 = jsgl.makeIdentityAffine();
+        temp_mat2 = jsgl.makeIdentityAffine();
+        proj_mat = jsgl.makeWindowProjection(
+            canvas_elem.width, canvas_elem.height, horizontal_fov_radians);
+        object_mat = jsgl.makeOrientationAffine(
+            {x:0, y:0, z:0}, {x:1, y:0, z:0}, {x:0, y:1, z:0});
+        camera_mat = jsgl.makeOrientationAffine(
+            {x:0, y:0, z: -0.2 - target_distance}, {x:0, y:0, z:1}, {x:0, y:-1, z:0});
+    
+        rotateObjectRandom();
+        requestAnimationFrame(() => {
+            draw();
+            resolve();
+        });
+    });
 }
 
 // Awesome cubemaps: http://www.humus.name/index.php?page=Textures&&start=32
 
 export function ready_perspective_with_image_src(canvas_id, src) {
-    window.addEventListener('load', function() {
+    return new Promise(resolve => {
         images.push(new Image());
-        images[0].onload = init(canvas_id);
+        images[0].onload = function () {
+            init(canvas_id);
+            resolve();
+        };
         images[0].src = src;
-      }, false);
+    });
 }
