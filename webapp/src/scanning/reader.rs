@@ -25,7 +25,8 @@ pub trait GlyphReader {
                 crop.set_pixel(x, y, is_black_rgb(&interpolated_color));
             }
         }
-        if crop.area() <= symcode_config.absolute_empty_cluster_threshold() {
+        crop = crop.crop();
+        if crop.area() <= symcode_config.absolute_empty_cluster_threshold(&crop) {
             None
         } else {
             Some(crop)

@@ -1,4 +1,4 @@
-use visioncortex::PointF64;
+use visioncortex::{BinaryImage, PointF64};
 use wasm_bindgen::prelude::*;
 
 use crate::canvas::Canvas;
@@ -66,8 +66,8 @@ impl SymcodeConfig {
     }
 
     #[inline]
-    pub fn absolute_empty_cluster_threshold(&self) -> u64 {
-        (self.empty_cluster_threshold * (self.symbol_width * self.symbol_height) as f64) as u64
+    pub fn absolute_empty_cluster_threshold(&self, image: &BinaryImage) -> u64 {
+        (self.empty_cluster_threshold * (image.width * image.height) as f64) as u64
     }
 }
 
