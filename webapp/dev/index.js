@@ -1,6 +1,7 @@
 import { SymcodeScanner, SymcodeConfig } from "symcode";
 import { SYMCODE_CONFIG } from "./config";
 import { loadAlphabet } from "./load";
+import { ready_perspective_with_image_src } from "./perspective";
 
 const canvas = document.getElementById('frame');
 const debugCanvas = document.getElementById('debug');
@@ -11,6 +12,8 @@ const img = new Image();
 
 let debugging = true;
 let finishScanning = false;
+
+ready_perspective_with_image_src("assets/prototype_4/3.png");
 
 const scannerConfig = SymcodeConfig.from_json_string(JSON.stringify(SYMCODE_CONFIG));
 const scanner = SymcodeScanner.from_config(scannerConfig);
