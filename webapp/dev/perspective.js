@@ -29,7 +29,7 @@ var mouse_y = 0;
 var mouse_grab_point = null;
 var mouse_is_down = false;
 var horizontal_fov_radians = Math.PI / 2;
-var object_omega = {x: 2.6, y: 2.6, z: 0};
+var object_omega = {x: 0, y: 0, z: 0};
 var target_distance = 1.9;
 var zoom_in_pressed = false;
 var zoom_out_pressed = false;
@@ -509,6 +509,7 @@ function draw() {
   // Draw.
   var im_width = images[0].width;
   var im_height = images[0].height;
+  console.log(im_width + " " + im_height);
   var verts = [
 	  {x:-1, y:-1, z: 0, u:0, v:0},
 	  {x: 1, y:-1, z: 0, u:im_width, v:0},
@@ -753,7 +754,13 @@ function init(canvas_id) {
 
   var texdim = images[0].width;
 
-  start_spinning();
+  //start_spinning();
+  requestAnimationFrame(() => {
+
+    rotateObject({x:1, y:0, z:0});
+
+    draw();
+  });
 }
 
 var loaded_count = 0;
