@@ -1,5 +1,3 @@
-use std::u64;
-
 use visioncortex::{BinaryImage, ColorImage, PointF64, PointI32, bilinear_interpolate};
 
 use crate::{math::PerspectiveTransform, util::console_log_util};
