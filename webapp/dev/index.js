@@ -56,9 +56,9 @@ function runOneTestCase() {
                     .then((result) => {
                         console.log("Recognition result: " + result);
                         if (result.localeCompare(groundTruthCode) == 0) {
-                            resolve(true);
+                            resolve({isCorrect: true, groundTruth: groundTruthCode, recognized: result});
                         } else {
-                            resolve(false);
+                            resolve({isCorrect: false, groundTruth: groundTruthCode, recognized: result});
                         }
                     })
                     .catch(e => { reject(e);});
@@ -72,16 +72,18 @@ async function runNTestCases(n) {
     let resultsHtml = [
         `<tr>
             <th>Raw Frame</th>
-            <th>Rectified code</th>
+            <th>Rectified code image</th>
+            <th>Recognized code</th>
+            <th>Ground-truth code</th>
             <th>Recognition result</th>
         </tr>`
     ];
     for (let i = 0; i < n; ++i) {
-        let isCorrect = false;
+        let result = {};
         let msg = "";
         try {
-            isCorrect = await runOneTestCase();
-            if (isCorrect) {
+            result = await runOneTestCase();
+            if (result.isCorrect) {
                 msg = "Correct";
                 ++correctCases;
             } else {
@@ -94,7 +96,9 @@ async function runNTestCases(n) {
             `<tr>
                 <th><img src="${frameCanvas.toDataURL("image/png;base64")}" /></th>
                 <th><img src="${debugCanvas.toDataURL("image/png;base64")}" /></th>
-                <th><h3 style="${isCorrect? SUCCESS_COLOR: ERROR_COLOR}">${msg}</h3></th>
+                <th><h4>${result.recognized}</h4></th>
+                <th><h4>${result.groundTruth}</h4></th>
+                <th><h3 style="${result.isCorrect? SUCCESS_COLOR: ERROR_COLOR}">${msg}</h3></th>
             </tr>`
         );
     }

@@ -101,13 +101,14 @@ impl SymcodeScanner {
                 return Err(("Failed at Stage 3: ".to_owned() + e).into());
             }
         };
+        let debug_code_string = format!("{:?}", symcode_instance);
 
         // Stage 4: Decode the Symcode
         match SymcodeDecoder::process(
             symcode_instance
         ) {
             Ok(decoded_symcode) => {
-                Ok(format!("{:?}", decoded_symcode))
+                Ok(format!("{}\n{:?}", debug_code_string, decoded_symcode))
             },
             Err(e) => {
                 Err(("Failed at Stage 4: ".to_owned() + e).into())
@@ -155,10 +156,11 @@ impl SymcodeScanner {
             }
         });
 
-        console_log_util(&format!("Generated glyphs: {:?}", ground_truth_code));
+        let ground_truth_code_string = format!("{:?}", ground_truth_code);
+        console_log_util(&format!("Generated glyphs: {}", ground_truth_code_string));
 
         let ground_truth_code = SymcodeDecoder::process(ground_truth_code).unwrap();
 
-        (symcode, format!("{:?}", ground_truth_code))
+        (symcode, format!("{}\n{:?}", ground_truth_code_string, ground_truth_code))
     }
 }
