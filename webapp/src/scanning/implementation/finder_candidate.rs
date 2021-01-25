@@ -43,19 +43,13 @@ impl Finder for FinderCandidate {
     }
 }
 
-// FinderCandidate as a pipeline component
-impl ScanningProcessor for FinderCandidate {
-    type Input = *const ColorImage;
+impl FinderCandidate {
 
-    type Output = Vec<PointI32>;
-
-    type Params = SymcodeConfig;
-
-    fn process(input: Self::Input, params: &Self::Params) -> Result<Self::Output, &str> {
+    pub fn process(input: &ColorImage, params: &SymcodeConfig) -> Result<Vec<PointI32>, &'static str> {
         Self::valid_input_and_params(&input, params)?;
 
         // Get the reference to the input raw frame
-        let raw_frame = unsafe {&*input};
+        let raw_frame = input;
         // Binarize
         let binary_raw_frame = binarize_image_util(raw_frame);
 
@@ -70,7 +64,7 @@ impl ScanningProcessor for FinderCandidate {
         }
     }
 
-    fn valid_input_and_params(input: &Self::Input, params: &Self::Params) -> Result<(), &'static str> {
+    pub fn valid_input_and_params(_input: &ColorImage, params: &SymcodeConfig) -> Result<(), &'static str> {
         if params.finder_positions.len() < 4 {
             return Err("Number of finder candidates specified in FinderCandidates' params is less than 4.");
         }

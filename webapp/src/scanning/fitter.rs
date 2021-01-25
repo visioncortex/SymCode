@@ -1,5 +1,5 @@
 use permutator::{Combination, Permutation};
-use visioncortex::{Point2,  PointF64};
+use visioncortex::{Point2, PointF64};
 
 use crate::{math::{PerspectiveTransform}};
 
