@@ -5,10 +5,10 @@ use crate::util::console_log_util;
 
 use super::{GlyphTrace};
 
-use num_derive::FromPrimitive;
-use num_traits::FromPrimitive;
+use num_derive::{FromPrimitive, ToPrimitive};
+use num_traits::{FromPrimitive, ToPrimitive};
 
-#[derive(Clone, Copy, Debug, FromPrimitive, PartialEq)]
+#[derive(Clone, Copy, Debug, FromPrimitive, ToPrimitive, PartialEq)]
 /// Useful for testing purposes only.
 ///
 /// For a given alphabet image, the index should go from top to bottom, left to right.
@@ -64,7 +64,6 @@ impl Default for GlyphLabel {
 }
 
 impl GlyphLabel {
-    /// Will be replaced by sth like FromPrimitive
     pub fn from_usize_representation(label: usize) -> Self {
         match FromPrimitive::from_usize(label) {
             Some(glyph_label) => glyph_label,
@@ -72,6 +71,20 @@ impl GlyphLabel {
                 console_log_util(&format!("No corresponding label for {}.", label));
                 panic!();
             },
+        }
+    }
+
+    pub fn option_self_to_primitive(label: Option<Self>) -> usize {
+        if let Some(label) = label {
+            match ToPrimitive::to_usize(&label) {
+                Some(primitive) => primitive,
+                None => {
+                    console_log_util(&format!("Cannot convert {:?} to primitive.", label));
+                    panic!();
+                }
+            }
+        } else {
+            0
         }
     }
 }

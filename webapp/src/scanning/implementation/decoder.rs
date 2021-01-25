@@ -8,9 +8,12 @@ impl Decoder for SymcodeDecoder {
 
     type DecodedData = Vec<Option<super::glyph::GlyphLabel>>;
 
-    type DecodeError = &'static str;
+    type Err = &'static str;
 
-    fn decode(encoded_data: Self::EncodedData) -> Result<Self::DecodedData, Self::DecodeError> {
+    fn decode(encoded_data: Self::EncodedData) -> Result<Self::DecodedData, Self::Err> {
+        encoded_data.iter().for_each(|datum| {
+            crate::util::console_log_util(super::glyph::GlyphLabel::option_self_to_primitive(*datum));
+        });
         Ok(encoded_data)
     }
 }

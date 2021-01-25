@@ -3,7 +3,7 @@ pub trait Decoder {
 
     type DecodedData;
     
-    type DecodeError;
+    type Err;
 
-    fn decode(encoded_data: Self::EncodedData) -> Result<Self::DecodedData, Self::DecodeError>;
+    fn decode(encoded_data: Self::EncodedData) -> Result<Self::DecodedData, Self::Err>;
 }

@@ -1,8 +1,6 @@
-use std::{fs, path::PathBuf};
+use visioncortex::{BinaryImage, Sampler};
 
-use visioncortex::{BinaryImage, ColorImage, Sampler};
-
-use crate::{scanning::{SymcodeConfig, image_diff_area, is_black_hsv}, util::console_log_util};
+use crate::{scanning::{SymcodeConfig, image_diff_area}};
 
 use super::{Glyph, GlyphLabel, GlyphTrace, Trace};
 
