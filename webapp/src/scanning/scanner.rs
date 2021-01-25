@@ -3,7 +3,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, render_binary_image_to_canvas};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, SymcodeDecoder, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, render_binary_image_to_canvas};
 
 #[wasm_bindgen]
 #[derive(Default)]
@@ -88,7 +88,7 @@ impl SymcodeScanner {
         };
 
         // Stage 3: Recognize the glyphs
-        match Recognizer::process(
+        let symcode_instance = match Recognizer::process(
             RecognizerInput {
                 raw_frame,
                 image_to_object,
@@ -96,11 +96,21 @@ impl SymcodeScanner {
             },
             symcode_config
         ) {
-            Ok(glyph_code) => {
-                Ok(format!("{:?}", glyph_code))
+            Ok(symcode_instance) => symcode_instance,
+            Err(e) => {
+                return Err(("Failed at Stage 3: ".to_owned() + e).into());
+            }
+        };
+
+        // Stage 4: Decode the Symcode
+        match SymcodeDecoder::process(
+            symcode_instance
+        ) {
+            Ok(decoded_symcode) => {
+                Ok(format!("{:?}", decoded_symcode))
             },
             Err(e) => {
-                Err(("Failed at Stage 3: ".to_owned() + e).into())
+                Err(("Failed at Stage 4: ".to_owned() + e).into())
             }
         }
     }
