@@ -58,6 +58,9 @@ pub enum GlyphLabel {
     TriforceL,
     TriforceU,
     TriforceR,
+
+    // For counting purpose
+    Last,
 }
 
 impl Default for GlyphLabel {
@@ -67,6 +70,11 @@ impl Default for GlyphLabel {
 }
 
 impl GlyphLabel {
+    /// Number of valid variants (empty + all valid glyphs)
+    pub fn num_variants() -> usize {
+        Self::option_self_to_primitive(Some(Self::Last)).unwrap()
+    }
+
     pub fn from_usize_representation(label: usize) -> Self {
         match FromPrimitive::from_usize(label) {
             Some(glyph_label) => glyph_label,

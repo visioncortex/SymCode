@@ -26,6 +26,11 @@ pub(crate) fn clockwise_points_f64(p1: &PointF64, p2: &PointF64, p3: &PointF64) 
     cross_z > EPSILON && cross_z.is_sign_positive()
 }
 
+/// Returns the number of significant bits of n
+pub(crate) fn num_bits(n: usize) -> usize {
+    (0_usize.leading_zeros() - n.leading_zeros()) as usize
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -73,5 +78,13 @@ mod tests {
         assert!(clockwise_points_f64(&PointF64::new(7.3, 5.2), &PointF64::new(10.5, 2.5), &PointF64::new(15.6, 4.2)));
         // Random anti-clockwise
         assert!(!clockwise_points_f64(&PointF64::new(23.3, 6.8), &PointF64::new(30.1, 14.7), &PointF64::new(27.5, 11.4)));
+    }
+
+    #[test]
+    fn test_num_bits() {
+        assert_eq!(num_bits(0), 0); // 0
+        assert_eq!(num_bits(1), 1); // 01
+        assert_eq!(num_bits(2), 2); // 10
+        assert_eq!(num_bits(33), 6); // 100001
     }
 }

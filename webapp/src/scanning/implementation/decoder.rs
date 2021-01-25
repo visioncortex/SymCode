@@ -10,9 +10,10 @@ impl Decoder for SymcodeDecoder {
 
     type Err = &'static str;
 
-    fn decode(encoded_data: Self::EncodedData) -> Result<Self::DecodedData, Self::Err> {
+    fn decode(encoded_data: Self::EncodedData, num_templates: usize) -> Result<Self::DecodedData, Self::Err> {
+        let num_bits = crate::math::num_bits(num_templates);
         encoded_data.iter().for_each(|datum| {
-            crate::util::console_log_util(&format!("{:?}", super::glyph::GlyphLabel::option_self_to_bit_vec(*datum, 6)));
+            crate::util::console_log_util(&format!("{:?}", super::glyph::GlyphLabel::option_self_to_bit_vec(*datum, num_bits)));
         });
         Ok(encoded_data)
     }
@@ -20,6 +21,6 @@ impl Decoder for SymcodeDecoder {
 
 impl SymcodeDecoder {
     pub fn process(input: Vec<Option<super::glyph::GlyphLabel>>) -> Result<Vec<Option<super::glyph::GlyphLabel>>, &'static str> {
-        Self::decode(input)
+        Self::decode(input, super::glyph::GlyphLabel::num_variants())
     }
 }
