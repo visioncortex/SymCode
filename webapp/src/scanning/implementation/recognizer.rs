@@ -1,6 +1,6 @@
 use visioncortex::{ColorImage};
 
-use crate::{math::PerspectiveTransform, scanning::{GlyphReader, SymcodeConfig, pipeline::ScanningProcessor}};
+use crate::{math::PerspectiveTransform, scanning::{GlyphReader, SymcodeConfig}};
 
 use super::{GlyphLabel, GlyphLibrary};
 
@@ -20,24 +20,17 @@ impl GlyphReader for Recognizer {
     }
 }
 
-pub struct RecognizerInput {
+pub struct RecognizerInput<'a> {
     pub raw_frame: ColorImage,
     pub image_to_object: PerspectiveTransform,
-    pub glyph_library: *const GlyphLibrary,
+    pub glyph_library: &'a GlyphLibrary,
 }
 
-impl ScanningProcessor for Recognizer {
-    type Input = RecognizerInput;
+impl<'a> Recognizer {
 
-    type Output = Vec<Option<GlyphLabel>>;
-
-    type Params = SymcodeConfig;
-
-    fn process(input: Self::Input, params: &Self::Params) -> Result<Self::Output, &str> {
-        Self::valid_input_and_params(&input, params)?;
-
+    pub fn process(input: RecognizerInput<'a>, params: &SymcodeConfig) -> Result<Vec<Option<GlyphLabel>>, &'static str> {
         // Processing starts
-        let glyph_library = unsafe {&*input.glyph_library};
+        let glyph_library = input.glyph_library;
         Ok(Self::read_glyphs_from_raw_frame(input.raw_frame, input.image_to_object, glyph_library, params))
     }
 }

@@ -1,6 +1,6 @@
 use visioncortex::{BinaryImage, ColorImage, PointI32, Shape};
 
-use crate::{scanning::{SymcodeConfig, binarize_image_util, finder::Finder, pipeline::ScanningProcessor, valid_pointf64_on_image}};
+use crate::scanning::{SymcodeConfig, binarize_image_util, finder::Finder, pipeline::ScanningProcessor, valid_pointf64_on_image};
 
 /// Specific implementation of Finder
 pub(crate) struct FinderCandidate;
