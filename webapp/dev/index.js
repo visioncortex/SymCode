@@ -24,7 +24,7 @@ const fps = 60;
 export function loadingCompletes() {
     console.log("Template loading completes.");
     //scanImageFromSource("assets/prototype_4/4.png");
-    document.getElementById('generate').click();
+    runNTestCases(10);
 }
 
 const ERROR_COLOR = "color: #ff5050;";
@@ -107,13 +107,14 @@ async function runNTestCases(n) {
                 </tr>`
             );
         }
+        console.log("At test case ", i+1, ", ", correctCases, " out of ", n, " are correct.");
     }
     document.getElementById("testResults").innerHTML = resultsHtml.join("");
     console.log("Test result: ", correctCases, " out of ", n, " test cases are correctly recognized.");
 }
 
 document.getElementById('test').addEventListener('click', () => {
-    runNTestCases(10);
+    runNTestCases(1000);
 });
 
 document.getElementById('generate').addEventListener('click', () => {
