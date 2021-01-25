@@ -39,10 +39,13 @@ pub trait GlyphReader {
     fn read_glyphs_from_raw_frame(image: ColorImage, image_to_object: PerspectiveTransform, glyph_library: &Self::Library, symcode_config: &crate::scanning::SymcodeConfig) -> Vec<Option<Self::Label>> {
         const DEBUG_OFFSET: usize = 20;
         let mut debug_code_image = BinaryImage::new_w_h(DEBUG_OFFSET + (symcode_config.symbol_width + DEBUG_OFFSET) * symcode_config.glyph_anchors.len(), symcode_config.symbol_height + 2*DEBUG_OFFSET);
+        let mut debug_glyph_rects = vec![];
         let result = symcode_config.glyph_anchors.iter().enumerate()
             .map(|(i, anchor)| {
                 let crop = Self::crop_at_anchor(anchor, &image, &image_to_object, symcode_config)?;
-                debug_code_image.paste_from(&crop, PointI32::new((DEBUG_OFFSET + i*(symcode_config.symbol_width + DEBUG_OFFSET)) as i32, DEBUG_OFFSET as i32));
+                let top_left = PointI32::new((DEBUG_OFFSET + i*(symcode_config.symbol_width + DEBUG_OFFSET)) as i32, DEBUG_OFFSET as i32);
+                debug_glyph_rects.push(visioncortex::BoundingRect::new_x_y_w_h(top_left.x, top_left.y, crop.width as i32, crop.height as i32));
+                debug_code_image.paste_from(&crop, top_left);
                 Some(Self::find_most_similar_glyph(crop, glyph_library, symcode_config))
             })
             .collect();
@@ -51,6 +54,9 @@ pub trait GlyphReader {
             if render_binary_image_to_canvas(&debug_code_image, debug_canvas).is_err() {
                 console_log_util("Cannot render debug code image.");
             }
+            debug_glyph_rects.iter().for_each(|rect| {
+                super::util::render_bounding_rect_to_canvas(rect, debug_canvas);
+            });
         }
         
         result
