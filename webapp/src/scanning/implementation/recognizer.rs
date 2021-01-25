@@ -32,7 +32,7 @@ impl<'a> Recognizer {
         // Processing starts
         let glyph_library = input.glyph_library;
         let glyphs = Self::read_glyphs_from_raw_frame(input.raw_frame, input.image_to_object, glyph_library, params);
-        crate::util::console_log_util(&format!("Recognized glyphs: {:?}", glyphs));
+        //crate::util::console_log_util(&format!("Recognized glyphs: {:?}", glyphs));
         Ok(glyphs)
     }
 }

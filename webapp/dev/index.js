@@ -39,7 +39,7 @@ function handleSuccess(msg) {
     console.log("%c" + msg, SUCCESS_COLOR);
 }
 
-function runOneTestCase() {
+function runOneTestCase(consoleOutput) {
     return new Promise((resolve, reject) => {
         let groundTruthCode = "";
         try {
@@ -48,13 +48,17 @@ function runOneTestCase() {
             handleError(e);
             return;
         }
-        console.log("Generated code: " + groundTruthCode);
+        if (consoleOutput) {
+            console.log("Generated code: " + groundTruthCode);
+        }
         ctx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
         generate_perspective_with_image_src("frame", loadBuffer.toDataURL())
             .then(() => {
                 scan()
                     .then((result) => {
-                        console.log("Recognition result: " + result);
+                        if (consoleOutput) {
+                            console.log("Recognition result: " + result);
+                        }
                         if (result.localeCompare(groundTruthCode) == 0) {
                             resolve({isCorrect: true, groundTruth: groundTruthCode, recognized: result});
                         } else {
@@ -82,7 +86,7 @@ async function runNTestCases(n) {
         let result = {};
         let msg = "";
         try {
-            result = await runOneTestCase();
+            result = await runOneTestCase(false);
             if (result.isCorrect) {
                 msg = "Correct";
                 ++correctCases;
@@ -113,7 +117,7 @@ document.getElementById('test').addEventListener('click', () => {
 });
 
 document.getElementById('generate').addEventListener('click', () => {
-    runOneTestCase()
+    runOneTestCase(true)
         .then((isCorrect) => {
             if (isCorrect) {
                 handleSuccess("Generated code is correctly recognized.");
