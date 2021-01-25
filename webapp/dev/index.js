@@ -82,6 +82,7 @@ async function runNTestCases(n) {
             <th>Ground-truth code</th>
         </tr>`
     ];
+    let errors = {};
     for (let i = 0; i < n; ++i) {
         let result = {};
         let msg = "";
@@ -92,9 +93,11 @@ async function runNTestCases(n) {
                 ++correctCases;
             } else {
                 msg = "Recognition is Wrong.";
+                errors[msg]? errors[msg]++ : errors[msg] = 1;
             }
         } catch (e) {
             msg = e;
+            errors[msg]? errors[msg]++ : errors[msg] = 1;
         }
         if (!result.isCorrect) {
             resultsHtml.push(
@@ -111,10 +114,11 @@ async function runNTestCases(n) {
     }
     document.getElementById("testResults").innerHTML = resultsHtml.join("");
     console.log("Test result: ", correctCases, " out of ", n, " test cases are correctly recognized.");
+    console.log("Errors: ", errors);
 }
 
 document.getElementById('test').addEventListener('click', () => {
-    runNTestCases(1000);
+    runNTestCases(100);
 });
 
 document.getElementById('generate').addEventListener('click', () => {
