@@ -31,6 +31,8 @@ impl<'a> Recognizer {
     pub fn process(input: RecognizerInput<'a>, params: &SymcodeConfig) -> Result<Vec<Option<GlyphLabel>>, &'static str> {
         // Processing starts
         let glyph_library = input.glyph_library;
-        Ok(Self::read_glyphs_from_raw_frame(input.raw_frame, input.image_to_object, glyph_library, params))
+        let glyphs = Self::read_glyphs_from_raw_frame(input.raw_frame, input.image_to_object, glyph_library, params);
+        crate::util::console_log_util(&format!("Recognized glyphs: {:?}", glyphs));
+        Ok(glyphs)
     }
 }

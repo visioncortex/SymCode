@@ -155,6 +155,10 @@ impl SymcodeScanner {
             }
         });
 
+        console_log_util(&format!("Generated glyphs: {:?}", ground_truth_code));
+
+        let ground_truth_code = SymcodeDecoder::process(ground_truth_code).unwrap();
+
         (symcode, format!("{:?}", ground_truth_code))
     }
 }
