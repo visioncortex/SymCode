@@ -12,7 +12,7 @@ impl Decoder for SymcodeDecoder {
 
     fn decode(encoded_data: Self::EncodedData) -> Result<Self::DecodedData, Self::Err> {
         encoded_data.iter().for_each(|datum| {
-            crate::util::console_log_util(super::glyph::GlyphLabel::option_self_to_primitive(*datum));
+            crate::util::console_log_util(&format!("{:?}", super::glyph::GlyphLabel::option_self_to_bit_vec(*datum, 6)));
         });
         Ok(encoded_data)
     }
