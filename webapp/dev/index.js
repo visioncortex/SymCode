@@ -39,30 +39,64 @@ function handleSuccess(msg) {
     console.log("%c" + msg, SUCCESS_COLOR);
 }
 
-document.getElementById('generate').addEventListener('click', function (e) {
-    let groundTruthCode = "";
-    try {
-        groundTruthCode = scanner.generate_symcode_to_canvas("loadBuffer");
-    } catch (e) {
-        handleError(e);
-        return;
+function runOneTestCase() {
+    return new Promise(resolve => {
+        let groundTruthCode = "";
+        try {
+            groundTruthCode = scanner.generate_symcode_to_canvas("loadBuffer");
+        } catch (e) {
+            handleError(e);
+            return;
+        }
+        console.log("Generated code: " + groundTruthCode);
+        ctx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
+        generate_perspective_with_image_src("frame", loadBuffer.toDataURL())
+            .then(() => {
+                scan()
+                    .then((result) => {
+                        console.log("Recognition result: " + result);
+                        if (result.localeCompare(groundTruthCode) == 0) {
+                            resolve(true);
+                        } else {
+                            resolve(false);
+                        }
+                    })
+                    .catch((e) => {
+                        handleError(e);
+                        resolve(false);
+                    });
+            });
+    });
+}
+
+async function runNTestCases(n) {
+    const testResultsDiv = document.getElementById("testResults");
+    console.log("Running ", n, " test cases...");
+    let correctCases = 0;
+    for (let i = 0; i < n; ++i) {
+        const isCorrect = await runOneTestCase();
+
+        
+
+        if (isCorrect) {
+            ++correctCases;
+        }
     }
-    console.log("Generated code: " + groundTruthCode);
-    ctx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
-    generate_perspective_with_image_src("frame", loadBuffer.toDataURL())
-        .then(() => {
-            scan()
-                .then((result) => {
-                    console.log("Recognition result: " + result);
-                    if (result.localeCompare(groundTruthCode) == 0) {
-                        handleSuccess("Generated code is correctly recognized.");
-                    } else {
-                        handleError("Generated code is INCORRECTLY recognized.");
-                    }
-                })
-                .catch((e) => {
-                    handleError(e);
-                });
+    console.log("Test result: ", correctCases, " out of ", n, " test cases are correctly recognized.");
+}
+
+document.getElementById('test').addEventListener('click', () => {
+    runNTestCases(1);
+});
+
+document.getElementById('generate').addEventListener('click', () => {
+    runOneTestCase()
+        .then((isCorrect) => {
+            if (isCorrect) {
+                handleSuccess("Generated code is correctly recognized.");
+            } else {
+                handleError("Generated code is INCORRECTLY recognized.");
+            }
         });
 });
 
