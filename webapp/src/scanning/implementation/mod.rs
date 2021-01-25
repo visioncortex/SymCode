@@ -1,10 +1,12 @@
 pub(crate) mod alphabet;
+pub(crate) mod decoder;
 pub(crate) mod finder_candidate;
 pub(crate) mod glyph;
 pub(crate) mod recognizer;
 pub(crate) mod transformer;
 
 pub(crate) use alphabet::*;
+pub(crate) use decoder::*;
 pub(crate) use finder_candidate::*;
 pub(crate) use glyph::*;
 pub(crate) use recognizer::*;

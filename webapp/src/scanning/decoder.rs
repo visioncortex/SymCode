@@ -5,5 +5,5 @@ pub trait Decoder {
     
     type DecodeError;
 
-    fn decode(encoded_data: Self::EncodedData) -> Result<DecodedData, DecodeError>;
+    fn decode(encoded_data: Self::EncodedData) -> Result<Self::DecodedData, Self::DecodeError>;
 }
