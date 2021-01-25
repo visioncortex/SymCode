@@ -4,7 +4,6 @@ pub mod reader;
 pub mod scanner;
 pub mod symcode_config;
 pub mod fitter;
-pub mod pipeline;
 pub mod util;
 
 pub(crate) use implementation::*;

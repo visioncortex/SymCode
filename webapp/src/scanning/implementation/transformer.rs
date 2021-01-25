@@ -1,6 +1,6 @@
 use visioncortex::{PointF64, PointI32};
 
-use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{SymcodeConfig, Fitter, pipeline::ScanningProcessor}};
+use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{SymcodeConfig, Fitter}};
 
 /// Implementation of Transformer
 pub(crate) struct TransformFitter;
@@ -53,16 +53,8 @@ pub struct TransformFitterInput {
     pub raw_image_height: usize,
 }
 
-impl ScanningProcessor for TransformFitter {
-    type Input = TransformFitterInput;
-
-    type Output = PerspectiveTransform;
-
-    type Params = SymcodeConfig;
-
-    fn process(input: Self::Input, params: &Self::Params) -> Result<Self::Output, &str> {
-        Self::valid_input_and_params(&input, params)?;
-
+impl TransformFitter {
+    pub fn process(input: TransformFitterInput, params: &SymcodeConfig) -> Result<PerspectiveTransform, &str> {
         // Processing starts
         Self::fit_transform(input.raw_image_width, input.raw_image_height, input.finder_positions_image, params)
     }
