@@ -11,6 +11,9 @@
     a {
       color: #88f;
     }
+    table, th, td {
+        border: 1px solid white;
+    }
     #camera {
         width: 300px;
         height: 300px;
@@ -29,12 +32,16 @@
         <button id="cameraButton">Camera</button>
         <button id="generate">Generate</button>
         <button id="export">Export</button>
+        <button id="test">Test</button>
         <input type="file" id="imageInput" accept="image/*">
     </div>
     <div>
         <canvas id="frame" width="400" height="400"></canvas>
         <canvas id="debug"></canvas>
         <canvas id="loadBuffer" style="display: none;"></canvas>
+    </div>
+    <div>
+        <table id="testResults"></table>
     </div>
   </body>
   <script src="./bootstrap.js"></script>

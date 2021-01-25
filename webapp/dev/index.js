@@ -40,7 +40,7 @@ function handleSuccess(msg) {
 }
 
 function runOneTestCase() {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         let groundTruthCode = "";
         try {
             groundTruthCode = scanner.generate_symcode_to_canvas("loadBuffer");
@@ -61,32 +61,49 @@ function runOneTestCase() {
                             resolve(false);
                         }
                     })
-                    .catch((e) => {
-                        handleError(e);
-                        resolve(false);
-                    });
+                    .catch(e => { reject(e);});
             });
     });
 }
 
 async function runNTestCases(n) {
-    const testResultsDiv = document.getElementById("testResults");
     console.log("Running ", n, " test cases...");
     let correctCases = 0;
+    let resultsHtml = [
+        `<tr>
+            <th>Raw Frame</th>
+            <th>Rectified code</th>
+            <th>Recognition result</th>
+        </tr>`
+    ];
     for (let i = 0; i < n; ++i) {
-        const isCorrect = await runOneTestCase();
-
-        
-
-        if (isCorrect) {
-            ++correctCases;
+        let isCorrect = false;
+        let msg = "";
+        try {
+            isCorrect = await runOneTestCase();
+            if (isCorrect) {
+                msg = "Correct";
+                ++correctCases;
+            } else {
+                msg = "Wrong";
+            }
+        } catch (e) {
+            msg = e;
         }
+        resultsHtml.push(
+            `<tr>
+                <th><img src="${frameCanvas.toDataURL("image/png;base64")}" /></th>
+                <th><img src="${debugCanvas.toDataURL("image/png;base64")}" /></th>
+                <th><h3 style="${isCorrect? SUCCESS_COLOR: ERROR_COLOR}">${msg}</h3></th>
+            </tr>`
+        );
     }
+    document.getElementById("testResults").innerHTML = resultsHtml.join("");
     console.log("Test result: ", correctCases, " out of ", n, " test cases are correctly recognized.");
 }
 
 document.getElementById('test').addEventListener('click', () => {
-    runNTestCases(1);
+    runNTestCases(10);
 });
 
 document.getElementById('generate').addEventListener('click', () => {
@@ -97,6 +114,9 @@ document.getElementById('generate').addEventListener('click', () => {
             } else {
                 handleError("Generated code is INCORRECTLY recognized.");
             }
+        })
+        .catch(e => {
+            handleError(e);
         });
 });
 
