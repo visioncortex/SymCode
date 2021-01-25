@@ -138,7 +138,7 @@ function scan() {
 
 if (document.getElementById('export')) {
     document.getElementById('export').addEventListener('click', function (e) {
-        let filename = 'visionmagic-' + new Date().toISOString().slice(0, 19).replace(/:/g, '').replace('T', ' ') + '.png';
+        let filename = 'symcode-' + new Date().toISOString().slice(0, 19).replace(/:/g, '').replace('T', ' ') + '.png';
 
         /// create an "off-screen" anchor tag
         let lnk = document.createElement('a');
