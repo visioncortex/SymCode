@@ -71,11 +71,11 @@ async function runNTestCases(n) {
     let correctCases = 0;
     let resultsHtml = [
         `<tr>
+            <th>Recognition result</th>
             <th>Raw Frame</th>
             <th>Rectified code image</th>
             <th>Recognized code</th>
             <th>Ground-truth code</th>
-            <th>Recognition result</th>
         </tr>`
     ];
     for (let i = 0; i < n; ++i) {
@@ -87,20 +87,22 @@ async function runNTestCases(n) {
                 msg = "Correct";
                 ++correctCases;
             } else {
-                msg = "Wrong";
+                msg = "Recognition is Wrong.";
             }
         } catch (e) {
             msg = e;
         }
-        resultsHtml.push(
-            `<tr>
-                <th><img src="${frameCanvas.toDataURL("image/png;base64")}" /></th>
-                <th><img src="${debugCanvas.toDataURL("image/png;base64")}" /></th>
-                <th><h4>${result.recognized}</h4></th>
-                <th><h4>${result.groundTruth}</h4></th>
-                <th><h3 style="${result.isCorrect? SUCCESS_COLOR: ERROR_COLOR}">${msg}</h3></th>
-            </tr>`
-        );
+        if (!result.isCorrect) {
+            resultsHtml.push(
+                `<tr>
+                    <th><h3 style="${ERROR_COLOR}">${msg}</h3></th>
+                    <th><img src="${frameCanvas.toDataURL("image/png;base64")}" /></th>
+                    <th><img src="${debugCanvas.toDataURL("image/png;base64")}" /></th>
+                    <th><h4>${result.recognized}</h4></th>
+                    <th><h4>${result.groundTruth}</h4></th>
+                </tr>`
+            );
+        }
     }
     document.getElementById("testResults").innerHTML = resultsHtml.join("");
     console.log("Test result: ", correctCases, " out of ", n, " test cases are correctly recognized.");
