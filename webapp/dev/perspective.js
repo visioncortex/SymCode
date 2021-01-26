@@ -266,9 +266,9 @@ function draw() {
 
 function rotateObjectRandom() {
     const getRandom = (lower, upper) => (Math.random() * (upper-lower) + lower);
-    let x_deg = getRandom(-30, 30);
-    let y_deg = getRandom(-30, 30);
-    let z_deg = getRandom(0, 360);
+    let x_deg = getRandom(-5, 5);
+    let y_deg = getRandom(-5, 5);
+    let z_deg = getRandom(-5, 5);
     rotateObjectXYZ(x_deg, y_deg, z_deg);
 }
 
