@@ -116,14 +116,22 @@ async function runNTestCases(n) {
     console.log("Test result: ", correctCases, " out of ", n, " test cases are correctly recognized.");
     console.log("Overall accuracy: ", correctCases / n * 100 + "%")
 
+    let nonWrongRecognitionErrors = 0;
+    let recognitionWrong = 0;
     for (let key in errors) {
+        if (!key.includes("Wrong")) {
+            nonWrongRecognitionErrors += errors[key];
+        } else {
+            recognitionWrong = errors[key];
+        }
         errors[key] = {num: errors[key], rate: errors[key]/n*100 + "%"};
     }
     console.log("Errors: ", JSON.stringify(errors, null, 2));
+    console.log("Recognition wrong after correct rectification rate: ", recognitionWrong / (n-nonWrongRecognitionErrors) * 100 + "%");
 }
 
 document.getElementById('test').addEventListener('click', () => {
-    runNTestCases(100);
+    runNTestCases(1000);
 });
 
 document.getElementById('generate').addEventListener('click', () => {
