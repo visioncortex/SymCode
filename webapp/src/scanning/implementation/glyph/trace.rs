@@ -78,8 +78,19 @@ impl Default for LayerTrace {
     }
 }
 
+macro_rules! set_bits {
+    ($stats:ident, $fun:ident, $tol:ident, $bits:ident, $bit_offset:literal) => {
+        match $stats.$fun($tol) {
+            Ordering::Less => $bits.set($bit_offset, false),
+            Ordering::Greater => $bits.set($bit_offset+1, false),
+            Ordering::Equal => {},
+        }
+    }
+}
+
+// Denote top-left, top-right, bottom-left, bottom-right weights by a,b,c,d respectively
 impl LayerTrace {
-    /// 2 bits each for vertical, horizontal, and diagonal comparison
+    /// 2 bits each for a+b <> c+d, a+c <> b+d, a+d <> b+c, a <> b, c <> d, a <> c, b <> d, a <> d, b <> c
     const LENGTH: usize = 6;
 
     pub fn from_image(image: &BinaryImage, tolerance: f64) -> Self {
@@ -90,23 +101,9 @@ impl LayerTrace {
 
         let mut bits = BitVec::from_elem(Self::LENGTH, true); // start with all 1's
         
-        match stats.vertical_comparison(tolerance) {
-            Ordering::Less => bits.set(0, false),
-            Ordering::Greater => bits.set(1, false),
-            Ordering::Equal => {},
-        }
-        
-        match stats.horizontal_comparison(tolerance) {
-            Ordering::Less => bits.set(2, false),
-            Ordering::Greater => bits.set(3, false),
-            Ordering::Equal => {},
-        }
-        
-        match stats.diagonal_comparison(tolerance) {
-            Ordering::Less => bits.set(4, false),
-            Ordering::Greater => bits.set(5, false),
-            Ordering::Equal => {},
-        }
+        set_bits!(stats, vertical_comparison, tolerance, bits, 0);
+        set_bits!(stats, horizontal_comparison, tolerance, bits, 2);
+        set_bits!(stats, diagonal_comparison, tolerance, bits, 4);
 
         Self {
             bits
