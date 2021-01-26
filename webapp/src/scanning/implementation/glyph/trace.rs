@@ -53,14 +53,8 @@ impl GlyphTrace {
 
     pub fn from_layer_traces(layer_traces: Vec<LayerTrace>) -> Self {
         let total_length = layer_traces.len() * LayerTrace::LENGTH;
-        let mut bits = BitVec::from_elem(total_length, false);
-
-        for i in 0..total_length {
-            bits.set(i, layer_traces[i/6].bits[i%6]);
-        }
-
         Self {
-            bits
+            bits: BitVec::from_fn(total_length, |i| {layer_traces[i/LayerTrace::LENGTH].bits.get(i%LayerTrace::LENGTH).unwrap()}),
         }
     }
 }
