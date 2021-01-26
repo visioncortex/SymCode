@@ -3,6 +3,7 @@ import { SYMCODE_CONFIG } from "./config";
 import { loadAlphabet, loadBuffer } from "./load";
 import { generate_perspective_with_image_src } from "./perspective";
 
+const htmldiff = require("./htmldiff.js");
 const frameCanvas = document.getElementById('frame');
 const debugCanvas = document.getElementById('debug');
 const ctx = frameCanvas.getContext('2d');
@@ -79,7 +80,6 @@ async function runNTestCases(n) {
             <th>Raw Frame</th>
             <th>Rectified code image</th>
             <th>Recognized code</th>
-            <th>Ground-truth code</th>
         </tr>`
     ];
     let errors = {};
@@ -105,8 +105,7 @@ async function runNTestCases(n) {
                     <th><h3 style="${ERROR_COLOR}">${msg}</h3></th>
                     <th><img src="${frameCanvas.toDataURL("image/png;base64")}" /></th>
                     <th><img src="${debugCanvas.toDataURL("image/png;base64")}" /></th>
-                    <th><h4>${result.recognized}</h4></th>
-                    <th><h4>${result.groundTruth}</h4></th>
+                    <th><h4>${htmldiff(result.recognized, result.groundTruth)}</h4></th>
                 </tr>`
             );
         }
