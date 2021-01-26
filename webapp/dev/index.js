@@ -110,11 +110,16 @@ async function runNTestCases(n) {
                 </tr>`
             );
         }
-        console.log("At test case ", i+1, ", ", correctCases, " out of ", n, " are correct.");
+        console.log("Running " + n + " test cases: ", correctCases, " out of ", i+1, " are correct. Running Accuracy: ", correctCases / (i+1) * 100 + "%");
     }
     document.getElementById("testResults").innerHTML = resultsHtml.join("");
     console.log("Test result: ", correctCases, " out of ", n, " test cases are correctly recognized.");
-    console.log("Errors: ", errors);
+    console.log("Overall accuracy: ", correctCases / n * 100 + "%")
+
+    for (let key in errors) {
+        errors[key] = {num: errors[key], rate: errors[key]/n*100 + "%"};
+    }
+    console.log("Errors: ", JSON.stringify(errors, null, 2));
 }
 
 document.getElementById('test').addEventListener('click', () => {
