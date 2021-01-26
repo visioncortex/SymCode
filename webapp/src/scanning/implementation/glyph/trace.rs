@@ -109,11 +109,11 @@ impl LayerTrace {
         set_bits!(horizontal_comparison);
         set_bits!(diagonal_comparison);
         set_bits!(a_b_comparison);
-        set_bits!(c_d_comparison);
         set_bits!(a_c_comparison);
-        set_bits!(b_d_comparison);
         set_bits!(a_d_comparison);
         set_bits!(b_c_comparison);
+        set_bits!(b_d_comparison);
+        set_bits!(c_d_comparison);
 
         Self {
             bits
@@ -126,8 +126,11 @@ mod tests {
 
     use super::*;
 
+    const T: bool = true;
+    const F: bool = false;
+
     #[test]
-    fn shape_encoding_encoding_diff() {
+    fn trace_diff() {
         let a = &mut LayerTrace::default();
         let b = &mut LayerTrace::default();
         assert_eq!(a.diff(b), 0);
@@ -147,8 +150,8 @@ mod tests {
     }
 
     #[test]
-    fn shape_encoding_from_image() {
-        // Should be 10 01 01
+    fn layer_trace_from_image() {
+        // Should be 10 01 01 01 11 11 10 10 11
         let encoding = &LayerTrace::from_image(
             &BinaryImage::from_string(
               &("-*\n".to_owned() +
@@ -156,15 +159,11 @@ mod tests {
             ),
             0.0
         );
-        println!("{:?}", encoding.bits);
-        assert_eq!(encoding.bits.get(0), Some(true));
-        assert_eq!(encoding.bits.get(1), Some(false));
-        assert_eq!(encoding.bits.get(2), Some(false));
-        assert_eq!(encoding.bits.get(3), Some(true));
-        assert_eq!(encoding.bits.get(4), Some(false));
-        assert_eq!(encoding.bits.get(5), Some(true));
+        assert!(encoding.bits.eq_vec(&[
+            T,F,F,T,F,T,F,T,T,T,T,T,T,F,T,F,T,T
+        ]));
 
-        // Should be 11 11 10
+        // Should be 11 11 10 10 10 11 11 01 01
         let encoding = &LayerTrace::from_image(
             &BinaryImage::from_string(
               &("*-\n".to_owned() +
@@ -172,17 +171,13 @@ mod tests {
             ),
             0.0
         );
-        println!("{:?}", encoding.bits);
-        assert_eq!(encoding.bits.get(0), Some(true));
-        assert_eq!(encoding.bits.get(1), Some(true));
-        assert_eq!(encoding.bits.get(2), Some(true));
-        assert_eq!(encoding.bits.get(3), Some(true));
-        assert_eq!(encoding.bits.get(4), Some(true));
-        assert_eq!(encoding.bits.get(5), Some(false));
+        assert!(encoding.bits.eq_vec(&[
+            T,T,T,T,T,F,T,F,T,F,T,T,T,T,F,T,F,T
+        ]));
     }
 
     #[test]
-    fn shape_encoding_empty_image() {
+    fn layer_trace_empty_image() {
         // Should be 00 00 00
         let encoding = &LayerTrace::from_image(
             &BinaryImage::from_string(
@@ -196,7 +191,7 @@ mod tests {
     }
 
     #[test]
-    fn glyph_encoding_empty() {
+    fn glyph_trace_empty() {
         let encoding = &GlyphTrace::from_image(
             &BinaryImage::from_string(
               &("----\n".to_owned() +
@@ -211,7 +206,8 @@ mod tests {
     }
 
     #[test]
-    fn glyph_encoding_typical() {
+    fn glyph_trace_typical() {
+        // Should be 01 01 10 11 11 01 11 01 01
         let encoding = &GlyphTrace::from_image(
             &BinaryImage::from_string(
               &("*---\n".to_owned() +
@@ -222,44 +218,9 @@ mod tests {
             ),
             0.0
         );
-        let i = 0;
-        assert_eq!(encoding.bits.get(i), Some(true)); // 1
-        assert_eq!(encoding.bits.get(i+1), Some(false)); // 0
-        assert_eq!(encoding.bits.get(i+2), Some(true)); // 1
-        assert_eq!(encoding.bits.get(i+3), Some(false)); // 0
-        assert_eq!(encoding.bits.get(i+4), Some(true)); // 1
-        assert_eq!(encoding.bits.get(i+5), Some(false)); // 0
 
-        let i = 6;
-        assert_eq!(encoding.bits.get(i), Some(false)); // 0
-        assert_eq!(encoding.bits.get(i+1), Some(true)); // 1
-        assert_eq!(encoding.bits.get(i+2), Some(true)); // 1
-        assert_eq!(encoding.bits.get(i+3), Some(false)); // 0
-        assert_eq!(encoding.bits.get(i+4), Some(false)); // 0
-        assert_eq!(encoding.bits.get(i+5), Some(true)); // 1
-
-        let i = 12;
-        assert_eq!(encoding.bits.get(i), Some(true)); // 1
-        assert_eq!(encoding.bits.get(i+1), Some(true)); // 1
-        assert_eq!(encoding.bits.get(i+2), Some(true)); // 1
-        assert_eq!(encoding.bits.get(i+3), Some(true)); // 1
-        assert_eq!(encoding.bits.get(i+4), Some(false)); // 0
-        assert_eq!(encoding.bits.get(i+5), Some(true)); // 1
-
-        let i = 18;
-        assert_eq!(encoding.bits.get(i), Some(true)); // 1
-        assert_eq!(encoding.bits.get(i+1), Some(false)); // 0
-        assert_eq!(encoding.bits.get(i+2), Some(true)); // 1
-        assert_eq!(encoding.bits.get(i+3), Some(false)); // 0
-        assert_eq!(encoding.bits.get(i+4), Some(true)); // 1
-        assert_eq!(encoding.bits.get(i+5), Some(false)); // 0
-
-        let i = 24;
-        assert_eq!(encoding.bits.get(i), Some(false)); // 0
-        assert_eq!(encoding.bits.get(i+1), Some(true)); // 1
-        assert_eq!(encoding.bits.get(i+2), Some(false)); // 0
-        assert_eq!(encoding.bits.get(i+3), Some(true)); // 1
-        assert_eq!(encoding.bits.get(i+4), Some(true)); // 1
-        assert_eq!(encoding.bits.get(i+5), Some(false)); // 0
+        assert!(encoding.bits.eq_vec(&[
+            F,T,F,T,T,F,T,T,T,T,F,T,T,T,F,T,F,T
+        ]));
     }
 }
