@@ -30,8 +30,9 @@ impl Trace for GlyphTrace {
 impl GlyphTrace {
 
     pub fn from_image(image: &BinaryImage, tolerance: f64) -> Self {
+        let mut layer_traces = vec![];
         // Encode each small layer
-        let mut layer_traces = Self::subdivide_and_encode(image, tolerance);
+        // layer_traces = Self::subdivide_and_encode(image, tolerance);
         // Encode the big layer
         layer_traces.push(LayerTrace::from_image(image, tolerance));
         Self::from_layer_traces(layer_traces)
@@ -79,8 +80,8 @@ impl Default for LayerTrace {
 }
 
 macro_rules! set_bits {
-    ($stats:ident, $fun:ident, $tol:ident, $bits:ident, $bit_offset:literal) => {
-        match $stats.$fun($tol) {
+    ($stats:ident, $fun:ident, $bits:ident, $bit_offset:expr) => {
+        match $stats.$fun() {
             Ordering::Less => $bits.set($bit_offset, false),
             Ordering::Greater => $bits.set($bit_offset+1, false),
             Ordering::Equal => {},
@@ -91,19 +92,26 @@ macro_rules! set_bits {
 // Denote top-left, top-right, bottom-left, bottom-right weights by a,b,c,d respectively
 impl LayerTrace {
     /// 2 bits each for a+b <> c+d, a+c <> b+d, a+d <> b+c, a <> b, c <> d, a <> c, b <> d, a <> d, b <> c
-    const LENGTH: usize = 6;
+    const LENGTH: usize = ShapeStats::NUM_COMPARISONS << 1;
 
     pub fn from_image(image: &BinaryImage, tolerance: f64) -> Self {
-        let stats = ShapeStats::from_image(image);
+        let stats = ShapeStats::from_image(image, tolerance);
         if stats.is_empty() {
             return Self::default();
         }
 
         let mut bits = BitVec::from_elem(Self::LENGTH, true); // start with all 1's
         
-        set_bits!(stats, vertical_comparison, tolerance, bits, 0);
-        set_bits!(stats, horizontal_comparison, tolerance, bits, 2);
-        set_bits!(stats, diagonal_comparison, tolerance, bits, 4);
+        let mut i = 0;
+        set_bits!(stats, vertical_comparison, bits, i); i += 2;
+        set_bits!(stats, horizontal_comparison, bits, i); i += 2;
+        set_bits!(stats, diagonal_comparison, bits, i); i += 2;
+        set_bits!(stats, a_b_comparison, bits, i); i += 2;
+        set_bits!(stats, c_d_comparison, bits, i); i += 2;
+        set_bits!(stats, a_c_comparison, bits, i); i += 2;
+        set_bits!(stats, b_d_comparison, bits, i); i += 2;
+        set_bits!(stats, a_d_comparison, bits, i); i += 2;
+        set_bits!(stats, b_c_comparison, bits, i); i += 2;
 
         Self {
             bits
