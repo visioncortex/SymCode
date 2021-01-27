@@ -31,7 +31,7 @@ export function loadTemplateByIndex(index) {
 }
 
 export function loadAlphabet(scanner) {
-    const path = "assets/alphabet/alphabet2.jpg";
+    const path = "assets/alphabet/alphabet2.png";
     const params = AlphabetReaderParams.from_json_string(JSON.stringify(ALPHABET_CONFIG));
     img.src = path;
     img.onload = function () {

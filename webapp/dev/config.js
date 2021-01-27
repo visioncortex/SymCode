@@ -20,17 +20,17 @@ export const SYMCODE_CONFIG = {
     debug_canvas: "debug",
     max_extra_finder_candidates: 3,
     rectify_error_threshold: 20.0,
-    stat_tolerance: 0.4,
+    stat_tolerance: 0.2,
     max_encoding_difference: 6,
     empty_cluster_threshold: 0.2,
 };
     
 export const ALPHABET_CONFIG = {
-    top_left: {x: 49, y: 49},
-    symbol_width: 80,
-    symbol_height: 80,
-    offset_x: 115,
-    offset_y: 116,
+    top_left: {x: 100, y: 100},
+    symbol_width: 155,
+    symbol_height: 155,
+    offset_x: 155*1.5,
+    offset_y: 155*1.5,
     num_columns: 4,
     num_rows: 8,
 };
