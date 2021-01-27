@@ -1,6 +1,6 @@
-use visioncortex::{BinaryImage, ColorImage, PointF64, PointI32, bilinear_interpolate};
+use visioncortex::{BinaryImage, BoundingRect, ColorImage, PointF64, PointI32, bilinear_interpolate};
 
-use crate::{math::PerspectiveTransform, util::console_log_util};
+use crate::{math::PerspectiveTransform};
 
 use super::{SymcodeConfig, is_black_rgb, render_binary_image_to_canvas};
 
@@ -12,53 +12,104 @@ pub trait GlyphReader {
 
     type Library;
 
-    /// Assuming the perspective transform done in the previous stage is accurate,
-    /// the areas at the anchors should be where the glyphs are.
-    fn crop_at_anchor(anchor: &PointF64, image: &ColorImage, image_to_object: &PerspectiveTransform, symcode_config: &SymcodeConfig) -> Option<BinaryImage> {
-        let width = symcode_config.symbol_width;
-        let height = symcode_config.symbol_height;
-        let mut crop = BinaryImage::new_w_h(width, height);
+    fn rectify_image(raw_image: ColorImage, image_to_object: PerspectiveTransform, symcode_config: &SymcodeConfig) -> BinaryImage {
+        let width = symcode_config.code_width;
+        let height = symcode_config.code_height;
+        let mut rectified_image = BinaryImage::new_w_h(width, height);
         for y in 0..height {
             for x in 0..width {
-                let sample_point = image_to_object.transform_inverse(*anchor + PointF64::new(x as f64, y as f64)).to_point_f32();
-                let interpolated_color = bilinear_interpolate(image, sample_point);
-                crop.set_pixel(x, y, is_black_rgb(&interpolated_color));
+                let sample_point = image_to_object.transform_inverse(PointF64::new(x as f64, y as f64)).to_point_f32();
+                let interpolated_color = bilinear_interpolate(&raw_image, sample_point);
+                rectified_image.set_pixel(x, y, is_black_rgb(&interpolated_color));
             }
         }
-        if crop.area() <= symcode_config.absolute_empty_cluster_threshold(&crop) {
-            None
-        } else {
-            Some(crop)
+        rectified_image
+    }
+
+    /// For each rect in cluster_rects, classify it into the group of rects that overlap with the glyph region
+    fn group_cluster_rects_by_glyph_regions(mut cluster_rects: Vec<BoundingRect>, symcode_config: &SymcodeConfig) -> Vec<Vec<BoundingRect>> {
+        let glyph_rects: Vec<BoundingRect> = symcode_config.glyph_anchors.iter().map(|top_left| {
+            BoundingRect::new_x_y_w_h(top_left.x as i32, top_left.y as i32, symcode_config.symbol_width as i32, symcode_config.symbol_height as i32)
+        }).collect();
+
+        let mut grouped_rects = vec![vec![]; glyph_rects.len()];
+        glyph_rects.into_iter().enumerate().for_each(|(i, glyph_rect)| {
+            cluster_rects.retain(|cluster_rect| {
+                if glyph_rect.hit(*cluster_rect) {
+                    grouped_rects[i].push(*cluster_rect);
+                    false
+                } else {
+                    true
+                }
+            });
+        });
+        
+        grouped_rects
+    }
+
+    /// Merge each group of cluster rects and returns the centers of the merged clusters, or None if the group has no cluster
+    fn centers_of_merged_clusters_in_glyph_regions(grouped_cluster_rects: Vec<Vec<BoundingRect>>) -> Vec<Option<PointI32>> {
+        grouped_cluster_rects.into_iter()
+            .map(|group| {
+                if group.is_empty() {
+                    None
+                } else {
+                    let rect = group[0];
+                    let merged_cluster = group.iter().skip(1).fold(rect, |mut a, b| {
+                        a.merge(*b); a
+                    });
+                    Some(
+                        merged_cluster.center()
+                    )
+                }
+            })
+            .collect()
+    }
+
+    /// Crop an image of a glyph at the specified center position
+    fn crop_glyph_at_center(image: &BinaryImage, center: PointI32, symcode_config: &SymcodeConfig) -> BinaryImage {
+        let width = symcode_config.symbol_width;
+        let height = symcode_config.symbol_height;
+        let top_left = center - PointI32::new((width >> 1) as i32, (height >> 1) as i32);
+        let rect = BoundingRect::new_x_y_w_h(top_left.x, top_left.y, width as i32, height as i32);
+        if let Some(debug_canvas) = &symcode_config.debug_canvas {
+            crate::scanning::util::render_bounding_rect_to_canvas(&rect, debug_canvas);
         }
+        image.crop_with_rect(rect)
     }
 
     /// Finds the most similar glyph in the library based on given params
-    fn find_most_similar_glyph(image: BinaryImage, glyph_library: &Self::Library, symcode_config: &crate::scanning::SymcodeConfig) -> Self::Label;
-
+    fn find_most_similar_glyph(image: BinaryImage, glyph_library: &Self::Library, symcode_config: &SymcodeConfig) -> Self::Label;
+    
     /// Read all glyphs at the anchors on the input image
     fn read_glyphs_from_raw_frame(image: ColorImage, image_to_object: PerspectiveTransform, glyph_library: &Self::Library, symcode_config: &crate::scanning::SymcodeConfig) -> Vec<Option<Self::Label>> {
-        const DEBUG_OFFSET: usize = 20;
-        let mut debug_code_image = BinaryImage::new_w_h(DEBUG_OFFSET + (symcode_config.symbol_width + DEBUG_OFFSET) * symcode_config.glyph_anchors.len(), symcode_config.symbol_height + 2*DEBUG_OFFSET);
-        let mut debug_glyph_rects = vec![];
-        let result = symcode_config.glyph_anchors.iter().enumerate()
-            .map(|(i, anchor)| {
-                let crop = Self::crop_at_anchor(anchor, &image, &image_to_object, symcode_config)?;
-                let top_left = PointI32::new((DEBUG_OFFSET + i*(symcode_config.symbol_width + DEBUG_OFFSET)) as i32, DEBUG_OFFSET as i32);
-                debug_glyph_rects.push(visioncortex::BoundingRect::new_x_y_w_h(top_left.x, top_left.y, crop.width as i32, crop.height as i32));
-                debug_code_image.paste_from(&crop, top_left);
-                Some(Self::find_most_similar_glyph(crop, glyph_library, symcode_config))
+        let rectified_image = Self::rectify_image(image, image_to_object, symcode_config);
+        if let Some(debug_canvas) = &symcode_config.debug_canvas {
+            if render_binary_image_to_canvas(&rectified_image, debug_canvas).is_err() {
+                crate::util::console_log_util("Cannot render rectified code image to debug canvas.");
+            }
+        }
+        let cluster_rects: Vec<BoundingRect> = rectified_image.to_clusters(true).clusters.into_iter()
+            .map(|cluster| cluster.rect)
+            .filter(|rect| {
+                rect.width() <= (symcode_config.symbol_width + 10) as i32 &&
+                rect.height() <= (symcode_config.symbol_height + 10) as i32
             })
             .collect();
-
-        if let Some(debug_canvas) = &symcode_config.debug_canvas {
-            if render_binary_image_to_canvas(&debug_code_image, debug_canvas).is_err() {
-                console_log_util("Cannot render debug code image.");
+        let grouped_cluster_rects = Self::group_cluster_rects_by_glyph_regions(cluster_rects, symcode_config);
+        let centers_of_groups = Self::centers_of_merged_clusters_in_glyph_regions(grouped_cluster_rects);
+        centers_of_groups.into_iter().map(|center| {
+            if let Some(center) = center {
+                let glyph_image = Self::crop_glyph_at_center(&rectified_image, center, symcode_config);
+                if glyph_image.area() < symcode_config.absolute_empty_cluster_threshold(&glyph_image) {
+                    None
+                } else {
+                    Some(Self::find_most_similar_glyph(glyph_image, glyph_library, symcode_config))
+                }
+            } else {
+                None
             }
-            debug_glyph_rects.iter().for_each(|rect| {
-                super::util::render_bounding_rect_to_canvas(rect, debug_canvas);
-            });
-        }
-        
-        result
+        })
+        .collect()
     }
 }
