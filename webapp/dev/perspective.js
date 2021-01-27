@@ -270,9 +270,9 @@ seedableRandom.seed(125);
 
 function rotateObjectRandom() {
     const getRandom = (lower, upper) => (seedableRandom.next() * (upper-lower) + lower);
-    let x_deg = getRandom(-30, 30);
-    let y_deg = getRandom(-30, 30);
-    let z_deg = getRandom(-5, 5);
+    let x_deg = getRandom(-45, 45);
+    let y_deg = getRandom(-45, 45);
+    let z_deg = getRandom(0, 359);
     rotateObjectXYZ(x_deg, y_deg, z_deg);
 }
 
