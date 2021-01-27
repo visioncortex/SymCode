@@ -75,14 +75,18 @@ function runOneTestCase(consoleOutput) {
 async function runNTestCases(n) {
     console.log("Running ", n, " test cases...");
     let correctCases = 0;
-    let resultsHtml = [
+    const testResultsHtml = document.getElementById("testResults");
+    if (!testResultsHtml || testResultsHtml.tagName.localeCompare("TABLE") != 0) {
+        console.log("Nowhere to show test results.");
+        return;
+    }
+    testResultsHtml.innerHTML =
         `<tr>
             <th>Recognition result</th>
             <th>Raw Frame</th>
             <th>Rectified code image</th>
             <th>Recognized code</th>
-        </tr>`
-    ];
+        </tr>`;
     let errors = {};
     for (let i = 0; i < n; ++i) {
         let result = {};
@@ -101,18 +105,16 @@ async function runNTestCases(n) {
             errors[msg]? errors[msg]++ : errors[msg] = 1;
         }
         if (!result.isCorrect) {
-            resultsHtml.push(
+            testResultsHtml.innerHTML +=
                 `<tr>
                     <th><h3 style="${ERROR_COLOR}">${msg}</h3></th>
                     <th><img src="${frameCanvas.toDataURL("image/png;base64")}" /></th>
                     <th><img src="${debugCanvas.toDataURL("image/png;base64")}" /></th>
                     <th><h4>${htmldiff(result.recognized, result.groundTruth)}</h4></th>
-                </tr>`
-            );
+                </tr>`;
         }
         console.log("Running " + n + " test cases: ", correctCases, " out of ", i+1, " are correct. Running Accuracy: ", correctCases / (i+1) * 100 + "%");
     }
-    document.getElementById("testResults").innerHTML = resultsHtml.join("");
     console.log("Test result: ", correctCases, " out of ", n, " test cases are correctly recognized.");
     console.log("Overall accuracy: ", correctCases / n * 100 + "%")
 
