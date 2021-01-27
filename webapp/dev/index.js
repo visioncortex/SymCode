@@ -2,6 +2,7 @@ import { SymcodeScanner, SymcodeConfig } from "symcode";
 import { SYMCODE_CONFIG } from "./config";
 import { loadAlphabet, loadBuffer } from "./load";
 import { generate_perspective_with_image_src } from "./perspective";
+import { calculateConfusionMatrix } from "./confusion";
 
 const htmldiff = require("./htmldiff.js");
 const frameCanvas = document.getElementById('frame');
@@ -127,6 +128,7 @@ async function runNTestCases(n) {
     }
     console.log("Errors: ", JSON.stringify(errors, null, 2));
     console.log("Recognition wrong after correct rectification rate: ", recognitionWrong / (n-nonWrongRecognitionErrors) * 100 + "%");
+    calculateConfusionMatrix("confusionMatrix");
 }
 
 document.getElementById('test').addEventListener('click', () => {
