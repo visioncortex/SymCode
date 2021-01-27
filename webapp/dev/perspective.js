@@ -264,10 +264,14 @@ function draw() {
   }
 }
 
+const SeedableRandom = require("./random");
+const seedableRandom = new SeedableRandom();
+seedableRandom.seed(125);
+
 function rotateObjectRandom() {
-    const getRandom = (lower, upper) => (Math.random() * (upper-lower) + lower);
-    let x_deg = getRandom(-15, 15);
-    let y_deg = getRandom(-15, 15);
+    const getRandom = (lower, upper) => (seedableRandom.next() * (upper-lower) + lower);
+    let x_deg = getRandom(-30, 30);
+    let y_deg = getRandom(-30, 30);
     let z_deg = getRandom(-5, 5);
     rotateObjectXYZ(x_deg, y_deg, z_deg);
 }
