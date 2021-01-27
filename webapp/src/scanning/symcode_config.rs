@@ -64,8 +64,8 @@ impl SymcodeConfig {
     }
 
     #[inline]
-    pub fn absolute_empty_cluster_threshold(&self, image: &BinaryImage) -> u64 {
-        (self.empty_cluster_threshold * (image.width * image.height) as f64) as u64
+    pub fn absolute_empty_cluster_threshold(&self, image_width: usize, image_height: usize) -> u64 {
+        (self.empty_cluster_threshold * (image_width * image_height) as f64) as u64
     }
 }
 

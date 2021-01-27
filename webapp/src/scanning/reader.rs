@@ -90,18 +90,27 @@ pub trait GlyphReader {
             }
         }
         let cluster_rects: Vec<BoundingRect> = rectified_image.to_clusters(true).clusters.into_iter()
-            .map(|cluster| cluster.rect)
-            .filter(|rect| {
-                rect.width() <= (symcode_config.symbol_width + 10) as i32 &&
-                rect.height() <= (symcode_config.symbol_height + 10) as i32
+            .filter_map(|cluster| {
+                let rect = cluster.rect;
+                if cluster.size() < symcode_config.absolute_empty_cluster_threshold(rect.width() as usize, rect.height() as usize) as usize {
+                    return None;
+                }
+                if  rect.width() <= (symcode_config.symbol_width + 10) as i32 &&
+                    rect.height() <= (symcode_config.symbol_height + 10) as i32 {
+                    Some(rect)
+                } else {
+                    None
+                }
             })
             .collect();
+
+        //cluster_rects.iter().for_each(|rect| crate::scanning::util::render_bounding_rect_to_canvas_with_color(rect, crate::canvas::Canvas::new_from_id("debug").as_ref().unwrap(), visioncortex::Color::new(0, 0, 255)));
         let grouped_cluster_rects = Self::group_cluster_rects_by_glyph_regions(cluster_rects, symcode_config);
         let centers_of_groups = Self::centers_of_merged_clusters_in_glyph_regions(grouped_cluster_rects);
         centers_of_groups.into_iter().map(|center| {
             if let Some(center) = center {
                 let glyph_image = Self::crop_glyph_at_center(&rectified_image, center, symcode_config);
-                if glyph_image.area() < symcode_config.absolute_empty_cluster_threshold(&glyph_image) {
+                if glyph_image.area() < symcode_config.absolute_empty_cluster_threshold(glyph_image.width, glyph_image.height) {
                     None
                 } else {
                     Some(Self::find_most_similar_glyph(glyph_image, glyph_library, symcode_config))
