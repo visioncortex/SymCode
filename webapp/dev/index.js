@@ -26,7 +26,7 @@ const fps = 60;
 export function loadingCompletes() {
     console.log("Template loading completes.");
     //scanImageFromSource("assets/prototype_4/4.png");
-    runNTestCases(10);
+    //runNTestCases(10);
 }
 
 const ERROR_COLOR = "color: #ff5050;";
