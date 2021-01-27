@@ -20,7 +20,7 @@ export const SYMCODE_CONFIG = {
     debug_canvas: "debug",
     max_extra_finder_candidates: 3,
     rectify_error_threshold: 20.0,
-    stat_tolerance: 0.2,
+    stat_tolerance: 1/3,
     max_encoding_difference: 6,
     empty_cluster_threshold: 0.2,
 };
