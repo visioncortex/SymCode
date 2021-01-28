@@ -268,10 +268,10 @@ const SeedableRandom = require("./random");
 const seedableRandom = new SeedableRandom();
 seedableRandom.seed(125);
 
-function rotateObjectRandom() {
+function rotateObjectRandom(angleVariation) {
     const getRandom = (lower, upper) => (seedableRandom.next() * (upper-lower) + lower);
-    let x_deg = getRandom(-45, 45);
-    let y_deg = getRandom(-45, 45);
+    let x_deg = getRandom(-angleVariation, angleVariation);
+    let y_deg = getRandom(-angleVariation, angleVariation);
     let z_deg = getRandom(0, 359);
     rotateObjectXYZ(x_deg, y_deg, z_deg);
 }
@@ -294,7 +294,7 @@ function rotateObject(scaled_axis) {
   jsgl.orthonormalizeRotation(object_mat);
 }
 
-function init(canvas_id) {
+function init(canvas_id, angleVariation) {
     return new Promise(resolve => {
         canvas_elem = document.getElementById(canvas_id);
         var ctx = canvas_elem.getContext('2d');
@@ -311,7 +311,7 @@ function init(canvas_id) {
         camera_mat = jsgl.makeOrientationAffine(
             {x:0, y:0, z: -0.2 - target_distance}, {x:0, y:0, z:1}, {x:0, y:-1, z:0});
     
-        rotateObjectRandom();
+        rotateObjectRandom(angleVariation);
         requestAnimationFrame(() => {
             draw();
             resolve();
@@ -321,11 +321,11 @@ function init(canvas_id) {
 
 // Awesome cubemaps: http://www.humus.name/index.php?page=Textures&&start=32
 
-export function generate_perspective_with_image_src(canvas_id, src) {
+export function generate_perspective_with_image_src(canvas_id, src, angleVariation) {
     return new Promise(resolve => {
         images.push(new Image());
         images[0].onload = function () {
-            init(canvas_id)
+            init(canvas_id, angleVariation)
                 .then(resolve);
         };
         images[0].src = src;

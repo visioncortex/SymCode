@@ -57,7 +57,7 @@ function runOneTestCase(consoleOutput) {
         ctx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
         debugCtx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
         debugCanvas.width = debugCanvas.height = 1;
-        generate_perspective_with_image_src("frame", loadBuffer.toDataURL())
+        generate_perspective_with_image_src("frame", loadBuffer.toDataURL(), 5)
             .then(() => {
                 scan()
                     .then((result) => {
