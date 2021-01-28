@@ -11,7 +11,7 @@ impl FinderCandidate {
         for i in 0..steps {
             let angle = i as f64 * std::f64::consts::PI / (steps as f64);
             let rotated_image = if i > 0 {
-                image.rotate(angle)
+                image.rotate(angle).crop()
             } else {
                 image.clone()
             };
