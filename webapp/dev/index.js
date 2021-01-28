@@ -42,7 +42,7 @@ function handleSuccess(msg) {
     console.log("%c" + msg, SUCCESS_COLOR);
 }
 
-function runOneTestCase(consoleOutput) {
+function runOneTestCase(consoleOutput, angleVariation) {
     return new Promise((resolve, reject) => {
         let groundTruthCode = "";
         try {
@@ -57,7 +57,7 @@ function runOneTestCase(consoleOutput) {
         ctx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
         debugCtx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
         debugCanvas.width = debugCanvas.height = 1;
-        generate_perspective_with_image_src("frame", loadBuffer.toDataURL(), 5)
+        generate_perspective_with_image_src("frame", loadBuffer.toDataURL(), angleVariation)
             .then(() => {
                 scan()
                     .then((result) => {
@@ -75,8 +75,8 @@ function runOneTestCase(consoleOutput) {
     });
 }
 
-async function runNTestCases(n) {
-    console.log("Running ", n, " test cases...");
+async function runNTestCases(n, angleVariation) {
+    console.log("Running", n, "test cases with angle variation", angleVariation, "...");
     let correctCases = 0;
     const testResultsHtml = document.getElementById("testResults");
     if (!testResultsHtml || testResultsHtml.tagName.localeCompare("TABLE") != 0) {
@@ -95,7 +95,7 @@ async function runNTestCases(n) {
         let result = {};
         let msg = "";
         try {
-            result = await runOneTestCase(false);
+            result = await runOneTestCase(false, angleVariation);
             if (result.isCorrect) {
                 msg = "Correct";
                 ++correctCases;
@@ -137,21 +137,21 @@ async function runNTestCases(n) {
 }
 
 document.getElementById('test').addEventListener('click', () => {
-    runNTestCases(1000);
-});
-
-document.getElementById('generate').addEventListener('click', () => {
-    runOneTestCase(true)
-        .then((isCorrect) => {
-            if (isCorrect) {
-                handleSuccess("Generated code is correctly recognized.");
-            } else {
-                handleError("Generated code is INCORRECTLY recognized.");
-            }
-        })
-        .catch(e => {
-            handleError(e);
-        });
+    let numTestCases = document.getElementById("numTestCases");
+    if (!numTestCases || numTestCases.tagName.localeCompare("INPUT") != 0) {
+        console.log("No element of tag <input> with id numTestCases found. Using 100 by default.");
+        numTestCases = 100;
+    } else {
+        numTestCases = numTestCases.value;
+    }
+    let angleVariation = document.getElementById("angleVariation");
+    if (!angleVariation || angleVariation.tagName.localeCompare("INPUT") != 0) {
+        console.log("No element of tag <input> with id angleVariation found. Using 30 by default.");
+        angleVariation = 30;
+    } else {
+        angleVariation = angleVariation.value;
+    }
+    runNTestCases(numTestCases, angleVariation);
 });
 
 document.getElementById('imageInput').addEventListener('change', function (e) { scanImageFromSource(this.files[0]) });
