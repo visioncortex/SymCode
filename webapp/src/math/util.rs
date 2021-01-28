@@ -1,6 +1,10 @@
 use visioncortex::PointF64;
 
-pub(crate) const EPSILON: f64 = 1e-5;
+pub(crate) const EPSILON: f64 = std::f64::EPSILON;
+
+pub(crate) fn f64_approximately(a: f64, b: f64) -> bool {
+    (a - b).abs() <= EPSILON
+}
 
 pub(crate) fn normalize_point_f64(p: &PointF64) -> PointF64 {
     let norm = p.norm();
@@ -35,10 +39,6 @@ pub(crate) fn num_bits(n: usize) -> usize {
 mod tests {
 
     use super::*;
-
-    fn f64_approximately(a: f64, b: f64) -> bool {
-        (a - b).abs() <= EPSILON
-    }
 
     #[test]
     fn test_euclid_dist_unit() {

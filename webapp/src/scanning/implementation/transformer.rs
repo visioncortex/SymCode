@@ -21,7 +21,7 @@ impl Fitter for TransformFitter {
         clockwise_points_f64(&finder_positions_image[2], &finder_positions_image[1], &finder_positions_image[3])
     }
 
-    fn evaluate_transform(img_to_obj: &PerspectiveTransform, finder_positions_image: &[PointF64], symcode_config: &SymcodeConfig) -> f64 {
+    fn evaluate_transform(img_to_obj: &PerspectiveTransform, finder_positions_image: &[PointF64], image_width: usize, image_height: usize, symcode_config: &SymcodeConfig) -> f64 {
         let check_points = &Self::calculate_check_points(symcode_config);
         
         if finder_positions_image.len() != check_points.len() {
@@ -36,11 +36,19 @@ impl Fitter for TransformFitter {
         // Calculate the vectors from the centers of the remaining three finders centers
         // to the remaining check points and Calculate their errors with the above vector
         let mut acc_error = 0.0;
-        finder_positions_image.iter().enumerate().skip(1).for_each(|(i, &finder_src_pt)| {
+        for (i, &finder_src_pt) in finder_positions_image.iter().enumerate().skip(1) {
             let check_point_img_space = img_to_obj.transform_inverse(check_points[i]);
+            if crate::math::util::f64_approximately(finder_positions_image[3].x, 279.0) {
+                if let Some(debug_canvas) = &symcode_config.debug_canvas {
+                    crate::scanning::util::render_point_i32_to_canvas_with_color(check_point_img_space.to_point_i32(), debug_canvas, visioncortex::Color::new(0, 255, 0))   
+                }
+            }
+            if !valid_pointf64_on_image(check_point_img_space, image_width, image_height) {
+                return std::f64::MAX;
+            }
             let finder_to_check_point = normalize_point_f64(&(check_point_img_space - finder_src_pt));
             acc_error += euclid_dist_f64(&first_finder_to_check_point, &finder_to_check_point);
-        });
+        }
 
         // Return the sum of the norms of the errors
         acc_error
