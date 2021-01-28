@@ -86,8 +86,7 @@ impl FinderCandidate {
 
     fn render_finder_candidates(finder_candidates: &[PointI32], canvas: &crate::canvas::Canvas) {
         finder_candidates.iter().for_each(|center| {
-            let rect = visioncortex::BoundingRect::new_x_y_w_h(center.x - 2, center.y - 2, 4, 4);
-            crate::scanning::util::render_bounding_rect_to_canvas(&rect, canvas);
+            crate::scanning::util::render_point_i32_to_canvas(*center, canvas);
         });
     }
 }

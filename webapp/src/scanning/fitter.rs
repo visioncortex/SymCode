@@ -63,8 +63,8 @@ pub trait Fitter {
                 let src_pts: Vec<PointF64> = src_pts.iter().map(|p| PointF64::new(p.x.into(), p.y.into())).collect();
                 if Self::correct_spatial_arrangement(&src_pts) {
                     let transform = PerspectiveTransform::from_point_f64(&src_pts, dst_pts);
-                    let error = Self::evaluate_transform(&transform, &src_pts, symcode_config);
                     let error = Self::evaluate_transform(&transform, &src_pts, image_width, image_height, symcode_config);
+                    crate::util::console_log_util(&format!("Error is {} when src_pts are {:?}", error, src_pts));
                     if error < min_error {
                         best_transform = Ok(transform);
                         min_error = error;

@@ -1,6 +1,6 @@
 use visioncortex::{PointF64, PointI32};
 
-use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{SymcodeConfig, Fitter}};
+use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{Fitter, SymcodeConfig, valid_pointf64_on_image}};
 
 /// Implementation of Transformer
 pub(crate) struct TransformFitter;
@@ -29,6 +29,11 @@ impl Fitter for TransformFitter {
         }
         // Reproject the first check point from obj to img space
         let first_check_point_img_space = img_to_obj.transform_inverse(check_points[0]);
+        if crate::math::util::f64_approximately(finder_positions_image[3].x, 279.0) {
+            if let Some(debug_canvas) = &symcode_config.debug_canvas {
+                crate::scanning::util::render_point_i32_to_canvas_with_color(first_check_point_img_space.to_point_i32(), debug_canvas, visioncortex::Color::new(0, 0, 255))   
+            }
+        }
 
         // Calculate the vector from the center of the first finder center to the first check point
         let first_finder_to_check_point = normalize_point_f64(&(first_check_point_img_space - finder_positions_image[0]));
