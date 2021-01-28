@@ -8,6 +8,7 @@ const htmldiff = require("./htmldiff.js");
 const frameCanvas = document.getElementById('frame');
 const debugCanvas = document.getElementById('debug');
 const ctx = frameCanvas.getContext('2d');
+const debugCtx = debugCanvas.getContext('2d');
 const camera = document.getElementById('camera');
 const cameraButton = document.getElementById('cameraButton');
 const img = new Image();
@@ -54,6 +55,8 @@ function runOneTestCase(consoleOutput) {
             console.log("Generated code: " + groundTruthCode);
         }
         ctx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
+        debugCtx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
+        debugCanvas.width = debugCanvas.height = 1;
         generate_perspective_with_image_src("frame", loadBuffer.toDataURL())
             .then(() => {
                 scan()
