@@ -52,10 +52,15 @@ impl FinderCandidate {
         let raw_frame = input;
         // Binarize
         let binary_raw_frame = binarize_image_util(raw_frame);
+        if let Some(debug_canvas) = &params.debug_canvas {
+            crate::scanning::util::render_binary_image_to_canvas(&binary_raw_frame, debug_canvas);
+        }
 
         // Processing starts
         let finder_candidates = Self::extract_finder_positions(binary_raw_frame);
-        //console_log_util(&format!("Extracted {} finder candidates from raw frame.", finder_candidates.len()));
+        if let Some(debug_canvas) = &params.debug_canvas {
+            Self::render_finder_candidates(&finder_candidates, debug_canvas);
+        }
 
         if finder_candidates.len() > params.max_finder_candidates() {
             Err("Too many finder candidates!")
@@ -77,5 +82,12 @@ impl FinderCandidate {
         }
 
         Ok(())
+    }
+
+    fn render_finder_candidates(finder_candidates: &[PointI32], canvas: &crate::canvas::Canvas) {
+        finder_candidates.iter().for_each(|center| {
+            let rect = visioncortex::BoundingRect::new_x_y_w_h(center.x - 2, center.y - 2, 4, 4);
+            crate::scanning::util::render_bounding_rect_to_canvas(&rect, canvas);
+        });
     }
 }

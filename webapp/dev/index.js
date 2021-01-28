@@ -87,7 +87,7 @@ async function runNTestCases(n, angleVariation) {
         `<tr>
             <th>Recognition result</th>
             <th>Raw Frame</th>
-            <th>Rectified code image</th>
+            <th>Debug image</th>
             <th>Recognized code</th>
         </tr>`;
     let errors = {};
