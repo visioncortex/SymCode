@@ -19,7 +19,7 @@ export const SYMCODE_CONFIG = {
     canvas: "frame",
     debug_canvas: "debug",
     max_extra_finder_candidates: 3,
-    rectify_error_threshold: 20.0,
+    rectify_error_threshold: 0.5,
     stat_tolerance: 1/3,
     max_encoding_difference: 3,
     empty_cluster_threshold: 0.2,
