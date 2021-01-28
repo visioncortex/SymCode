@@ -46,7 +46,7 @@ impl Finder for FinderCandidate {
 impl FinderCandidate {
 
     pub fn process(input: &ColorImage, params: &SymcodeConfig) -> Result<Vec<PointI32>, &'static str> {
-        Self::valid_input_and_params(&input, params)?;
+        Self::valid_params(params)?;
 
         // Get the reference to the input raw frame
         let raw_frame = input;
@@ -64,7 +64,7 @@ impl FinderCandidate {
         }
     }
 
-    pub fn valid_input_and_params(_input: &ColorImage, params: &SymcodeConfig) -> Result<(), &'static str> {
+    pub fn valid_params(params: &SymcodeConfig) -> Result<(), &'static str> {
         if params.finder_positions.len() < 4 {
             return Err("Number of finder candidates specified in FinderCandidates' params is less than 4.");
         }
