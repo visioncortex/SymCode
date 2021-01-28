@@ -19,7 +19,7 @@ pub trait GlyphReader {
         for y in 0..height {
             for x in 0..width {
                 let sample_point = image_to_object.transform_inverse(PointF64::new(x as f64, y as f64)).to_point_f32();
-                let interpolated_color = bilinear_interpolate(&raw_image, sample_point);
+                let interpolated_color = raw_image.sample_pixel_at(sample_point);
                 rectified_image.set_pixel(x, y, is_black_rgb(&interpolated_color));
             }
         }
