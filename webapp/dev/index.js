@@ -58,6 +58,8 @@ function runOneTestCase(consoleOutput, angleVariation) {
         ctx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
         debugCtx.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
         debugCanvas.width = debugCanvas.height = 1;
+        frameCanvas.width = inputFrameSize.width;
+        frameCanvas.height = inputFrameSize.height;
         generate_perspective_with_image_src("frame", loadBuffer.toDataURL(), angleVariation)
             .then(() => {
                 scan()
