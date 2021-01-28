@@ -266,7 +266,8 @@ function draw() {
 
 const SeedableRandom = require("./random");
 const seedableRandom = new SeedableRandom();
-seedableRandom.seed(125);
+export const SEED = 125;
+seedableRandom.seed(SEED);
 
 function rotateObjectRandom(angleVariation) {
     const getRandom = (lower, upper) => (seedableRandom.next() * (upper-lower) + lower);

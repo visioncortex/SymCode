@@ -1,8 +1,9 @@
 import { SymcodeScanner, SymcodeConfig } from "symcode";
 import { SYMCODE_CONFIG } from "./config";
 import { loadAlphabet, loadBuffer } from "./load";
-import { generate_perspective_with_image_src } from "./perspective";
+import { SEED as testSeed, generate_perspective_with_image_src } from "./perspective";
 import { calculateConfusionMatrix } from "./confusion";
+import util from "./util";
 
 const htmldiff = require("./htmldiff.js");
 const frameCanvas = document.getElementById('frame');
@@ -75,8 +76,8 @@ function runOneTestCase(consoleOutput, angleVariation) {
     });
 }
 
-async function runNTestCases(n, angleVariation) {
-    console.log("Running", n, "test cases with angle variation", angleVariation, "...");
+async function runNTestCases(numTestCases, angleVariation) {
+    console.log("Running", numTestCases, "test cases with angle variation", angleVariation, "...");
     let correctCases = 0;
     const testResultsHtml = document.getElementById("testResults");
     if (!testResultsHtml || testResultsHtml.tagName.localeCompare("TABLE") != 0) {
@@ -91,7 +92,7 @@ async function runNTestCases(n, angleVariation) {
             <th>Recognized code</th>
         </tr>`;
     let errors = {};
-    for (let i = 0; i < n; ++i) {
+    for (let i = 0; i < numTestCases; ++i) {
         let result = {};
         let msg = "";
         try {
@@ -116,10 +117,16 @@ async function runNTestCases(n, angleVariation) {
                     <th><h4>${htmldiff(result.recognized, result.groundTruth)}</h4></th>
                 </tr>`;
         }
-        console.log("Running " + n + " test cases: ", correctCases, " out of ", i+1, " are correct. Running Accuracy: ", correctCases / (i+1) * 100 + "%");
+        console.log("Running " + numTestCases + " test cases: ", correctCases, " out of ", i+1, " are correct. Running Accuracy: ", correctCases / (i+1) * 100 + "%");
     }
-    console.log("Test result: ", correctCases, " out of ", n, " test cases are correctly recognized.");
-    console.log("Overall accuracy: ", correctCases / n * 100 + "%")
+    const testConfig = {
+        numTestCases,
+        angleVariation,
+        testSeed
+    };
+    console.log("Test config: ", util.beautifyJSON(testConfig))
+    console.log("Test result: ", correctCases, " out of ", numTestCases, " test cases are correctly recognized.");
+    console.log("Overall accuracy: ", correctCases / numTestCases * 100 + "%")
 
     let nonWrongRecognitionErrors = 0;
     let recognitionWrong = 0;
@@ -129,10 +136,10 @@ async function runNTestCases(n, angleVariation) {
         } else {
             recognitionWrong = errors[key];
         }
-        errors[key] = {num: errors[key], rate: errors[key]/n*100 + "%"};
+        errors[key] = {num: errors[key], rate: errors[key]/numTestCases*100 + "%"};
     }
     console.log("Errors: ", JSON.stringify(errors, null, 2));
-    console.log("Recognition wrong after correct rectification rate: ", recognitionWrong / (n-nonWrongRecognitionErrors) * 100 + "%");
+    console.log("Recognition wrong after correct rectification rate: ", recognitionWrong / (numTestCases-nonWrongRecognitionErrors) * 100 + "%");
     calculateConfusionMatrix("confusionMatrix");
 }
 
