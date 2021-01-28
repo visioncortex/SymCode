@@ -11,8 +11,23 @@ pub(crate) fn normalize_point_f64(p: &PointF64) -> PointF64 {
     PointF64::new(p.x / norm, p.y / norm)
 }
 
+pub(crate) fn normalize_vec_f64(v: &[f64]) -> Vec<f64> {
+    let norm = v.iter().fold(0.0, |acc, element| acc + element * element).sqrt();
+    v.iter().map(|element| element / norm).collect()
+}
+
 pub(crate) fn euclid_dist_f64(p1: &PointF64, p2: &PointF64) -> f64 {
     (*p1-*p2).norm()
+}
+
+pub(crate) fn euclid_dist_vec_f64(v1: &[f64], v2: &[f64]) -> f64 {
+    if v1.len() != v2.len() {
+        panic!("Lengths of vectors do not agree.");
+    }
+    let len = v1.len();
+    v1.iter().enumerate()
+        .fold(0.0, |acc, (i, element)| acc + (element - v2[i])*(element - v2[i]))
+        .sqrt()
 }
 
 /// Returns true iff the traversal p1->p2->p3 is in clockwise order and not collinear.
@@ -41,7 +56,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_euclid_dist_unit() {
+    fn math_euclid_dist_unit() {
         let p1 = PointF64::new(1.0, 0.0);
         let p2 = PointF64::new(0.0, 1.0);
         let dist = euclid_dist_f64(&p1, &p2);
@@ -49,7 +64,7 @@ mod tests {
     }
 
     #[test]
-    fn test_euclid_dist_zero() {
+    fn math_euclid_dist_zero() {
         let p1 = PointF64::new(0.0, 0.0);
         let p2 = PointF64::new(0.0, 0.0);
         let dist = euclid_dist_f64(&p1, &p2);
@@ -57,7 +72,7 @@ mod tests {
     }
 
     #[test]
-    fn test_euclid_dist_regular() {
+    fn math_euclid_dist_regular() {
         let p1 = PointF64::new(3.0, 4.0);
         let p2 = PointF64::new(1.0, 5.0);
         let dist = euclid_dist_f64(&p1, &p2);
@@ -65,7 +80,7 @@ mod tests {
     }
 
     #[test]
-    fn test_clockwise_points() {
+    fn math_clockwise_points() {
         // Clockwise
         assert!(clockwise_points_f64(&PointF64::new(0.0, 0.0), &PointF64::new(1.0, 0.0), &PointF64::new(0.0, 1.0)));
         // Anti-Clockwise
@@ -81,10 +96,21 @@ mod tests {
     }
 
     #[test]
-    fn test_num_bits() {
+    fn math_num_bits() {
         assert_eq!(num_bits(0), 0); // 0
         assert_eq!(num_bits(1), 1); // 01
         assert_eq!(num_bits(2), 2); // 10
         assert_eq!(num_bits(33), 6); // 100001
+    }
+
+    #[test]
+    fn math_euclid_dist_vec() {
+        let v1 = vec![1.0, 1.0, 1.0];
+        let v2 = vec![1.0, 1.0, 1.0];
+        assert!(f64_approximately(euclid_dist_vec_f64(&v1, &v2), 0.0));
+        let v1 = vec![1.0, 0.5, 1.0];
+        let v2 = vec![2.0, 1.0, 3.0];
+        println!("{}", euclid_dist_vec_f64(&v1, &v2));
+        assert!(f64_approximately(euclid_dist_vec_f64(&v1, &v2), 2.29128784747792));
     }
 }
