@@ -144,13 +144,12 @@ async function runNTestCases(testConfig) {
 }
 
 document.getElementById('test').addEventListener('click', () => {
-    let numTestCasesElem = document.getElementById("numTestCases");
-    let numTestCases = 0;
-    if (!numTestCasesElem || numTestCasesElem.tagName.localeCompare("INPUT") != 0) {
+    let numTestCases = document.getElementById("numTestCases");
+    if (!numTestCases || numTestCases.tagName.localeCompare("INPUT") != 0) {
         console.log("No element of tag <input> with id numTestCases found. Using 100 by default.");
         numTestCases = 100;
     } else {
-        numTestCases = parseInt(numTestCasesElem.value);
+        numTestCases = parseInt(numTestCases.value);
     }
     let angleVariation = document.getElementById("angleVariation");
     if (!angleVariation || angleVariation.tagName.localeCompare("INPUT") != 0) {
@@ -159,10 +158,18 @@ document.getElementById('test').addEventListener('click', () => {
     } else {
         angleVariation = parseInt(angleVariation.value);
     }
+    let testSeed = document.getElementById("testSeed");
+    if (!testSeed || testSeed.tagName.localeCompare("INPUT") != 0) {
+        console.log("No element of tag <input> with id testSeed found. Using 125 by default.");
+        testSeed = 125;
+    } else {
+        testSeed = parseInt(testSeed.value);
+    }
+
     runNTestCases({
         numTestCases,
         angleVariation,
-        seed: 125
+        seed: testSeed,
     });
 });
 
