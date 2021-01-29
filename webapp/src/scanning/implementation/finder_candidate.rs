@@ -9,7 +9,7 @@ impl FinderCandidate {
     fn shape_is_finder(image: BinaryImage) -> bool {
         let steps = 6;
         for i in 0..steps {
-            let angle = i as f64 * std::f64::consts::PI / (steps as f64);
+            let angle = i as f64 * std::f64::consts::FRAC_PI_2 / (steps as f64);
             let rotated_image = if i > 0 {
                 image.rotate(angle).crop()
             } else {
