@@ -82,6 +82,7 @@ async function runNTestCases(testConfig) {
     console.log("Running", testConfig.numTestCases, "test cases with angle variation", testConfig.angleVariation, "...");
     console.log("Setting seed of rng to ", testConfig.seed);
     rng.seed(testConfig.seed);
+    scanner.seed_rng(BigInt(testConfig.seed));
     let correctCases = 0;
     const testResultsHtml = document.getElementById("testResults");
     if (!testResultsHtml || testResultsHtml.tagName.localeCompare("TABLE") != 0) {

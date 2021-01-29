@@ -1,6 +1,6 @@
 use std::borrow::BorrowMut;
 
-use rand::{Rng, RngCore, SeedableRng, rngs::StdRng};
+use rand::{RngCore, SeedableRng, rngs::StdRng};
 use visioncortex::{BinaryImage, PointI32, Shape};
 use wasm_bindgen::prelude::*;
 
@@ -23,6 +23,10 @@ impl SymcodeScanner {
             config,
             rng: StdRng::seed_from_u64(seed),
         }
+    }
+
+    pub fn seed_rng(&mut self, seed: u64) {
+        self.rng = StdRng::seed_from_u64(seed);
     }
 
     /// Takes the id of the canvas element storing the template image, and the usize representation of the glyph label
