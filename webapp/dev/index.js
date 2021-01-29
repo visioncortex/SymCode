@@ -143,6 +143,10 @@ async function runNTestCases(testConfig) {
     calculateConfusionMatrix("confusionMatrix");
 }
 
+document.getElementById('randomizeSeed').addEventListener('change', function (e) {
+    document.getElementById('testSeed').disabled = this.checked;
+});
+
 document.getElementById('test').addEventListener('click', () => {
     let numTestCases = document.getElementById("numTestCases");
     if (!numTestCases || numTestCases.tagName.localeCompare("INPUT") != 0) {
@@ -151,6 +155,7 @@ document.getElementById('test').addEventListener('click', () => {
     } else {
         numTestCases = parseInt(numTestCases.value);
     }
+
     let angleVariation = document.getElementById("angleVariation");
     if (!angleVariation || angleVariation.tagName.localeCompare("INPUT") != 0) {
         console.log("No element of tag <input> with id angleVariation found. Using 30 by default.");
@@ -158,12 +163,18 @@ document.getElementById('test').addEventListener('click', () => {
     } else {
         angleVariation = parseInt(angleVariation.value);
     }
+
     let testSeed = document.getElementById("testSeed");
     if (!testSeed || testSeed.tagName.localeCompare("INPUT") != 0) {
         console.log("No element of tag <input> with id testSeed found. Using 125 by default.");
         testSeed = 125;
     } else {
         testSeed = parseInt(testSeed.value);
+    }
+
+    let randomizeSeed = document.getElementById("randomizeSeed");
+    if (randomizeSeed && randomizeSeed.checked) {
+        testSeed = Math.floor(Math.random() * 1000);
     }
 
     runNTestCases({
