@@ -1,7 +1,7 @@
 import { SymcodeScanner, SymcodeConfig } from "symcode";
 import { SYMCODE_CONFIG } from "./config";
 import { loadAlphabet, loadBuffer } from "./load";
-import { SEED as testSeed, generate_perspective_with_image_src } from "./perspective";
+import { rng, generate_perspective_with_image_src } from "./perspective";
 import { calculateConfusionMatrix } from "./confusion";
 import util from "./util";
 
@@ -17,7 +17,7 @@ const img = new Image();
 let finishScanning = false;
 
 const scannerConfig = SymcodeConfig.from_json_string(JSON.stringify(SYMCODE_CONFIG));
-const scanner = SymcodeScanner.from_config(scannerConfig);
+const scanner = SymcodeScanner.from_config(scannerConfig, 125n);
 
 const inputFrameSize = {
     width: 350,
@@ -27,7 +27,7 @@ const fps = 60;
 
 export function loadingCompletes() {
     console.log("Template loading completes.");
-    scanImageFromSource("assets/bad_transform.png");
+    //scanImageFromSource("assets/bad_transform.png");
     //runNTestCases(10);
 }
 
@@ -43,7 +43,7 @@ function handleSuccess(msg) {
     console.log("%c" + msg, SUCCESS_COLOR);
 }
 
-function runOneTestCase(consoleOutput, angleVariation) {
+function runOneTestCase(consoleOutput, testConfig) {
     return new Promise((resolve, reject) => {
         let groundTruthCode = "";
         try {
@@ -60,7 +60,7 @@ function runOneTestCase(consoleOutput, angleVariation) {
         debugCanvas.width = debugCanvas.height = 1;
         frameCanvas.width = inputFrameSize.width;
         frameCanvas.height = inputFrameSize.height;
-        generate_perspective_with_image_src("frame", loadBuffer.toDataURL(), angleVariation)
+        generate_perspective_with_image_src("frame", loadBuffer.toDataURL(), testConfig)
             .then(() => {
                 scan()
                     .then((result) => {
@@ -78,8 +78,10 @@ function runOneTestCase(consoleOutput, angleVariation) {
     });
 }
 
-async function runNTestCases(numTestCases, angleVariation) {
-    console.log("Running", numTestCases, "test cases with angle variation", angleVariation, "...");
+async function runNTestCases(testConfig) {
+    console.log("Running", testConfig.numTestCases, "test cases with angle variation", testConfig.angleVariation, "...");
+    console.log("Setting seed of rng to ", testConfig.seed);
+    rng.seed(testConfig.seed);
     let correctCases = 0;
     const testResultsHtml = document.getElementById("testResults");
     if (!testResultsHtml || testResultsHtml.tagName.localeCompare("TABLE") != 0) {
@@ -94,11 +96,11 @@ async function runNTestCases(numTestCases, angleVariation) {
             <th>Recognized code</th>
         </tr>`;
     let errors = {};
-    for (let i = 0; i < numTestCases; ++i) {
+    for (let i = 0; i < testConfig.numTestCases; ++i) {
         let result = {};
         let msg = "";
         try {
-            result = await runOneTestCase(false, angleVariation);
+            result = await runOneTestCase(false, testConfig);
             if (result.isCorrect) {
                 msg = "Correct";
                 ++correctCases;
@@ -119,16 +121,11 @@ async function runNTestCases(numTestCases, angleVariation) {
                     <th><h4>${htmldiff(result.recognized, result.groundTruth)}</h4></th>
                 </tr>`;
         }
-        console.log("Running " + numTestCases + " test cases: ", correctCases, " out of ", i+1, " are correct. Running Accuracy: ", correctCases / (i+1) * 100 + "%");
+        console.log("Running " + testConfig.numTestCases + " test cases: ", correctCases, " out of ", i+1, " are correct. Running Accuracy: ", correctCases / (i+1) * 100 + "%");
     }
-    const testConfig = {
-        numTestCases,
-        angleVariation,
-        testSeed
-    };
     console.log("Test config: ", util.beautifyJSON(testConfig))
-    console.log("Test result: ", correctCases, " out of ", numTestCases, " test cases are correctly recognized.");
-    console.log("Overall accuracy: ", correctCases / numTestCases * 100 + "%")
+    console.log("Test result: ", correctCases, " out of ", testConfig.numTestCases, " test cases are correctly recognized.");
+    console.log("Overall accuracy: ", correctCases / testConfig.numTestCases * 100 + "%")
 
     let nonWrongRecognitionErrors = 0;
     let recognitionWrong = 0;
@@ -138,29 +135,34 @@ async function runNTestCases(numTestCases, angleVariation) {
         } else {
             recognitionWrong = errors[key];
         }
-        errors[key] = {num: errors[key], rate: errors[key]/numTestCases*100 + "%"};
+        errors[key] = {num: errors[key], rate: errors[key]/testConfig.numTestCases*100 + "%"};
     }
     console.log("Errors: ", JSON.stringify(errors, null, 2));
-    console.log("Recognition wrong after correct rectification rate: ", recognitionWrong / (numTestCases-nonWrongRecognitionErrors) * 100 + "%");
+    console.log("Recognition wrong after correct rectification rate: ", recognitionWrong / (testConfig.numTestCases-nonWrongRecognitionErrors) * 100 + "%");
     calculateConfusionMatrix("confusionMatrix");
 }
 
 document.getElementById('test').addEventListener('click', () => {
-    let numTestCases = document.getElementById("numTestCases");
-    if (!numTestCases || numTestCases.tagName.localeCompare("INPUT") != 0) {
+    let numTestCasesElem = document.getElementById("numTestCases");
+    let numTestCases = 0;
+    if (!numTestCasesElem || numTestCasesElem.tagName.localeCompare("INPUT") != 0) {
         console.log("No element of tag <input> with id numTestCases found. Using 100 by default.");
         numTestCases = 100;
     } else {
-        numTestCases = numTestCases.value;
+        numTestCases = parseInt(numTestCasesElem.value);
     }
     let angleVariation = document.getElementById("angleVariation");
     if (!angleVariation || angleVariation.tagName.localeCompare("INPUT") != 0) {
         console.log("No element of tag <input> with id angleVariation found. Using 30 by default.");
         angleVariation = 30;
     } else {
-        angleVariation = angleVariation.value;
+        angleVariation = parseInt(angleVariation.value);
     }
-    runNTestCases(numTestCases, angleVariation);
+    runNTestCases({
+        numTestCases,
+        angleVariation,
+        seed: 125
+    });
 });
 
 document.getElementById('imageInput').addEventListener('change', function (e) { scanImageFromSource(this.files[0]) });

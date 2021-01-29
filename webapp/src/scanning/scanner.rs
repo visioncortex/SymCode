@@ -1,3 +1,6 @@
+use std::borrow::BorrowMut;
+
+use rand::{Rng, RngCore, SeedableRng, rngs::StdRng};
 use visioncortex::{BinaryImage, PointI32, Shape};
 use wasm_bindgen::prelude::*;
 
@@ -6,18 +9,19 @@ use crate::{canvas::Canvas, util::console_log_util};
 use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, SymcodeDecoder, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, render_binary_image_to_canvas};
 
 #[wasm_bindgen]
-#[derive(Default)]
 pub struct SymcodeScanner {
     glyph_library: GlyphLibrary,
     config: SymcodeConfig,
+    rng: StdRng,
 }
 
 #[wasm_bindgen]
 impl SymcodeScanner {
-    pub fn from_config(config: SymcodeConfig) -> Self {
+    pub fn from_config(config: SymcodeConfig, seed: u64) -> Self {
         Self {
             glyph_library: GlyphLibrary::default(),
             config,
+            rng: StdRng::seed_from_u64(seed),
         }
     }
 
@@ -116,13 +120,13 @@ impl SymcodeScanner {
         }
     }
 
-    pub fn generate_symcode_to_canvas(&self, canvas_id: &str) -> Result<String, JsValue> {
+    pub fn generate_symcode_to_canvas(&mut self, canvas_id: &str) -> Result<String, JsValue> {
         let canvas = if let Some(canvas) = Canvas::new_from_id(canvas_id) {
             canvas
         } else {
             return Err("Code generation: Canvas does not exist.".into());
         };
-        let (symcode, ground_truth_code) = self.generate_symcode();
+        let (symcode, ground_truth_code) = self.borrow_mut().generate_symcode();
 
         if render_binary_image_to_canvas(&symcode, &canvas).is_err() {
             return Err("Cannot render generated symcode to canvas.".into());
@@ -131,7 +135,7 @@ impl SymcodeScanner {
         Ok(ground_truth_code)
     }
 
-    fn generate_symcode(&self) -> (BinaryImage, String) {
+    fn generate_symcode(&mut self) -> (BinaryImage, String) {
         let mut symcode = BinaryImage::new_w_h(self.config.code_width, self.config.code_height);
 
         // Put in the finders
@@ -143,8 +147,8 @@ impl SymcodeScanner {
 
         // Put in the glyphs
         let mut ground_truth_code = vec![];
-        self.config.glyph_anchors.iter().for_each(|glyph_top_left| {
-            let glyph_index: usize = rand::random();
+        self.config.glyph_anchors.clone().iter().for_each(|glyph_top_left| {
+            let glyph_index: usize = self.rng.next_u64() as usize;
             let glyph_index = glyph_index % (self.glyph_library.len() + 1);
 
             // if glyph_index == glyph_library.len(), this will return None

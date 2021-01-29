@@ -6,6 +6,9 @@ import { jsgl } from "./jsgl";
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.  Use at your own risk.
 
+const SeedableRandom = require("./random");
+export const rng = new SeedableRandom();
+
 var images = [];
 var canvas_elem = null;
 var c3d = null;
@@ -264,13 +267,8 @@ function draw() {
   }
 }
 
-const SeedableRandom = require("./random");
-const seedableRandom = new SeedableRandom();
-export const SEED = 125;
-seedableRandom.seed(SEED);
-
 function rotateObjectRandom(angleVariation) {
-    const getRandom = (lower, upper) => (seedableRandom.next() * (upper-lower) + lower);
+    const getRandom = (lower, upper) => (rng.next() * (upper-lower) + lower);
     let x_deg = getRandom(-angleVariation, angleVariation);
     let y_deg = getRandom(-angleVariation, angleVariation);
     let z_deg = getRandom(0, 359);
@@ -295,7 +293,7 @@ function rotateObject(scaled_axis) {
   jsgl.orthonormalizeRotation(object_mat);
 }
 
-function init(canvas_id, angleVariation) {
+function init(canvas_id, testConfig) {
     return new Promise(resolve => {
         canvas_elem = document.getElementById(canvas_id);
         var ctx = canvas_elem.getContext('2d');
@@ -312,7 +310,7 @@ function init(canvas_id, angleVariation) {
         camera_mat = jsgl.makeOrientationAffine(
             {x:0, y:0, z: -0.2 - target_distance}, {x:0, y:0, z:1}, {x:0, y:-1, z:0});
     
-        rotateObjectRandom(angleVariation);
+        rotateObjectRandom(testConfig.angleVariation);
         requestAnimationFrame(() => {
             draw();
             resolve();
@@ -322,11 +320,11 @@ function init(canvas_id, angleVariation) {
 
 // Awesome cubemaps: http://www.humus.name/index.php?page=Textures&&start=32
 
-export function generate_perspective_with_image_src(canvas_id, src, angleVariation) {
+export function generate_perspective_with_image_src(canvas_id, src, testConfig) {
     return new Promise(resolve => {
         images.push(new Image());
         images[0].onload = function () {
-            init(canvas_id, angleVariation)
+            init(canvas_id, testConfig)
                 .then(resolve);
         };
         images[0].src = src;
