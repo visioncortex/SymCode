@@ -115,12 +115,16 @@ impl Shape {
     }
 
     pub fn is_circle(&self) -> bool {
-        if self.image.width <= 4 && self.image.height <= 4 {
-            return false;
-        }
         if std::cmp::max(self.image.width, self.image.height) - 
             std::cmp::min(self.image.width, self.image.height) >
             std::cmp::max(self.image.width, self.image.height) / 4 {
+            return false;
+        }
+        self.is_ellipse()
+    }
+
+    pub fn is_ellipse(&self) -> bool {
+        if self.image.width <= 4 && self.image.height <= 4 {
             return false;
         }
         let threshold = self.image.width * self.image.height / 4;

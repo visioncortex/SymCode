@@ -15,7 +15,7 @@ impl FinderCandidate {
             } else {
                 image.clone()
             };
-            if Shape::from(rotated_image).is_circle() {
+            if Shape::from(rotated_image).is_ellipse() {
                 return true;
             }
         }
