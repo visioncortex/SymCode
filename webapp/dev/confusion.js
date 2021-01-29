@@ -6,17 +6,24 @@ function extractUsefulInnerText(tag) {
     return htmlCollectionToArray(document.getElementsByTagName(tag))
         .map(element => element.innerText) // extract the innerText
         .filter(text => !(/^\d/.test(text))) // filter out the binary representations
-        .map(text => { // Remove unnecessary parts of the text
-            if (text.startsWith("(")) {
-                return text.substring("(".length);
-            } else if (text.startsWith("Some(")) {
-                return text.substring("Some(".length);
-            } else if (text.endsWith(")")) {
-                return text.substring(text.length - ")".length);
-            } else {
-                return text;
-            }
-        });
+        .map(text => extractUsefulText(text)); // Remove unnecessary parts of the text
+}
+
+// Remove unwanted parts recursively
+function extractUsefulText(text) {
+    if (text.startsWith("(")) {
+        return extractUsefulText(text.substring("(".length));
+    } else if (text.startsWith("Some")) {
+        return extractUsefulText(text.substring("Some".length));
+    } else if (text.startsWith("[")) {
+        return extractUsefulText(text.substring("[".length));
+    } else if (text.endsWith(")")) {
+        return extractUsefulText(text.substring(0, text.length - ")".length));
+    } else if (text.endsWith("]")) {
+        return extractUsefulText(text.substring(0, text.length - "]".length));
+    } else {
+        return text;
+    }
 }
 
 function drawConfusionMatrixToHtmlTable(tableId, confusionMatrix) {
