@@ -1,4 +1,4 @@
-use visioncortex::{BinaryImage, BoundingRect, ColorImage, PointF64, PointI32, bilinear_interpolate};
+use visioncortex::{BinaryImage, BoundingRect, ColorImage, PointF64, PointI32};
 
 use crate::{math::PerspectiveTransform};
 

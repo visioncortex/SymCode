@@ -3,18 +3,8 @@ use std::cmp::Ordering;
 use bit_vec::BitVec;
 use visioncortex::{BinaryImage, PointI32};
 
+use crate::scanning::Trace;
 use super::ShapeStats;
-
-pub trait Trace {
-    fn bits(&self) -> &BitVec;
-    fn diff(&self, other: &Self) -> usize {
-        let (mut self_clone, mut other_clone) = (self.bits().clone(), other.bits().clone());
-        self_clone.difference(&other.bits());
-        other_clone.difference(&self.bits());
-        self_clone.or(&other_clone);
-        self_clone.into_iter().filter(|bit| *bit).count()
-    }
-}
 
 #[derive(Debug)]
 pub struct GlyphTrace {

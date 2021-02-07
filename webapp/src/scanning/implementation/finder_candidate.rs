@@ -24,11 +24,10 @@ impl FinderCandidate {
 }
 
 impl Finder for FinderCandidate {
-    type FrameInput = BinaryImage;
 
     type FinderElement = PointI32;
 
-    fn extract_finder_positions(image: Self::FrameInput) -> Vec<Self::FinderElement> {
+    fn extract_finder_positions(image: BinaryImage) -> Vec<Self::FinderElement> {
         let clusters = image.to_clusters(false);
         
         clusters.clusters.iter()

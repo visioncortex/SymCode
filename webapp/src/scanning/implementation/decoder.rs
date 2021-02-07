@@ -6,13 +6,12 @@ pub struct SymcodeDecoder;
 
 // Dummy implementation, error detection/correction will be supported later
 impl Decoder for SymcodeDecoder {
-    type EncodedData = Vec<Option<super::glyph::GlyphLabel>>;
-
-    type DecodedData = BitVec;
+    type Symbol = Option<super::glyph::GlyphLabel>;
+    // To Sanford: why option here? dont we have GlyphLabel::Invalid already? Shall we add an GlyphLabel::None?
 
     type Err = &'static str;
 
-    fn decode(encoded_data: Self::EncodedData, num_templates: usize) -> Result<Self::DecodedData, Self::Err> {
+    fn decode(encoded_data: Vec<Self::Symbol>, num_templates: usize) -> Result<BitVec, Self::Err> {
         let num_bits_per_glyph = crate::math::num_bits(num_templates);
 
         let mut decoded_data = vec![];

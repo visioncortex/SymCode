@@ -1,10 +1,13 @@
-pub trait Decoder {
-    type EncodedData;
+use bit_vec::BitVec;
 
-    type DecodedData;
-    
+type DecodedData = BitVec;
+
+pub trait Decoder {
+
+    type Symbol;
+
     type Err;
 
     /// Decode the data given how many bits one glyph represents
-    fn decode(encoded_data: Self::EncodedData, num_bits: usize) -> Result<Self::DecodedData, Self::Err>;
+    fn decode(encoded_data: Vec<Self::Symbol>, num_bits: usize) -> Result<DecodedData, Self::Err>;
 }

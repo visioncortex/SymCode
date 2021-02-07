@@ -1,8 +1,8 @@
 use visioncortex::{BinaryImage, Sampler};
 
-use crate::{scanning::{SymcodeConfig, image_diff_area}};
+use crate::{scanning::{SymcodeConfig, image_diff_area, Trace}};
 
-use super::{Glyph, GlyphLabel, GlyphTrace, Trace};
+use super::{Glyph, GlyphLabel, GlyphTrace};
 
 #[derive(Debug)]
 pub struct GlyphLibrary {
