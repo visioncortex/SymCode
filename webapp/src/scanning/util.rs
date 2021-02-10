@@ -63,12 +63,11 @@ pub(crate) fn render_color_image_to_canvas(image: &ColorImage, canvas: &Canvas) 
 }
 
 pub(crate) fn render_point_i32_to_canvas(point: PointI32, canvas: &Canvas) {
-    let rect = &visioncortex::BoundingRect::new_x_y_w_h(point.x - 2, point.y - 2, 4, 4);
-    render_bounding_rect_to_canvas_with_color(rect, canvas, Color::new(255, 0, 0))
+    render_point_i32_to_canvas_with_size_color(point, canvas, 4, Color::new(255, 0, 0))
 }
 
-pub(crate) fn render_point_i32_to_canvas_with_color(point: PointI32, canvas: &Canvas, color: Color) {
-    let rect = &visioncortex::BoundingRect::new_x_y_w_h(point.x - 2, point.y - 2, 4, 4);
+pub(crate) fn render_point_i32_to_canvas_with_size_color(point: PointI32, canvas: &Canvas, size: usize, color: Color) {
+    let rect = &visioncortex::BoundingRect::new_x_y_w_h(point.x - (size>>1) as i32, point.y - (size>>1) as i32, size as i32, size as i32);
     render_bounding_rect_to_canvas_with_color(rect, canvas, color)
 }
 

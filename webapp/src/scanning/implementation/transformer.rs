@@ -104,10 +104,11 @@ impl Fitter for TransformFitter {
                 }
             });
         });
-        debug_min_err_src_pts.into_iter().for_each(|point| {
-            crate::scanning::util::render_point_i32_to_canvas_with_color(
+        debug_min_err_src_pts.into_iter().enumerate().for_each(|(i, point)| {
+            crate::scanning::util::render_point_i32_to_canvas_with_size_color(
                 point.to_point_i32(),
                 crate::canvas::Canvas::new_from_id("debug").as_ref().unwrap(),
+                4+i,
                 visioncortex::Color::new(0, 255, 0));
         });
         if min_error > symcode_config.rectify_error_threshold {
