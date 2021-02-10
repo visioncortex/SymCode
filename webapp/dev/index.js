@@ -63,7 +63,7 @@ function runOneTestCase(consoleOutput, testConfig) {
         frameCanvas.height = inputFrameSize.height;
         generate_perspective_with_image_src("frame", loadBuffer.toDataURL(), testConfig)
             .then(() => {
-                addNoiseToCanvas("frame", testConfig.noiseOpacity, testConfig.seed);
+                addNoiseToCanvas("frame", testConfig.noiseMaxOpacity, testConfig.seed);
                 scan()
                     .then((result) => {
                         if (consoleOutput) {
@@ -182,11 +182,19 @@ document.getElementById('test').addEventListener('click', () => {
         testSeed = Math.floor(Math.random() * 1000);
     }
 
+    let noiseMaxOpacity = document.getElementById("noiseMaxOpacity");
+    if (!noiseMaxOpacity || noiseMaxOpacity.tagName.localeCompare("INPUT") != 0) {
+        console.log("No element of tag <input> with id noiseMaxOpacity found. Using .5 by default.");
+        noiseMaxOpacity = .5;
+    } else {
+        noiseMaxOpacity = parseFloat(noiseMaxOpacity.value);
+    }
+
     runNTestCases({
         numTestCases,
         angleVariation,
         seed: testSeed,
-        noiseOpacity: .7,
+        noiseMaxOpacity,
     });
 });
 
