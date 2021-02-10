@@ -3,6 +3,7 @@ import { SYMCODE_CONFIG } from "./config";
 import { loadAlphabet, loadBuffer } from "./load";
 import { rng, generate_perspective_with_image_src } from "./perspective";
 import { calculateConfusionMatrix } from "./confusion";
+import { addNoiseToCanvas } from "./noise";
 import util from "./util";
 
 const htmldiff = require("./htmldiff.js");
@@ -27,8 +28,8 @@ const fps = 60;
 
 export function loadingCompletes() {
     console.log("Template loading completes.");
-    scanImageFromSource("assets/bad_transform.png");
-    //runNTestCases(10);
+    //scanImageFromSource("assets/778wrong_recognition.png");
+    document.getElementById("test").click();
 }
 
 const ERROR_COLOR = "color: #ff5050;";
@@ -62,6 +63,7 @@ function runOneTestCase(consoleOutput, testConfig) {
         frameCanvas.height = inputFrameSize.height;
         generate_perspective_with_image_src("frame", loadBuffer.toDataURL(), testConfig)
             .then(() => {
+                addNoiseToCanvas("frame", testConfig.noiseOpacity, testConfig.seed);
                 scan()
                     .then((result) => {
                         if (consoleOutput) {
@@ -184,6 +186,7 @@ document.getElementById('test').addEventListener('click', () => {
         numTestCases,
         angleVariation,
         seed: testSeed,
+        noiseOpacity: .7,
     });
 });
 
