@@ -91,6 +91,7 @@ async function runNTestCases(testConfig) {
         console.log("Nowhere to show test results.");
         return;
     }
+    testResultsHtml.style.display = "none";
     testResultsHtml.innerHTML =
         `<tr>
             <th>Recognition result</th>
@@ -118,6 +119,7 @@ async function runNTestCases(testConfig) {
             errors[msg]? errors[msg]++ : errors[msg] = 1;
         }
         if (!result.isCorrect) {
+            testResultsHtml.style.display = "block";
             testResultsHtml.innerHTML +=
                 `<tr>
                     <th><h3 style="${ERROR_COLOR}">${msg}</h3></th>
