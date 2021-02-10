@@ -27,7 +27,7 @@ const fps = 60;
 
 export function loadingCompletes() {
     console.log("Template loading completes.");
-    //scanImageFromSource("assets/bad_transform.png");
+    scanImageFromSource("assets/bad_transform.png");
     //runNTestCases(10);
 }
 
