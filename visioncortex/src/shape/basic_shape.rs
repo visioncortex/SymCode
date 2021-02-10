@@ -127,7 +127,8 @@ impl Shape {
         if self.image.width <= 4 && self.image.height <= 4 {
             return false;
         }
-        let threshold = self.image.width * self.image.height / 4;
+        let threshold = std::cmp::min(self.image.width, self.image.height);
+        let threshold = (threshold * threshold) / 4;
         let diff = self.image.diff(&Self::ellipse(self.image.width, self.image.height).image);
         let clusters = diff.to_clusters(false);
         let mut sum = 0;
