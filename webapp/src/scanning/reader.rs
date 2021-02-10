@@ -99,7 +99,9 @@ pub trait GlyphReader {
                     return None;
                 }
                 if  rect.width() <= (symcode_config.symbol_width + 10) as i32 &&
-                    rect.height() <= (symcode_config.symbol_height + 10) as i32 {
+                    rect.height() <= (symcode_config.symbol_height + 10) as i32 &&
+                    rect.width() >= (symcode_config.symbol_width >> 4) as i32 &&
+                    rect.height() >= (symcode_config.symbol_height >> 4) as i32  {
                     Some(rect)
                 } else {
                     None
