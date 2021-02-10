@@ -89,6 +89,7 @@ impl Fitter for TransformFitter {
         
         let mut best_transform = Err("No spatial arrangement for the finder candidates is correct");
         let mut min_error = std::f64::MAX;
+        let mut debug_min_err_src_pts: Vec<PointF64> = vec![];
         finder_positions_image.combination(num_finders).for_each(|mut c| {
             c.permutation().for_each(|src_rects| {
                 let src_pts: Vec<PointF64> = src_rects.iter().map(|rect| rect.center().to_point_f64()).collect();
@@ -98,9 +99,16 @@ impl Fitter for TransformFitter {
                     if error < min_error {
                         best_transform = Ok(transform);
                         min_error = error;
+                        debug_min_err_src_pts = src_pts;
                     }
                 }
             });
+        });
+        debug_min_err_src_pts.into_iter().for_each(|point| {
+            crate::scanning::util::render_point_i32_to_canvas_with_color(
+                point.to_point_i32(),
+                crate::canvas::Canvas::new_from_id("debug").as_ref().unwrap(),
+                visioncortex::Color::new(0, 255, 0));
         });
         if min_error > symcode_config.rectify_error_threshold {
            return Err("Minimum transform error is larger than rectify error threshold");
