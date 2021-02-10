@@ -334,6 +334,18 @@ impl ColorImage {
     pub fn sample_pixel_at(&self, p: PointF32) -> Color {
         bilinear_interpolate(self, p)
     }
+
+    pub fn sample_pixel_at_safe(&self, p:PointF32) -> Option<Color> {
+        bilinear_interpolate_safe(self, p)
+    }
+}
+
+pub fn bilinear_interpolate_safe(im: &ColorImage, p: PointF32) -> Option<Color> {
+    if p.x.is_sign_negative() || p.y.is_sign_negative() || p.x > (im.width - 1) as f32 || p.y > (im.height - 1) as f32 {
+        None
+    } else {
+        Some(bilinear_interpolate(im, p))
+    }
 }
 
 pub fn bilinear_interpolate(im: &ColorImage, p: PointF32) -> Color {
