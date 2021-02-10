@@ -42,7 +42,10 @@ function drawConfusionMatrixToHtmlTable(tableId, confusionMatrix) {
             } else if (i == j) {
                 html.push(`<td>-</td>`)
             } else {
-                html.push(`<td>${text}</td>`);
+                html.push(
+                    `<td><div class="tooltip">${text}
+                    <span class="tooltiptext">${confusionMatrix[i][0]}\\${confusionMatrix[0][j]}</span></div></td>`
+                );
             }
         });
         html.push(`</tr>`);
@@ -85,6 +88,10 @@ export function calculateConfusionMatrix(targetTableId) {
         } else {
             confusions[groundTruth][mistaken] += 1;
         }
+    }
+
+    if (labelArray.length == 0) {
+        return;
     }
 
     // Construct the confusion matrix
