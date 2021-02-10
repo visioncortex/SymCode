@@ -1,4 +1,4 @@
-use visioncortex::{BinaryImage, ColorImage, PointI32, Shape};
+use visioncortex::{BinaryImage, BoundingRect, ColorImage, Shape};
 
 use crate::scanning::{SymcodeConfig, binarize_image_util, finder::Finder, valid_pointf64_on_image};
 
@@ -25,7 +25,7 @@ impl FinderCandidate {
 
 impl Finder for FinderCandidate {
 
-    type FinderElement = PointI32;
+    type FinderElement = BoundingRect;
 
     fn extract_finder_positions(image: BinaryImage) -> Vec<Self::FinderElement> {
         let clusters = image.to_clusters(false);
@@ -33,7 +33,7 @@ impl Finder for FinderCandidate {
         clusters.clusters.iter()
             .filter_map(|cluster| {
                 if Self::shape_is_finder(cluster.to_binary_image()) {
-                    Some(cluster.rect.center())
+                    Some(cluster.rect)
                 } else {
                     None
                 }
@@ -44,7 +44,7 @@ impl Finder for FinderCandidate {
 
 impl FinderCandidate {
 
-    pub fn process(input: &ColorImage, params: &SymcodeConfig) -> Result<Vec<PointI32>, &'static str> {
+    pub fn process(input: &ColorImage, params: &SymcodeConfig) -> Result<Vec<BoundingRect>, &'static str> {
         Self::valid_params(params)?;
 
         // Get the reference to the input raw frame
@@ -83,9 +83,9 @@ impl FinderCandidate {
         Ok(())
     }
 
-    fn render_finder_candidates(finder_candidates: &[PointI32], canvas: &crate::canvas::Canvas) {
-        finder_candidates.iter().for_each(|center| {
-            crate::scanning::util::render_point_i32_to_canvas(*center, canvas);
+    fn render_finder_candidates(finder_candidates: &[BoundingRect], canvas: &crate::canvas::Canvas) {
+        finder_candidates.iter().for_each(|rect| {
+            crate::scanning::util::render_point_i32_to_canvas(rect.center(), canvas);
         });
     }
 }
