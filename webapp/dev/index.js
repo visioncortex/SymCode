@@ -65,12 +65,12 @@ function runOneTestCase(consoleOutput, testConfig) {
                 scan()
                     .then((result) => {
                         if (consoleOutput) {
-                            console.log("Recognition result: " + result);
+                            console.log("Recognition result: " + result.code);
                         }
-                        if (result.localeCompare(groundTruthCode) == 0) {
-                            resolve({isCorrect: true, groundTruth: groundTruthCode, recognized: result});
+                        if (result.code.localeCompare(groundTruthCode) == 0) {
+                            resolve({isCorrect: true, groundTruth: groundTruthCode, recognized: result.code, time: result.time});
                         } else {
-                            resolve({isCorrect: false, groundTruth: groundTruthCode, recognized: result});
+                            resolve({isCorrect: false, groundTruth: groundTruthCode, recognized: result.code});
                         }
                     })
                     .catch(e => { reject(e);});
@@ -97,6 +97,7 @@ async function runNTestCases(testConfig) {
             <th>Recognized code</th>
         </tr>`;
     let errors = {};
+    let totalTime = 0;
     for (let i = 0; i < testConfig.numTestCases; ++i) {
         let result = {};
         let msg = "";
@@ -105,6 +106,7 @@ async function runNTestCases(testConfig) {
             if (result.isCorrect) {
                 msg = "Correct";
                 ++correctCases;
+                totalTime += result.time;
             } else {
                 msg = "Recognition is Wrong.";
                 errors[msg]? errors[msg]++ : errors[msg] = 1;
@@ -127,6 +129,7 @@ async function runNTestCases(testConfig) {
     console.log("Test config: ", util.beautifyJSON(testConfig))
     console.log("Test result: ", correctCases, " out of ", testConfig.numTestCases, " test cases are correctly recognized.");
     console.log("Overall accuracy: ", correctCases / testConfig.numTestCases * 100 + "%")
+    console.log("Average scanning time: ", totalTime/correctCases + " ms");
 
     let nonWrongRecognitionErrors = 0;
     let recognitionWrong = 0;
@@ -197,7 +200,7 @@ function scanImageFromSource(source) {
         ctx.drawImage(img, 0, 0);
         scan()
             .then((result) => {
-                console.log("Recognition result: " + result);
+                console.log("Recognition result: " + result.code);
             })
             .catch((e) => {
                 handleError(e);
@@ -211,9 +214,10 @@ function scan() {
     return new Promise((resolve) => {
         try {
             let startTime = new Date();
-            const result = scanner.scan_from_canvas_id("frame");
-            handleSuccess("Scanning finishes in " + (new Date() - startTime) + " ms.");
-            resolve(result);
+            const code = scanner.scan_from_canvas_id("frame");
+            const time = (new Date() - startTime);
+            handleSuccess("Scanning finishes in " + time + " ms.");
+            resolve({code, time});
         } catch (e) {
             throw e;
         }
