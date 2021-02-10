@@ -32,6 +32,14 @@ function drawConfusionMatrixToHtmlTable(tableId, confusionMatrix) {
         console.log("No <table> element found with id " + tableId);
         return;
     }
+    if (confusionMatrix.length == 1) {
+        // Empty
+        table.style.display = "none";
+        return;
+    } else {
+        table.style.display = "block";
+    }
+    
     let html = [];
 
     for (let i = 0; i < confusionMatrix.length; ++i) {
@@ -88,10 +96,6 @@ export function calculateConfusionMatrix(targetTableId) {
         } else {
             confusions[groundTruth][mistaken] += 1;
         }
-    }
-
-    if (labelArray.length == 0) {
-        return;
     }
 
     // Construct the confusion matrix
