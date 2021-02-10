@@ -28,23 +28,6 @@ impl Fitter for TransformFitter {
 
         let finder_positions_image: Vec<PointF64> = finders_image.iter().map(|finder| finder.center().to_point_f64()).collect();
         
-        let debug_points = &[
-            PointF64::new(201.0, 220.0),
-            PointF64::new(175.0, 175.0),
-            PointF64::new(159.0, 132.0),
-            PointF64::new(147.0, 141.0),
-        ];
-        let are_debug_points = |points: &[PointF64]| {
-            if points.len() != debug_points.len() {
-                return false;
-            }
-            points.iter().enumerate().fold(true, |acc, (i, point)| {
-                acc &&
-                crate::math::f64_approximately(point.x, debug_points[i].x) &&
-                crate::math::f64_approximately(point.y, debug_points[i].y)
-            })
-        };
-
         if finders_image.len() != check_points.len() {
             panic!("Number of finder source points and number of check points do not agree in transform evaluation.");
         }
@@ -63,11 +46,6 @@ impl Fitter for TransformFitter {
         
         // Reproject the first check point from obj to img space
         let first_check_point_img_space = img_to_obj.transform_inverse(check_points[0]);
-        if are_debug_points(&finder_positions_image) {
-            if let Some(debug_canvas) = &symcode_config.debug_canvas {
-                crate::scanning::util::render_point_i32_to_canvas_with_color(first_check_point_img_space.to_point_i32(), debug_canvas, visioncortex::Color::new(0, 0, 255))   
-            }
-        }
 
         let get_normalized_and_norm = |p1: PointF64, p2: PointF64| {
             let v = p2 - p1;
@@ -85,11 +63,6 @@ impl Fitter for TransformFitter {
         let mut longest_dist = first_dist;
         for (i, &finder_src_pt) in finder_positions_image.iter().enumerate().skip(1) {
             let check_point_img_space = img_to_obj.transform_inverse(check_points[i]);
-            if are_debug_points(&finder_positions_image) {
-                if let Some(debug_canvas) = &symcode_config.debug_canvas {
-                    crate::scanning::util::render_point_i32_to_canvas_with_color(check_point_img_space.to_point_i32(), debug_canvas, visioncortex::Color::new(0, 255, 0))   
-                }
-            }
             if !valid_pointf64_on_image(check_point_img_space, image_width, image_height) {
                 return std::f64::MAX;
             }
@@ -122,7 +95,6 @@ impl Fitter for TransformFitter {
                 if Self::correct_spatial_arrangement(&src_pts) {
                     let transform = PerspectiveTransform::from_point_f64(&src_pts, dst_pts);
                     let error = Self::evaluate_transform(&transform, src_rects, image_width, image_height, symcode_config);
-                    //crate::util::console_log_util(&format!("Error is {} with src_pts {:?}", error, src_pts));
                     if error < min_error {
                         best_transform = Ok(transform);
                         min_error = error;
