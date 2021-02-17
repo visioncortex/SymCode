@@ -28,8 +28,9 @@ const fps = 60;
 
 export function loadingCompletes() {
     console.log("Template loading completes.");
-    scanImageFromSource("assets/invalid.png");
+    //scanImageFromSource("assets/invalid.png");
     //document.getElementById("test").click();
+    runOneTestCase(true, getTestConfigFromHtml())
 }
 
 const ERROR_COLOR = "color: #ff5050;";
@@ -154,7 +155,7 @@ document.getElementById('randomizeSeed').addEventListener('change', function (e)
     document.getElementById('testSeed').disabled = this.checked;
 });
 
-document.getElementById('test').addEventListener('click', () => {
+function getTestConfigFromHtml() {
     let numTestCases = document.getElementById("numTestCases");
     if (!numTestCases || numTestCases.tagName.localeCompare("INPUT") != 0) {
         console.log("No element of tag <input> with id numTestCases found. Using 100 by default.");
@@ -192,12 +193,16 @@ document.getElementById('test').addEventListener('click', () => {
         noiseMaxOpacity = parseFloat(noiseMaxOpacity.value);
     }
 
-    runNTestCases({
+    return {
         numTestCases,
         angleVariation,
         seed: testSeed,
         noiseMaxOpacity,
-    });
+    };
+
+}
+document.getElementById('test').addEventListener('click', () => {
+    runNTestCases(getTestConfigFromHtml());
 });
 
 document.getElementById('imageInput').addEventListener('change', function (e) { scanImageFromSource(this.files[0]) });
