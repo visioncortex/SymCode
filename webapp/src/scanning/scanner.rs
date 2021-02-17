@@ -1,12 +1,15 @@
 use std::borrow::BorrowMut;
 
 use rand::{RngCore, SeedableRng, rngs::StdRng};
-use visioncortex::{BinaryImage, PointI32, Shape};
+use visioncortex::{BinaryImage, ColorImage, PointI32, Shape};
 use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, SymcodeDecoder, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, render_binary_image_to_canvas};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLabel, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, SymcodeDecoder, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, render_binary_image_to_canvas};
+
+use crate::scanner::interface::SymcodeScanner as ScannerInterface;
+use crate::generator::interface::SymcodeGenerator as GeneratorInterface;
 
 #[wasm_bindgen]
 pub struct SymcodeScanner {
@@ -60,68 +63,18 @@ impl SymcodeScanner {
             return Err("No templates loaded into the SymcodeScanner instance yet!".into());
         }
 
-        let symcode_config = &self.config;
-
         // Stage 0: Prepare the raw input
         let raw_frame = if let Some(canvas) = &Canvas::new_from_id(canvas_id) {
             canvas.get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
         } else {
             return Err("Cannot read input image from canvas.".into());
         };
-        
-        // Stage 1: Locate finder candidates
-        let finder_positions = match FinderCandidate::process(
-            &raw_frame,
-            symcode_config
-        ) {
-            Ok(finder_positions) => finder_positions,
-            Err(e) => {
-                return Err(("Failed at Stage 1: ".to_owned() + e).into());
-            }
-        };
-        
-        // Stage 2: Fit a perspective transform from the image space to the object space
-        let image_to_object = match TransformFitter::process(
-            TransformFitterInput {
-                finder_positions_image: finder_positions,
-                raw_image_width: raw_frame.width,
-                raw_image_height: raw_frame.height,
-            },
-            symcode_config
-        ) {
-            Ok(image_to_object) => image_to_object,
-            Err(e) => {
-                return Err(("Failed at Stage 2: ".to_owned() + e).into());
-            }
-        };
 
-        // Stage 3: Recognize the glyphs
-        let symcode_instance = match Recognizer::process(
-            RecognizerInput {
-                raw_frame,
-                image_to_object,
-                glyph_library: &self.glyph_library,
-            },
-            symcode_config
-        ) {
-            Ok(symcode_instance) => symcode_instance,
-            Err(e) => {
-                return Err(("Failed at Stage 3: ".to_owned() + e).into());
-            }
-        };
-        let debug_code_string = format!("{:?}", symcode_instance);
+        let symcode = self.scan(raw_frame)?;
+        let debug_code_string = format!("{:?}", symcode);
 
-        // Stage 4: Decode the Symcode
-        match SymcodeDecoder::process(
-            symcode_instance
-        ) {
-            Ok(decoded_symcode) => {
-                Ok(format!("{}\n{:?}", debug_code_string, decoded_symcode))
-            },
-            Err(e) => {
-                Err(("Failed at Stage 4: ".to_owned() + e).into())
-            }
-        }
+        let decoded_bit_string = self.decode(symcode)?;
+        Ok(format!("{}\n{:?}", debug_code_string, decoded_bit_string))
     }
 
     pub fn generate_symcode_to_canvas(&mut self, canvas_id: &str) -> Result<String, JsValue> {
@@ -170,5 +123,71 @@ impl SymcodeScanner {
         let ground_truth_code = SymcodeDecoder::process(ground_truth_code).unwrap();
 
         (symcode, format!("{}\n{:?}", ground_truth_code_string, ground_truth_code))
+    }
+}
+
+impl ScannerInterface for SymcodeScanner {
+    type Symcode = Vec<Option<GlyphLabel>>;
+
+    type Err = JsValue;
+
+    fn scan(&self, image: ColorImage) -> Result<Self::Symcode, Self::Err> {
+        let symcode_config = &self.config;
+        // Stage 1: Locate finder candidates
+        let finder_positions = match FinderCandidate::process(
+            &image,
+            symcode_config
+        ) {
+            Ok(finder_positions) => finder_positions,
+            Err(e) => {
+                return Err(("Failed at Stage 1: ".to_owned() + e).into());
+            }
+        };
+        
+        // Stage 2: Fit a perspective transform from the image space to the object space
+        let image_to_object = match TransformFitter::process(
+            TransformFitterInput {
+                finder_positions_image: finder_positions,
+                raw_image_width: image.width,
+                raw_image_height: image.height,
+            },
+            symcode_config
+        ) {
+            Ok(image_to_object) => image_to_object,
+            Err(e) => {
+                return Err(("Failed at Stage 2: ".to_owned() + e).into());
+            }
+        };
+
+        // Stage 3: Recognize the glyphs
+        let symcode_instance = match Recognizer::process(
+            RecognizerInput {
+                raw_frame: image,
+                image_to_object,
+                glyph_library: &self.glyph_library,
+            },
+            symcode_config
+        ) {
+            Ok(symcode_instance) => symcode_instance,
+            Err(e) => {
+                return Err(("Failed at Stage 3: ".to_owned() + e).into());
+            }
+        };
+
+        Ok(symcode_instance)
+    }
+
+    fn decode(&self, symcode: Self::Symcode) -> Result<bit_vec::BitVec, Self::Err> {
+        // Stage 4: Decode the Symcode
+        match SymcodeDecoder::process(
+            symcode
+        ) {
+            Ok(decoded_symcode) => {
+                Ok(decoded_symcode)
+            },
+            Err(e) => {
+                Err(("Failed at Stage 4: ".to_owned() + e).into())
+            }
+        }
     }
 }
