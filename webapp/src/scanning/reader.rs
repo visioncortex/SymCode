@@ -29,6 +29,16 @@ pub trait GlyphReader {
         rectified_image
     }
 
+    /// Validates the size of a cluster in rectified image
+    fn validate_cluster_by_size(cluster_rect: &BoundingRect, symcode_config: &SymcodeConfig) -> bool {
+        let height_tolerance = ((symcode_config.symbol_height >> 3) + 5) as i32;
+        let width_tolerance = ((symcode_config.symbol_width >> 3) + 5) as i32;
+        cluster_rect.width() <= symcode_config.symbol_width as i32 + width_tolerance &&
+        cluster_rect.height() <= symcode_config.symbol_height as i32 + height_tolerance &&
+        cluster_rect.width() >= width_tolerance &&
+        cluster_rect.height() >= height_tolerance
+    }
+    
     /// For each rect in cluster_rects, classify it into the group of rects that overlap with the glyph region
     fn group_cluster_rects_by_glyph_regions(mut cluster_rects: Vec<BoundingRect>, symcode_config: &SymcodeConfig) -> Vec<Vec<BoundingRect>> {
         let glyph_rects: Vec<BoundingRect> = symcode_config.glyph_anchors.iter().map(|top_left| {
@@ -99,10 +109,7 @@ pub trait GlyphReader {
                 if cluster.size() < symcode_config.absolute_empty_cluster_threshold(rect.width() as usize, rect.height() as usize) as usize {
                     return None;
                 }
-                if  rect.width() <= (symcode_config.symbol_width + 15) as i32 &&
-                    rect.height() <= (symcode_config.symbol_height + 15) as i32 &&
-                    rect.width() >= (symcode_config.symbol_width >> 4) as i32 &&
-                    rect.height() >= (symcode_config.symbol_height >> 4) as i32  {
+                if Self::validate_cluster_by_size(&rect, symcode_config) {
                     Some(rect)
                 } else {
                     None
