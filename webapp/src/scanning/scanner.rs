@@ -127,11 +127,11 @@ impl SymcodeScanner {
 }
 
 impl ScannerInterface for SymcodeScanner {
-    type Symcode = Vec<Option<GlyphLabel>>;
+    type SymcodeRepresentation = Vec<Option<GlyphLabel>>;
 
     type Err = JsValue;
 
-    fn scan(&self, image: ColorImage) -> Result<Self::Symcode, Self::Err> {
+    fn scan(&self, image: ColorImage) -> Result<Self::SymcodeRepresentation, Self::Err> {
         let symcode_config = &self.config;
         // Stage 1: Locate finder candidates
         let finder_positions = match FinderCandidate::process(
@@ -177,7 +177,7 @@ impl ScannerInterface for SymcodeScanner {
         Ok(symcode_instance)
     }
 
-    fn decode(&self, symcode: Self::Symcode) -> Result<bit_vec::BitVec, Self::Err> {
+    fn decode(&self, symcode: Self::SymcodeRepresentation) -> Result<bit_vec::BitVec, Self::Err> {
         // Stage 4: Decode the Symcode
         match SymcodeDecoder::process(
             symcode
