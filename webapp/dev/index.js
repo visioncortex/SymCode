@@ -28,8 +28,8 @@ const fps = 60;
 
 export function loadingCompletes() {
     console.log("Template loading completes.");
-    //scanImageFromSource("assets/778wrong_recognition.png");
-    document.getElementById("test").click();
+    scanImageFromSource("assets/invalid.png");
+    //document.getElementById("test").click();
 }
 
 const ERROR_COLOR = "color: #ff5050;";

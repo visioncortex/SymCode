@@ -95,11 +95,12 @@ pub trait GlyphReader {
         let cluster_rects: Vec<BoundingRect> = rectified_image.to_clusters(true).clusters.into_iter()
             .filter_map(|cluster| {
                 let rect = cluster.rect;
+                // Checks the number of solid points within this cluster
                 if cluster.size() < symcode_config.absolute_empty_cluster_threshold(rect.width() as usize, rect.height() as usize) as usize {
                     return None;
                 }
-                if  rect.width() <= (symcode_config.symbol_width + 10) as i32 &&
-                    rect.height() <= (symcode_config.symbol_height + 10) as i32 &&
+                if  rect.width() <= (symcode_config.symbol_width + 15) as i32 &&
+                    rect.height() <= (symcode_config.symbol_height + 15) as i32 &&
                     rect.width() >= (symcode_config.symbol_width >> 4) as i32 &&
                     rect.height() >= (symcode_config.symbol_height >> 4) as i32  {
                     Some(rect)
