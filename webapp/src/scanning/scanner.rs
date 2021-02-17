@@ -93,36 +93,27 @@ impl SymcodeScanner {
     }
 
     fn generate_symcode(&mut self) -> (BinaryImage, String) {
-        let mut symcode = BinaryImage::new_w_h(self.config.code_width, self.config.code_height);
-
-        // Put in the finders
-        let finder_image = Shape::circle(self.config.symbol_width, self.config.symbol_height).image;
-        self.config.finder_positions.iter().for_each(|finder_center| {
-            let top_left = finder_center.to_point_i32() - PointI32::new((self.config.symbol_width >> 1) as i32, (self.config.symbol_height >> 1) as i32);
-            symcode.paste_from(&finder_image, top_left);
-        });
-
-        // Put in the glyphs
         let mut ground_truth_code = vec![];
-        self.config.glyph_anchors.clone().iter().for_each(|glyph_top_left| {
+        for _ in 0..self.config.num_glyphs_in_code() {
             let glyph_index: usize = self.rng.next_u64() as usize;
             let glyph_index = glyph_index % (self.glyph_library.len() + 1);
-
+            
             // if glyph_index == glyph_library.len(), this will return None
             if let Some(glyph) = self.glyph_library.get_glyph_at(glyph_index) {
                 ground_truth_code.push(Some(glyph.label));
-                symcode.paste_from(&glyph.image, glyph_top_left.to_point_i32());
             } else {
                 ground_truth_code.push(None);
             }
-        });
-
-        let ground_truth_code_string = format!("{:?}", ground_truth_code);
+        }
+        
+        let ground_truth_code_as_string = format!("{:?}", ground_truth_code);
         //console_log_util(&format!("Generated glyphs: {}", ground_truth_code_string));
 
-        let ground_truth_code = SymcodeDecoder::process(ground_truth_code).unwrap();
+        let ground_truth_code_as_bits = SymcodeDecoder::process(ground_truth_code.clone()).unwrap();
 
-        (symcode, format!("{}\n{:?}", ground_truth_code_string, ground_truth_code))
+        let symcode_image = self.generate(ground_truth_code);
+
+        (symcode_image, format!("{}\n{:?}", ground_truth_code_as_string, ground_truth_code_as_bits))
     }
 }
 
@@ -189,5 +180,32 @@ impl ScannerInterface for SymcodeScanner {
                 Err(("Failed at Stage 4: ".to_owned() + e).into())
             }
         }
+    }
+}
+
+impl GeneratorInterface for SymcodeScanner {
+    type SymcodeRepresentation = Vec<Option<GlyphLabel>>;
+
+    fn generate(&self, symcode: Self::SymcodeRepresentation) -> BinaryImage {
+        let mut symcode_image = BinaryImage::new_w_h(self.config.code_width, self.config.code_height);
+
+        // Put in the finders
+        let finder_image = Shape::circle(self.config.symbol_width, self.config.symbol_height).image;
+        self.config.finder_positions.iter().for_each(|finder_center| {
+            let top_left = finder_center.to_point_i32() - PointI32::new((self.config.symbol_width >> 1) as i32, (self.config.symbol_height >> 1) as i32);
+            symcode_image.paste_from(&finder_image, top_left);
+        });
+
+        // Put in the glyphs
+        symcode.iter().enumerate().for_each(|(i, glyph_label)| {
+            if let Some(glyph_label) = glyph_label {
+                let glyph_top_left = self.config.glyph_anchors[i];
+                if let Some(glyph) = self.glyph_library.get_glyph_with_label(*glyph_label) {
+                    symcode_image.paste_from(&glyph.image, glyph_top_left.to_point_i32());
+                }
+            }
+        });
+
+        symcode_image
     }
 }

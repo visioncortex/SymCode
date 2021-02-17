@@ -67,6 +67,11 @@ impl SymcodeConfig {
     pub fn absolute_empty_cluster_threshold(&self, image_width: usize, image_height: usize) -> u64 {
         (self.empty_cluster_threshold * (image_width * image_height) as f64) as u64
     }
+
+    #[inline]
+    pub fn num_glyphs_in_code(&self) -> usize {
+        self.glyph_anchors.len()
+    }
 }
 
 #[wasm_bindgen]

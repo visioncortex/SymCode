@@ -32,6 +32,15 @@ impl GlyphLibrary {
         }
     }
 
+    pub fn get_glyph_with_label(&self, label: GlyphLabel) -> Option<&Glyph> {
+        for glyph in self.templates.iter() {
+            if glyph.label == label {
+                return Some(glyph);
+            }
+        }
+        None
+    }
+
     pub fn print_label_and_trace(&self) -> String {
         let list: Vec<String> = self.templates.iter().map(|glyph| {
             format!("{:?}: {:?}\n", glyph.label, glyph.encoding.bits)
