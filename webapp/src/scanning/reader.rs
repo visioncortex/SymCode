@@ -30,7 +30,7 @@ pub trait GlyphReader {
     }
 
     /// Validates the size of a cluster in rectified image
-    fn validate_cluster_by_size(cluster_rect: &BoundingRect, symcode_config: &SymcodeConfig) -> bool {
+    fn validate_cluster_by_rect_size(cluster_rect: &BoundingRect, symcode_config: &SymcodeConfig) -> bool {
         let height_tolerance = ((symcode_config.symbol_height >> 3) + 5) as i32;
         let width_tolerance = ((symcode_config.symbol_width >> 3) + 5) as i32;
         cluster_rect.width() <= symcode_config.symbol_width as i32 + width_tolerance &&
@@ -109,7 +109,8 @@ pub trait GlyphReader {
                 if cluster.size() < symcode_config.absolute_empty_cluster_threshold(rect.width() as usize, rect.height() as usize) as usize {
                     return None;
                 }
-                if Self::validate_cluster_by_size(&rect, symcode_config) {
+                // Checks the size of bounding box
+                if Self::validate_cluster_by_rect_size(&rect, symcode_config) {
                     Some(rect)
                 } else {
                     None
