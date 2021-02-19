@@ -119,6 +119,26 @@ impl GlyphLabel {
             None
         }
     }
+
+    pub fn bit_vec_to_primitive(bit_vec: BitVec) -> usize {
+        let mut primitive = 0;
+        for i in bit_vec {
+            primitive <<= 1;
+            primitive += i as usize;
+        }
+        primitive
+    }
+
+    pub fn option_self_from_bit_vec(bit_vec: BitVec) -> Option<Self> {
+        let label = Self::from_usize_representation(
+            Self::bit_vec_to_primitive(bit_vec)
+        );
+        if label == Self::Empty {
+            None
+        } else {
+            Some(label)
+        }
+    }
 }
 
 pub struct Glyph {
@@ -219,5 +239,24 @@ mod tests {
             let check = i==3;
             assert_eq!(bit_vec.get(i).unwrap(), check);
         }
+    }
+
+    #[test]
+    fn glyph_label_primitive_bit_vec_conversion() {
+        const LENGTH: usize = 6;
+        let primitive = 5;
+        let mut bit_vec = BitVec::from_elem(LENGTH, false);
+        bit_vec.set(3, true);
+        bit_vec.set(LENGTH-1, true);
+        assert_eq!(GlyphLabel::primitive_to_bit_vec(primitive, LENGTH), bit_vec);
+        assert_eq!(primitive, GlyphLabel::bit_vec_to_primitive(bit_vec));
+
+        let primitive = 15;
+        let mut bit_vec = BitVec::from_elem(LENGTH, false);
+        for i in 2..LENGTH {
+            bit_vec.set(i, true);
+        }
+        assert_eq!(GlyphLabel::primitive_to_bit_vec(primitive, LENGTH), bit_vec);
+        assert_eq!(primitive, GlyphLabel::bit_vec_to_primitive(bit_vec)); 
     }
 }
