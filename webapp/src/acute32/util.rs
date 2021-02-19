@@ -47,19 +47,23 @@ pub(crate) fn image_diff_area(img1: &BinaryImage, img2: &BinaryImage) -> u64 {
     img1.diff(img2).area()
 }
 
-pub(crate) fn render_binary_image_to_canvas(image: &BinaryImage, canvas: &Canvas) -> Result<(), JsValue> {
+pub(crate) fn render_binary_image_to_canvas(image: &BinaryImage, canvas: &Canvas) -> Result<(), &'static str> {
     let image = &image.to_color_image();
     render_color_image_to_canvas(image, canvas)
 }
 
-pub(crate) fn render_color_image_to_canvas(image: &ColorImage, canvas: &Canvas) -> Result<(), JsValue> {
+pub(crate) fn render_color_image_to_canvas(image: &ColorImage, canvas: &Canvas) -> Result<(), &'static str> {
     let mut data = image.pixels.clone();
-    let data = ImageData::new_with_u8_clamped_array_and_sh(Clamped(&mut data), image.width as u32, image.height as u32)?;
+    let data = ImageData::new_with_u8_clamped_array_and_sh(Clamped(&mut data), image.width as u32, image.height as u32).unwrap();
     let ctx = canvas.get_rendering_context_2d();
     canvas.set_width(image.width);
     canvas.set_height(image.height);
     ctx.clear_rect(0.0, 0.0, canvas.width() as f64, canvas.height() as f64);
-    ctx.put_image_data(&data, 0.0, 0.0)
+    if ctx.put_image_data(&data, 0.0, 0.0).is_err() {
+        Err("failed to put_image_data")
+    } else {
+        Ok(())
+    }
 }
 
 pub(crate) fn render_point_i32_to_canvas(point: PointI32, canvas: &Canvas) {

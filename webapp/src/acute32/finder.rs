@@ -43,7 +43,7 @@ impl Acute32FinderCandidate {
         // Binarize
         let binary_raw_frame = binarize_image_util(raw_frame);
         if let Some(debug_canvas) = &params.debug_canvas {
-            crate::acute32::util::render_binary_image_to_canvas(&binary_raw_frame, debug_canvas);
+            crate::acute32::util::render_binary_image_to_canvas(&binary_raw_frame, debug_canvas)?;
         }
 
         // Processing starts
