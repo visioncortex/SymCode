@@ -2,10 +2,10 @@ use bit_vec::BitVec;
 
 use crate::acute32::Decoder;
 
-pub struct SymcodeDecoder;
+pub struct Acute32Decoder;
 
 // Dummy implementation, error detection/correction will be supported later
-impl Decoder for SymcodeDecoder {
+impl Decoder for Acute32Decoder {
     type Symbol = Option<super::glyph::GlyphLabel>;
     // To Sanford: why option here? dont we have GlyphLabel::Invalid already? Shall we add an GlyphLabel::None?
 
@@ -37,7 +37,7 @@ impl Decoder for SymcodeDecoder {
     }
 }
 
-impl SymcodeDecoder {
+impl Acute32Decoder {
     pub fn process(input: Vec<Option<super::glyph::GlyphLabel>>) -> Result<BitVec, &'static str> {
         Self::decode(input, super::glyph::GlyphLabel::num_variants())
     }

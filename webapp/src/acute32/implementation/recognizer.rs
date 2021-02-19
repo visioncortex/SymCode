@@ -5,9 +5,9 @@ use crate::{math::PerspectiveTransform, acute32::{GlyphReader, Acute32SymcodeCon
 use super::{GlyphLabel, Acute32Library};
 
 /// An implementation of GlyphReader
-pub struct Recognizer;
+pub struct Acute32Recognizer;
 
-impl GlyphReader for Recognizer {
+impl GlyphReader for Acute32Recognizer {
     type Label = GlyphLabel;
 
     type Library = Acute32Library;
@@ -26,7 +26,7 @@ pub struct RecognizerInput<'a> {
     pub glyph_library: &'a Acute32Library,
 }
 
-impl<'a> Recognizer {
+impl<'a> Acute32Recognizer {
 
     pub fn process(input: RecognizerInput<'a>, params: &Acute32SymcodeConfig) -> Result<Vec<Option<GlyphLabel>>, &'static str> {
         // Processing starts

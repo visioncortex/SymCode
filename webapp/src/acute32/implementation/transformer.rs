@@ -4,9 +4,9 @@ use visioncortex::{BoundingRect, PointF64};
 use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, acute32::{Fitter, Acute32SymcodeConfig, valid_pointf64_on_image}};
 
 /// Implementation of Transformer
-pub(crate) struct TransformFitter;
+pub(crate) struct Acute32TransformFitter;
 
-impl TransformFitter {
+impl Acute32TransformFitter {
     /// Use the top of each finder in object space as check points
     fn calculate_check_points(symcode_config: &crate::acute32::Acute32SymcodeConfig) -> Vec<PointF64> {
         symcode_config.finder_positions.iter()
@@ -15,7 +15,7 @@ impl TransformFitter {
     }
 }
 
-impl Fitter for TransformFitter {
+impl Fitter for Acute32TransformFitter {
     type FinderElement = BoundingRect;
     fn correct_spatial_arrangement(finder_positions_image: &[PointF64]) -> bool {
         clockwise_points_f64(&finder_positions_image[0], &finder_positions_image[1], &finder_positions_image[2]) &&
@@ -131,7 +131,7 @@ pub struct TransformFitterInput {
     pub raw_image_height: usize,
 }
 
-impl TransformFitter {
+impl Acute32TransformFitter {
     pub fn process(input: TransformFitterInput, params: &Acute32SymcodeConfig) -> Result<PerspectiveTransform, &str> {
         // Processing starts
         Self::fit_transform(input.raw_image_width, input.raw_image_height, input.finder_positions_image, params)

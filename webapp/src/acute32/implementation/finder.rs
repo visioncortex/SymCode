@@ -31,9 +31,9 @@ impl FinderInterface for CircleFinder {
 }
 
 /// Specific implementation of Finder candidates
-pub(crate) struct FinderCandidate;
+pub(crate) struct Acute32FinderCandidate;
 
-impl FinderCandidate {
+impl Acute32FinderCandidate {
 
     pub fn process(input: &ColorImage, params: &Acute32SymcodeConfig) -> Result<Vec<BoundingRect>, &'static str> {
         Self::valid_params(params)?;

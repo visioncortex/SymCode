@@ -6,7 +6,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, interfaces::finder::Finder as FinderInterface, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLabel, Recognizer, RecognizerInput, Acute32SymcodeConfig, SymcodeDecoder, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, render_binary_image_to_canvas};
+use super::{AlphabetReader, AlphabetReaderParams, Acute32FinderCandidate, GlyphLabel, Acute32Recognizer, RecognizerInput, Acute32SymcodeConfig, Acute32Decoder, implementation::transformer::{Acute32TransformFitter, TransformFitterInput}, is_black_hsv, render_binary_image_to_canvas};
 
 use crate::interfaces::scanner::SymcodeScanner as ScannerInterface;
 use crate::interfaces::generator::SymcodeGenerator as GeneratorInterface;
@@ -96,7 +96,7 @@ impl Acute32SymcodeMain {
         let ground_truth_code_as_string = format!("{:?}", ground_truth_code);
         //console_log_util(&format!("Generated glyphs: {}", ground_truth_code_string));
 
-        let ground_truth_code_as_bits = SymcodeDecoder::process(ground_truth_code.clone()).unwrap();
+        let ground_truth_code_as_bits = Acute32Decoder::process(ground_truth_code.clone()).unwrap();
 
         let symcode_image = self.generate(ground_truth_code);
 
@@ -112,7 +112,7 @@ impl ScannerInterface for Acute32SymcodeMain {
     fn scan(&self, image: ColorImage) -> Result<Self::SymcodeRepresentation, Self::Err> {
         let symcode_config = &self.config;
         // Stage 1: Locate finder candidates
-        let finder_positions = match FinderCandidate::process(
+        let finder_positions = match Acute32FinderCandidate::process(
             &image,
             symcode_config
         ) {
@@ -123,7 +123,7 @@ impl ScannerInterface for Acute32SymcodeMain {
         };
         
         // Stage 2: Fit a perspective transform from the image space to the object space
-        let image_to_object = match TransformFitter::process(
+        let image_to_object = match Acute32TransformFitter::process(
             TransformFitterInput {
                 finder_positions_image: finder_positions,
                 raw_image_width: image.width,
@@ -138,7 +138,7 @@ impl ScannerInterface for Acute32SymcodeMain {
         };
 
         // Stage 3: Recognize the glyphs
-        let symcode_instance = match Recognizer::process(
+        let symcode_instance = match Acute32Recognizer::process(
             RecognizerInput {
                 raw_frame: image,
                 image_to_object,
@@ -157,7 +157,7 @@ impl ScannerInterface for Acute32SymcodeMain {
 
     fn decode(&self, symcode: Self::SymcodeRepresentation) -> Result<bit_vec::BitVec, Self::Err> {
         // Stage 4: Decode the Symcode
-        match SymcodeDecoder::process(
+        match Acute32Decoder::process(
             symcode
         ) {
             Ok(decoded_symcode) => {
