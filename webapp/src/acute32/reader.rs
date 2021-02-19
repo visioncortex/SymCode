@@ -2,17 +2,12 @@ use visioncortex::{BinaryImage, BoundingRect, ColorImage, PointF64, PointI32};
 
 use crate::math::PerspectiveTransform;
 
-use super::{Acute32SymcodeConfig, is_black_rgb, render_binary_image_to_canvas};
+use super::{Acute32Library, Acute32SymcodeConfig, GlyphLabel, is_black_rgb, render_binary_image_to_canvas};
 
-pub trait GlyphReader {
-    // Input = BinaryImage, Library
-    // Output = Option<Vec<Label>>
+pub struct Acute32Recognizer;
 
-    type Label;
-
-    type Library;
-
-    fn rectify_image(raw_image: ColorImage, image_to_object: PerspectiveTransform, symcode_config: &Acute32SymcodeConfig) -> BinaryImage {
+impl Acute32Recognizer {
+    pub fn rectify_image(raw_image: ColorImage, image_to_object: PerspectiveTransform, symcode_config: &Acute32SymcodeConfig) -> BinaryImage {
         let width = symcode_config.code_width;
         let height = symcode_config.code_height;
         let mut rectified_image = BinaryImage::new_w_h(width, height);
@@ -30,7 +25,7 @@ pub trait GlyphReader {
     }
 
     /// Validates the size of a cluster in rectified image
-    fn validate_cluster_by_rect_size(cluster_rect: &BoundingRect, symcode_config: &Acute32SymcodeConfig) -> bool {
+    pub fn validate_cluster_by_rect_size(cluster_rect: &BoundingRect, symcode_config: &Acute32SymcodeConfig) -> bool {
         let height_tolerance = ((symcode_config.symbol_height >> 3) + 5) as i32;
         let width_tolerance = ((symcode_config.symbol_width >> 3) + 5) as i32;
         cluster_rect.width() <= symcode_config.symbol_width as i32 + width_tolerance &&
@@ -40,7 +35,7 @@ pub trait GlyphReader {
     }
     
     /// For each rect in cluster_rects, classify it into the group of rects that overlap with the glyph region
-    fn group_cluster_rects_by_glyph_regions(mut cluster_rects: Vec<BoundingRect>, symcode_config: &Acute32SymcodeConfig) -> Vec<Vec<BoundingRect>> {
+    pub fn group_cluster_rects_by_glyph_regions(mut cluster_rects: Vec<BoundingRect>, symcode_config: &Acute32SymcodeConfig) -> Vec<Vec<BoundingRect>> {
         let glyph_rects: Vec<BoundingRect> = symcode_config.glyph_anchors.iter().map(|top_left| {
             BoundingRect::new_x_y_w_h(top_left.x as i32, top_left.y as i32, symcode_config.symbol_width as i32, symcode_config.symbol_height as i32)
         }).collect();
@@ -61,7 +56,7 @@ pub trait GlyphReader {
     }
 
     /// Merge each group of cluster rects and returns the centers of the merged clusters, or None if the group has no cluster
-    fn centers_of_merged_clusters_in_glyph_regions(grouped_cluster_rects: Vec<Vec<BoundingRect>>) -> Vec<Option<PointI32>> {
+    pub fn centers_of_merged_clusters_in_glyph_regions(grouped_cluster_rects: Vec<Vec<BoundingRect>>) -> Vec<Option<PointI32>> {
         grouped_cluster_rects.into_iter()
             .map(|group| {
                 if group.is_empty() {
@@ -80,7 +75,7 @@ pub trait GlyphReader {
     }
 
     /// Crop an image of a glyph at the specified center position
-    fn crop_glyph_at_center(image: &BinaryImage, center: PointI32, symcode_config: &Acute32SymcodeConfig) -> BinaryImage {
+    pub fn crop_glyph_at_center(image: &BinaryImage, center: PointI32, symcode_config: &Acute32SymcodeConfig) -> BinaryImage {
         let width = symcode_config.symbol_width;
         let height = symcode_config.symbol_height;
         let top_left = center - PointI32::new((width >> 1) as i32, (height >> 1) as i32);
@@ -92,10 +87,15 @@ pub trait GlyphReader {
     }
 
     /// Finds the most similar glyph in the library based on given params
-    fn find_most_similar_glyph(image: BinaryImage, glyph_library: &Self::Library, symcode_config: &Acute32SymcodeConfig) -> Self::Label;
+    pub fn find_most_similar_glyph(image: BinaryImage, glyph_library: &Acute32Library, symcode_config: &Acute32SymcodeConfig) -> GlyphLabel {
+        glyph_library.find_most_similar_glyph(
+            image,
+            symcode_config
+        )
+    }
     
     /// Read all glyphs at the anchors on the input image
-    fn read_glyphs_from_raw_frame(image: ColorImage, image_to_object: PerspectiveTransform, glyph_library: &Self::Library, symcode_config: &crate::acute32::Acute32SymcodeConfig) -> Vec<Option<Self::Label>> {
+    pub fn read_glyphs_from_raw_frame(image: ColorImage, image_to_object: PerspectiveTransform, glyph_library: &Acute32Library, symcode_config: &crate::acute32::Acute32SymcodeConfig) -> Vec<GlyphLabel> {
         let rectified_image = Self::rectify_image(image, image_to_object, symcode_config);
         if let Some(debug_canvas) = &symcode_config.debug_canvas {
             if render_binary_image_to_canvas(&rectified_image, debug_canvas).is_err() {
@@ -125,14 +125,30 @@ pub trait GlyphReader {
             if let Some(center) = center {
                 let glyph_image = Self::crop_glyph_at_center(&rectified_image, center, symcode_config);
                 if glyph_image.area() < symcode_config.absolute_empty_cluster_threshold(glyph_image.width, glyph_image.height) {
-                    None
+                    GlyphLabel::Empty
                 } else {
-                    Some(Self::find_most_similar_glyph(glyph_image, glyph_library, symcode_config))
+                    Self::find_most_similar_glyph(glyph_image, glyph_library, symcode_config)
                 }
             } else {
-                None
+                GlyphLabel::Empty
             }
         })
         .collect()
+    }
+}
+
+pub struct RecognizerInput<'a> {
+    pub raw_frame: ColorImage,
+    pub image_to_object: PerspectiveTransform,
+    pub glyph_library: &'a Acute32Library,
+}
+
+impl<'a> Acute32Recognizer {
+    pub fn process(input: RecognizerInput<'a>, params: &Acute32SymcodeConfig) -> Result<Vec<GlyphLabel>, &'static str> {
+        // Processing starts
+        let glyph_library = input.glyph_library;
+        let glyphs = Self::read_glyphs_from_raw_frame(input.raw_frame, input.image_to_object, glyph_library, params);
+        //crate::util::console_log_util(&format!("Recognized glyphs: {:?}", glyphs));
+        Ok(glyphs)
     }
 }

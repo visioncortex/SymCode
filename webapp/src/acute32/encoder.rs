@@ -8,7 +8,7 @@ use super::GlyphLabel;
 pub struct Acute32Encoder;
 
 impl EncoderInterface for Acute32Encoder {
-    type SymcodeRepresentation = Vec<Option<GlyphLabel>>;
+    type SymcodeRepresentation = Vec<GlyphLabel>;
 
     fn encode(&self, bits: bit_vec::BitVec, num_symbols: usize) -> Self::SymcodeRepresentation {
         let symbol_num_bits = crate::math::num_bits(GlyphLabel::num_variants());
@@ -23,7 +23,7 @@ impl EncoderInterface for Acute32Encoder {
                 let index = i*symbol_num_bits + j;
                 bits[index]
             });
-            result.push(GlyphLabel::option_self_from_bit_vec(symbol_bit_vec));
+            result.push(GlyphLabel::self_from_bit_vec(symbol_bit_vec));
         }
 
         result
@@ -41,6 +41,6 @@ mod tests {
         let mut bits = BitVec::from_bytes(&[0b01001010, 0b00000001, 0b10000011, 0b01000100]); // Will be 32 bits
         bits.truncate(30); // Only wants the first 30 bits (last two 0's are dummy)
         let symcode = encoder.encode(bits, 5);
-        assert_eq!(symcode, &[Some(ArrowDD), Some(TriforceR), Some(LongDU), Some(LongLL), Some(ArrowRR)]);
+        assert_eq!(symcode, &[ArrowDD, TriforceR, LongDU, LongLL, ArrowRR]);
     }
 }

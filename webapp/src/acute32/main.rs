@@ -87,9 +87,9 @@ impl Acute32SymcodeMain {
             
             // if glyph_index == glyph_library.len(), this will return None
             if let Some(glyph) = self.config.library().get_glyph_at(glyph_index) {
-                ground_truth_code.push(Some(glyph.label));
+                ground_truth_code.push(glyph.label);
             } else {
-                ground_truth_code.push(None);
+                ground_truth_code.push(GlyphLabel::Empty);
             }
         }
         
@@ -105,7 +105,7 @@ impl Acute32SymcodeMain {
 }
 
 impl ScannerInterface for Acute32SymcodeMain {
-    type SymcodeRepresentation = Vec<Option<GlyphLabel>>;
+    type SymcodeRepresentation = Vec<GlyphLabel>;
 
     type Err = JsValue;
 
@@ -171,7 +171,7 @@ impl ScannerInterface for Acute32SymcodeMain {
 }
 
 impl GeneratorInterface for Acute32SymcodeMain {
-    type SymcodeRepresentation = Vec<Option<GlyphLabel>>;
+    type SymcodeRepresentation = Vec<GlyphLabel>;
 
     fn generate(&self, symcode: Self::SymcodeRepresentation) -> BinaryImage {
         let mut symcode_image = BinaryImage::new_w_h(self.config.code_width, self.config.code_height);
@@ -184,10 +184,10 @@ impl GeneratorInterface for Acute32SymcodeMain {
         });
 
         // Put in the glyphs
-        symcode.iter().enumerate().for_each(|(i, glyph_label)| {
-            if let Some(glyph_label) = glyph_label {
+        symcode.iter().enumerate().for_each(|(i, &glyph_label)| {
+            if glyph_label != GlyphLabel::Empty {
                 let glyph_top_left = self.config.glyph_anchors[i];
-                if let Some(glyph) = self.config.library().get_glyph_with_label(*glyph_label) {
+                if let Some(glyph) = self.config.library().get_glyph_with_label(glyph_label) {
                     symcode_image.paste_from(&glyph.image, glyph_top_left.to_point_i32());
                 }
             }

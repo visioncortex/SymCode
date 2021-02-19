@@ -8,8 +8,7 @@ pub struct Acute32Decoder;
 
 // Dummy implementation, error detection/correction will be supported later
 impl Decoder for Acute32Decoder {
-    type Symbol = Option<GlyphLabel>;
-    // To Sanford: why option here? dont we have GlyphLabel::Invalid already? Shall we add an GlyphLabel::None?
+    type Symbol = GlyphLabel;
 
     type Err = &'static str;
 
@@ -18,10 +17,10 @@ impl Decoder for Acute32Decoder {
 
         let mut decoded_data = vec![];
         for datum in encoded_data.iter() {
-            if *datum == Some(GlyphLabel::Invalid) {
+            if *datum == GlyphLabel::Invalid {
                 return Err("Some recognized glyph is invalid.");
             }
-            if let Some(bit_vec) = GlyphLabel::option_self_to_bit_vec(*datum, num_bits_per_glyph) {
+            if let Some(bit_vec) = GlyphLabel::self_to_bit_vec(*datum, num_bits_per_glyph) {
                 decoded_data.push(bit_vec);
             } else {
                 panic!("Invalid glyphs fed into bit vec conversion.");
@@ -40,7 +39,7 @@ impl Decoder for Acute32Decoder {
 }
 
 impl Acute32Decoder {
-    pub fn process(input: Vec<Option<GlyphLabel>>) -> Result<BitVec, &'static str> {
+    pub fn process(input: Vec<GlyphLabel>) -> Result<BitVec, &'static str> {
         Self::decode(input, GlyphLabel::num_variants())
     }
 }

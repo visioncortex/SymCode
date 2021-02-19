@@ -12,8 +12,6 @@ use num_traits::{FromPrimitive, ToPrimitive};
 /// For a given alphabet image, the index should go from top to bottom, left to right.
 pub enum GlyphLabel {
     Invalid = -1,
-    // During recognition, if a slot is found to be empty, the corresponding Option<GlyphLabel> should be None.
-    // This variant is to establish the agreement that Empty corresponds to 0.
     Empty = 0,
 
     LongRR,
@@ -69,7 +67,7 @@ impl Default for GlyphLabel {
 impl GlyphLabel {
     /// Number of valid variants (empty + all valid glyphs)
     pub fn num_variants() -> usize {
-        Self::option_self_to_primitive(Some(Self::Last)).unwrap()
+        Self::self_to_primitive(Self::Last).unwrap()
     }
 
     pub fn from_usize_representation(label: usize) -> Self {
@@ -82,21 +80,16 @@ impl GlyphLabel {
         }
     }
 
-    pub fn option_self_to_primitive(label: Option<Self>) -> Option<usize> {
-        if let Some(label) = label {
-            if label == GlyphLabel::Invalid {
-                return None;
+    pub fn self_to_primitive(label: Self) -> Option<usize> {
+        if label == GlyphLabel::Invalid {
+            return None;
+        }
+        match ToPrimitive::to_usize(&label) {
+            Some(primitive) => Some(primitive),
+            None => {
+                console_log_util(&format!("Cannot convert {:?} to primitive.", label));
+                None
             }
-            match ToPrimitive::to_usize(&label) {
-                Some(primitive) => Some(primitive),
-                None => {
-                    console_log_util(&format!("Cannot convert {:?} to primitive.", label));
-                    None
-                }
-            }
-        } else {
-            // Empty
-            Some(0)
         }
     }
 
@@ -109,8 +102,8 @@ impl GlyphLabel {
         bit_vec
     }
 
-    pub fn option_self_to_bit_vec(label: Option<Self>, length: usize) -> Option<BitVec> {
-        if let Some(primitive) = Self::option_self_to_primitive(label) {
+    pub fn self_to_bit_vec(label: Self, length: usize) -> Option<BitVec> {
+        if let Some(primitive) = Self::self_to_primitive(label) {
             Some(Self::primitive_to_bit_vec(primitive, length))
         } else {
             None
@@ -126,15 +119,10 @@ impl GlyphLabel {
         primitive
     }
 
-    pub fn option_self_from_bit_vec(bit_vec: BitVec) -> Option<Self> {
-        let label = Self::from_usize_representation(
+    pub fn self_from_bit_vec(bit_vec: BitVec) -> Self {
+        Self::from_usize_representation(
             Self::bit_vec_to_primitive(bit_vec)
-        );
-        if label == Self::Empty {
-            None
-        } else {
-            Some(label)
-        }
+        )
     }
 }
 
@@ -154,14 +142,14 @@ mod tests {
 
     #[test]
     fn glyph_label_conversion_to_primitive() {
-        let label = Some(GlyphLabel::ArrowUU);
-        assert_eq!(GlyphLabel::option_self_to_primitive(label), Some(20));
-        let label = Some(GlyphLabel::Invalid);
-        assert_eq!(GlyphLabel::option_self_to_primitive(label), None);
-        let label = Some(GlyphLabel::Empty);
-        assert_eq!(GlyphLabel::option_self_to_primitive(label), Some(0));
-        let label = Some(GlyphLabel::TriforceR);
-        assert_eq!(GlyphLabel::option_self_to_primitive(label), Some(32));
+        let label = GlyphLabel::ArrowUU;
+        assert_eq!(GlyphLabel::self_to_primitive(label), Some(20));
+        let label = GlyphLabel::Invalid;
+        assert_eq!(GlyphLabel::self_to_primitive(label), None);
+        let label = GlyphLabel::Empty;
+        assert_eq!(GlyphLabel::self_to_primitive(label), Some(0));
+        let label = GlyphLabel::TriforceR;
+        assert_eq!(GlyphLabel::self_to_primitive(label), Some(32));
     }
 
     #[test]
@@ -191,21 +179,21 @@ mod tests {
     #[test]
     fn glyph_label_option_self_to_bit_vec() {
         const LENGTH: usize = 6;
-        let label = None;
-        assert!(!GlyphLabel::option_self_to_bit_vec(label, LENGTH).unwrap().any());
+        let label = GlyphLabel::Empty;
+        assert!(!GlyphLabel::self_to_bit_vec(label, LENGTH).unwrap().any());
 
-        let label = Some(GlyphLabel::TriforceR);
-        let bit_vec = GlyphLabel::option_self_to_bit_vec(label, LENGTH).unwrap(); // 100000
+        let label = GlyphLabel::TriforceR;
+        let bit_vec = GlyphLabel::self_to_bit_vec(label, LENGTH).unwrap(); // 100000
         assert_eq!(bit_vec.get(0).unwrap(), true);
         for i in 1..LENGTH {
             assert_eq!(bit_vec.get(i).unwrap(), false);
         }
 
-        let label = Some(GlyphLabel::Invalid);
-        assert_eq!(GlyphLabel::option_self_to_bit_vec(label, LENGTH), None);
+        let label = GlyphLabel::Invalid;
+        assert_eq!(GlyphLabel::self_to_bit_vec(label, LENGTH), None);
 
-        let label = Some(GlyphLabel::LongUU);
-        let bit_vec = GlyphLabel::option_self_to_bit_vec(label, LENGTH).unwrap(); // 000100
+        let label = GlyphLabel::LongUU;
+        let bit_vec = GlyphLabel::self_to_bit_vec(label, LENGTH).unwrap(); // 000100
         for i in 0..LENGTH {
             let check = i==3;
             assert_eq!(bit_vec.get(i).unwrap(), check);
