@@ -6,7 +6,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, interfaces::finder::Finder as FinderInterface, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, Acute32FinderCandidate, GlyphLabel, Acute32Recognizer, RecognizerInput, Acute32SymcodeConfig, Acute32Decoder, implementation::transformer::{Acute32TransformFitter, TransformFitterInput}, is_black_hsv, render_binary_image_to_canvas};
+use super::{Acute32Decoder, Acute32FinderCandidate, Acute32Recognizer, Acute32SymcodeConfig, Acute32TransformFitter, AlphabetReader, AlphabetReaderParams, GlyphLabel, RecognizerInput, TransformFitterInput, is_black_hsv, render_binary_image_to_canvas};
 
 use crate::interfaces::scanner::SymcodeScanner as ScannerInterface;
 use crate::interfaces::generator::SymcodeGenerator as GeneratorInterface;

@@ -30,8 +30,8 @@ export function loadingCompletes() {
     console.log("Template loading completes.");
     //scanImageFromSource("assets/invalid.png");
     //document.getElementById("test").click();
-    //runNTestCases({...getTestConfigFromHtml(), numTestCases: 1});
-    runOneTestCase(true, getTestConfigFromHtml())
+    runNTestCases({...getTestConfigFromHtml(), numTestCases: 1});
+    //runOneTestCase(true, getTestConfigFromHtml())
 }
 
 const ERROR_COLOR = "color: #ff5050;";

@@ -1,5 +1,4 @@
 pub mod alphabet;
-pub mod implementation;
 pub mod decoder;
 pub mod encoder;
 pub mod fitter;
@@ -14,7 +13,6 @@ pub mod trace;
 pub mod util;
 
 pub use alphabet::*;
-pub use implementation::*;
 pub use decoder::*;
 pub use encoder::*;
 pub use finder::*;
