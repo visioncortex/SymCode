@@ -5,17 +5,17 @@ use crate::{scanning::{Symbol, Acute32SymcodeConfig, Trace, image_diff_area}};
 use super::{GlyphLabel, GlyphTrace};
 
 #[derive(Debug)]
-pub struct SymbolLibrary {
+pub struct Acute32Library {
     templates: Vec<Symbol>,
 }
 
-impl Default for SymbolLibrary {
+impl Default for Acute32Library {
     fn default() -> Self {
         Self { templates: vec![] }
     }
 }
 
-impl SymbolLibrary {
+impl Acute32Library {
     pub fn is_empty(&self) -> bool {
         self.templates.is_empty()
     }

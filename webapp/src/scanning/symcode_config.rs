@@ -3,11 +3,11 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas};
 
-use super::{Acute32Encoder, CircleFinder, Symbol, valid_pointf64_on_image};
+use super::{Acute32Encoder, Acute32Library, CircleFinder, valid_pointf64_on_image};
 
 #[wasm_bindgen]
 pub struct Acute32SymcodeConfig {
-    symbols: Vec<Symbol>,
+    symbol_library: Acute32Library,
     finder: CircleFinder,
     encoder: Acute32Encoder,
     
@@ -67,7 +67,7 @@ impl Default for Acute32SymcodeConfig {
             stat_tolerance: 0.2,
             max_encoding_difference: 1,
             empty_cluster_threshold: 0.2,
-            symbols: vec![],
+            symbol_library: Acute32Library::default(),
             finder: CircleFinder::default(),
             encoder: Acute32Encoder::default(),
         }
@@ -199,7 +199,7 @@ impl Acute32SymcodeConfig {
             stat_tolerance: json["stat_tolerance"].as_f64().unwrap(),
             max_encoding_difference: json["max_encoding_difference"].as_i64().unwrap() as usize,
             empty_cluster_threshold: json["empty_cluster_threshold"].as_f64().unwrap(),
-            symbols: vec![],
+            symbol_library: Acute32Library::default(),
             finder: CircleFinder::default(),
             encoder: Acute32Encoder::default(),
         }
