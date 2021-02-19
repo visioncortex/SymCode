@@ -83,7 +83,8 @@ impl AlphabetReaderParams {
 }
 
 impl<'a> AlphabetReader {
-    pub fn read_alphabet_to_library(library: &'a mut Acute32Library, image: BinaryImage, params: AlphabetReaderParams, symcode_config: &'a Acute32SymcodeConfig) -> Result<(), &'a str> {
+    pub fn read_alphabet_to_library(image: BinaryImage, params: AlphabetReaderParams, symcode_config: &'a Acute32SymcodeConfig) -> Result<Acute32Library, &'a str> {
+        let mut library = Acute32Library::default();
         crate::scanning::util::render_binary_image_to_canvas(&image, symcode_config.debug_canvas.as_ref().unwrap());
         for i in 0..params.num_rows {
             for j in 0..params.num_columns {
@@ -100,6 +101,6 @@ impl<'a> AlphabetReader {
             }
         }
         //crate::util::console_log_util(&library.print_label_and_trace());
-        Ok(())
+        Ok(library)
     }
 }

@@ -32,12 +32,20 @@ pub struct Acute32SymcodeConfig {
 }
 
 impl Acute32SymcodeConfig {
+    pub fn library(&self) -> &Acute32Library {
+        &self.symbol_library
+    }
+    
     pub fn finder(&self) -> &CircleFinder {
         &self.finder
     }
 
     pub fn encoder(&self) -> &Acute32Encoder {
         &self.encoder
+    }
+
+    pub fn set_library(&mut self, library: Acute32Library) {
+        self.symbol_library = library;
     }
 }
 

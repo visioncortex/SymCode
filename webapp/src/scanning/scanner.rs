@@ -53,8 +53,9 @@ impl Acute32SymcodeScanner {
         let image = canvas
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
             .to_binary_image(|c| is_black_hsv(&c.to_hsv()));
-        if let Some(e) = AlphabetReader::read_alphabet_to_library(&mut self.glyph_library, image, params, &self.config).err() {
-            console_log_util(e);
+        match AlphabetReader::read_alphabet_to_library(image, params, &self.config) {
+            Ok(library) => self.config.set_library(library),
+            Err(e) => console_log_util(e),
         }
     }
 
