@@ -141,32 +141,6 @@ impl GlyphLabel {
     }
 }
 
-pub struct Glyph {
-    pub image: BinaryImage,
-    pub label: GlyphLabel,
-    pub encoding: GlyphTrace,
-}
-
-impl Debug for Glyph {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Glyph")
-            .field("label", &self.label)
-            .field("encoding", &self.encoding)
-            .finish()
-    }
-}
-
-impl Glyph {
-    pub fn from_image_label(image: BinaryImage, label: GlyphLabel, stat_tolerance: f64) -> Self {
-        let encoding = GlyphTrace::from_image(&image, stat_tolerance);
-        Self {
-            image,
-            label,
-            encoding,
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

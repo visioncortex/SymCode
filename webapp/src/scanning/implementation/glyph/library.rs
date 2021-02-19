@@ -1,12 +1,12 @@
 use visioncortex::{BinaryImage, Sampler};
 
-use crate::{scanning::{SymcodeConfig, image_diff_area, Trace}};
+use crate::{scanning::{Symbol, SymcodeConfig, Trace, image_diff_area}};
 
-use super::{Glyph, GlyphLabel, GlyphTrace};
+use super::{GlyphLabel, GlyphTrace};
 
 #[derive(Debug)]
 pub struct GlyphLibrary {
-    templates: Vec<Glyph>,
+    templates: Vec<Symbol>,
 }
 
 impl Default for GlyphLibrary {
@@ -24,7 +24,7 @@ impl GlyphLibrary {
         self.templates.len()
     }
 
-    pub fn get_glyph_at(&self, i: usize) -> Option<&Glyph> {
+    pub fn get_glyph_at(&self, i: usize) -> Option<&Symbol> {
         if i >= self.templates.len() {
             None
         } else {
@@ -32,7 +32,7 @@ impl GlyphLibrary {
         }
     }
 
-    pub fn get_glyph_with_label(&self, label: GlyphLabel) -> Option<&Glyph> {
+    pub fn get_glyph_with_label(&self, label: GlyphLabel) -> Option<&Symbol> {
         for glyph in self.templates.iter() {
             if glyph.label == label {
                 return Some(glyph);
@@ -53,7 +53,7 @@ impl GlyphLibrary {
         let image = Sampler::resample_image(&image, symcode_config.symbol_width, symcode_config.symbol_height);
         let label = GlyphLabel::from_usize_representation(self.templates.len() + 1);
         //console_log_util(&format!("{:?}\n{}", label, image.to_string()));
-        self.templates.push(Glyph::from_image_label(image, label, symcode_config.stat_tolerance));
+        self.templates.push(Symbol::from_image_label(image, label, symcode_config.stat_tolerance));
     }
 
     pub fn find_most_similar_glyph(&self, image: BinaryImage, symcode_config: &SymcodeConfig) -> GlyphLabel {
