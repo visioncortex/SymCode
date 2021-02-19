@@ -15,11 +15,8 @@ impl Trace for GlyphTrace {
     fn bits(&self) -> &BitVec {
         &self.bits
     }
-}
 
-impl GlyphTrace {
-
-    pub fn from_image(image: &BinaryImage, tolerance: f64) -> Self {
+    fn from_image(image: &BinaryImage, tolerance: f64) -> Self {
         let mut layer_traces = vec![];
         // Encode each small layer
         // layer_traces = Self::subdivide_and_encode(image, tolerance);
@@ -27,7 +24,9 @@ impl GlyphTrace {
         layer_traces.push(LayerTrace::from_image(image, tolerance));
         Self::from_layer_traces(layer_traces)
     }
+}
 
+impl GlyphTrace {
     pub fn from_layer_traces(layer_traces: Vec<LayerTrace>) -> Self {
         let total_length = layer_traces.len() * LayerTrace::LENGTH;
         Self {
@@ -45,23 +44,9 @@ impl Trace for LayerTrace {
     fn bits(&self) -> &BitVec {
         &self.bits
     }
-}
-
-impl Default for LayerTrace {
-    fn default() -> Self {
-        Self {
-            bits: BitVec::from_elem(Self::LENGTH, false),
-        }
-    }
-}
-
-// Denote top-left, top-right, bottom-left, bottom-right weights by a,b,c,d respectively
-impl LayerTrace {
-    /// 2 bits each for a+b <> c+d, a+c <> b+d, a+d <> b+c, a <> b, c <> d, a <> c, b <> d, a <> d, b <> c
-    const LENGTH: usize = ShapeStats::NUM_COMPARISONS << 1;
 
     #[allow(unused_assignments)]
-    pub fn from_image(image: &BinaryImage, tolerance: f64) -> Self {
+    fn from_image(image: &BinaryImage, tolerance: f64) -> Self {
         let stats = ShapeStats::from_image(image, tolerance);
         if stats.is_empty() {
             return Self::default();
@@ -95,6 +80,20 @@ impl LayerTrace {
             bits
         }
     }
+}
+
+impl Default for LayerTrace {
+    fn default() -> Self {
+        Self {
+            bits: BitVec::from_elem(Self::LENGTH, false),
+        }
+    }
+}
+
+// Denote top-left, top-right, bottom-left, bottom-right weights by a,b,c,d respectively
+impl LayerTrace {
+    /// 2 bits each for a+b <> c+d, a+c <> b+d, a+d <> b+c, a <> b, c <> d, a <> c, b <> d, a <> d, b <> c
+    const LENGTH: usize = ShapeStats::NUM_COMPARISONS << 1;
 }
 
 #[cfg(test)]

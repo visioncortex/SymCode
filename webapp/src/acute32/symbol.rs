@@ -4,7 +4,7 @@ use visioncortex::BinaryImage;
 
 use crate::interfaces::symbol::Symbol as SymbolInterface;
 
-use super::{GlyphLabel, GlyphTrace};
+use super::{GlyphLabel, GlyphTrace, Trace};
 
 pub struct Symbol {
     pub image: BinaryImage,

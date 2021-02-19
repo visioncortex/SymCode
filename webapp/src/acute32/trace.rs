@@ -1,4 +1,5 @@
 use bit_vec::BitVec;
+use visioncortex::BinaryImage;
 
 pub trait Trace {
     fn bits(&self) -> &BitVec;
@@ -11,4 +12,7 @@ pub trait Trace {
         self_clone.or(&other_clone);
         self_clone.into_iter().filter(|bit| *bit).count()
     }
+
+
+    fn from_image(image: &BinaryImage, tolerance: f64) -> Self;
 }
