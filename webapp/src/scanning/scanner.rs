@@ -6,14 +6,14 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, scanner::interface::Finder as FinderInterface, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, Finder, FinderCandidate, GlyphLabel, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, SymcodeDecoder, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, render_binary_image_to_canvas};
+use super::{AlphabetReader, AlphabetReaderParams, Finder, FinderCandidate, GlyphLabel, SymbolLibrary, Recognizer, RecognizerInput, SymcodeConfig, SymcodeDecoder, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, render_binary_image_to_canvas};
 
 use crate::scanner::interface::SymcodeScanner as ScannerInterface;
 use crate::generator::interface::SymcodeGenerator as GeneratorInterface;
 
 #[wasm_bindgen]
 pub struct SymcodeScanner {
-    glyph_library: GlyphLibrary,
+    glyph_library: SymbolLibrary,
     config: SymcodeConfig,
     rng: StdRng,
 }
@@ -22,7 +22,7 @@ pub struct SymcodeScanner {
 impl SymcodeScanner {
     pub fn from_config(config: SymcodeConfig, seed: u64) -> Self {
         Self {
-            glyph_library: GlyphLibrary::default(),
+            glyph_library: SymbolLibrary::default(),
             config,
             rng: StdRng::seed_from_u64(seed),
         }

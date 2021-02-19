@@ -2,7 +2,7 @@ use visioncortex::{ColorImage};
 
 use crate::{math::PerspectiveTransform, scanning::{GlyphReader, SymcodeConfig}};
 
-use super::{GlyphLabel, GlyphLibrary};
+use super::{GlyphLabel, SymbolLibrary};
 
 /// An implementation of GlyphReader
 pub struct Recognizer;
@@ -10,7 +10,7 @@ pub struct Recognizer;
 impl GlyphReader for Recognizer {
     type Label = GlyphLabel;
 
-    type Library = GlyphLibrary;
+    type Library = SymbolLibrary;
 
     fn find_most_similar_glyph(image: visioncortex::BinaryImage, glyph_library: &Self::Library, symcode_config: &crate::scanning::SymcodeConfig) -> Self::Label {
         glyph_library.find_most_similar_glyph(
@@ -23,7 +23,7 @@ impl GlyphReader for Recognizer {
 pub struct RecognizerInput<'a> {
     pub raw_frame: ColorImage,
     pub image_to_object: PerspectiveTransform,
-    pub glyph_library: &'a GlyphLibrary,
+    pub glyph_library: &'a SymbolLibrary,
 }
 
 impl<'a> Recognizer {

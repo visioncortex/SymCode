@@ -5,17 +5,17 @@ use crate::{scanning::{Symbol, SymcodeConfig, Trace, image_diff_area}};
 use super::{GlyphLabel, GlyphTrace};
 
 #[derive(Debug)]
-pub struct GlyphLibrary {
+pub struct SymbolLibrary {
     templates: Vec<Symbol>,
 }
 
-impl Default for GlyphLibrary {
+impl Default for SymbolLibrary {
     fn default() -> Self {
         Self { templates: vec![] }
     }
 }
 
-impl GlyphLibrary {
+impl SymbolLibrary {
     pub fn is_empty(&self) -> bool {
         self.templates.is_empty()
     }
