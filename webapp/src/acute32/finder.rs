@@ -31,7 +31,7 @@ impl FinderInterface for CircleFinder {
 }
 
 /// Specific implementation of Finder candidates
-pub(crate) struct Acute32FinderCandidate;
+pub struct Acute32FinderCandidate;
 
 impl Acute32FinderCandidate {
 

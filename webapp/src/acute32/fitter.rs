@@ -5,7 +5,7 @@ use crate::math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, n
 
 use super::{Acute32SymcodeConfig, valid_pointf64_on_image};
 
-pub(crate) struct Acute32TransformFitter;
+pub struct Acute32TransformFitter;
 
 impl Acute32TransformFitter {
     /// Use the top of each finder in object space as check points
