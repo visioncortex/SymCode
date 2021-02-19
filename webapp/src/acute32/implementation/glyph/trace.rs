@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use bit_vec::BitVec;
-use visioncortex::{BinaryImage, PointI32};
+use visioncortex::BinaryImage;
 
 use crate::acute32::Trace;
 use super::ShapeStats;
@@ -26,20 +26,6 @@ impl GlyphTrace {
         // Encode the big layer
         layer_traces.push(LayerTrace::from_image(image, tolerance));
         Self::from_layer_traces(layer_traces)
-    }
-
-    /// Returns a vector of 4 LayerTrace in order of top-left, top-right, bot-right, bot-left
-    fn subdivide_and_encode(image: &BinaryImage, tolerance: f64) -> Vec<LayerTrace> {
-        let horiz_mid = image.width as i32;
-        let vert_mid = image.height as i32;
-        let image = &visioncortex::Sampler::resample_image(image, image.width*2, image.height*2);
-        [PointI32::new(0, 0), PointI32::new(horiz_mid, 0), PointI32::new(horiz_mid, vert_mid), PointI32::new(0, vert_mid)].iter()
-            .map(|top_left| {
-                let rect = visioncortex::BoundingRect::new_x_y_w_h(top_left.x, top_left.y, horiz_mid, vert_mid);
-                let crop = image.crop_with_rect(rect);
-                LayerTrace::from_image(&crop, tolerance)
-            })
-            .collect()
     }
 
     pub fn from_layer_traces(layer_traces: Vec<LayerTrace>) -> Self {
