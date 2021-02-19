@@ -12,14 +12,14 @@ use crate::scanner::interface::SymcodeScanner as ScannerInterface;
 use crate::generator::interface::SymcodeGenerator as GeneratorInterface;
 
 #[wasm_bindgen]
-pub struct SymcodeScanner {
+pub struct Acute32SymcodeScanner {
     glyph_library: SymbolLibrary,
     config: Acute32SymcodeConfig,
     rng: StdRng,
 }
 
 #[wasm_bindgen]
-impl SymcodeScanner {
+impl Acute32SymcodeScanner {
     pub fn from_config(config: Acute32SymcodeConfig, seed: u64) -> Self {
         Self {
             glyph_library: SymbolLibrary::default(),
@@ -117,7 +117,7 @@ impl SymcodeScanner {
     }
 }
 
-impl ScannerInterface for SymcodeScanner {
+impl ScannerInterface for Acute32SymcodeScanner {
     type SymcodeRepresentation = Vec<Option<GlyphLabel>>;
 
     type Err = JsValue;
@@ -183,7 +183,7 @@ impl ScannerInterface for SymcodeScanner {
     }
 }
 
-impl GeneratorInterface for SymcodeScanner {
+impl GeneratorInterface for Acute32SymcodeScanner {
     type SymcodeRepresentation = Vec<Option<GlyphLabel>>;
 
     fn generate(&self, symcode: Self::SymcodeRepresentation) -> BinaryImage {
