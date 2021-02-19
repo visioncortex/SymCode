@@ -1,6 +1,6 @@
-use visioncortex::{PointF64};
+use visioncortex::PointF64;
 
-use crate::{math::{PerspectiveTransform}};
+use crate::math::PerspectiveTransform;
 
 use super::{Acute32SymcodeConfig, valid_pointf64_on_image};
 
