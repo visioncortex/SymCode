@@ -1,8 +1,6 @@
 use visioncortex::{ColorImage};
 
-use crate::{math::PerspectiveTransform, acute32::{GlyphReader, Acute32SymcodeConfig}};
-
-use super::{GlyphLabel, Acute32Library};
+use crate::{acute32::{Acute32Library, Acute32SymcodeConfig, GlyphLabel, GlyphReader}, math::PerspectiveTransform};
 
 /// An implementation of GlyphReader
 pub struct Acute32Recognizer;

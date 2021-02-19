@@ -1,7 +1,9 @@
-pub(crate) mod glyph;
-pub(crate) mod recognizer;
-pub(crate) mod transformer;
+pub mod recognizer;
+pub mod stats;
+pub mod trace;
+pub mod transformer;
 
-pub(crate) use glyph::*;
-pub(crate) use recognizer::*;
-//pub(crate) use transformer::*;
+pub use recognizer::*;
+pub use stats::*;
+pub use trace::*;
+pub use transformer::*;
