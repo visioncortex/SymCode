@@ -3,6 +3,7 @@ use wasm_bindgen::prelude::*;
 mod canvas;
 mod common;
 mod crc;
+mod encoder;
 mod generator;
 mod math;
 mod scanner;

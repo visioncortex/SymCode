@@ -1,5 +1,6 @@
 pub mod implementation;
 pub mod decoder;
+pub mod encoder;
 pub mod fitter;
 pub mod reader;
 pub mod scanner;
@@ -9,6 +10,7 @@ pub mod util;
 
 pub(crate) use implementation::*;
 pub use decoder::*;
+pub use encoder::*;
 pub use finder::*;
 pub use fitter::*;
 pub use reader::*;
