@@ -59,7 +59,7 @@ pub enum GlyphLabel {
     TriforceU,
     TriforceR,
 
-    // For counting purpose
+    // For counting
     Last,
 }
 
