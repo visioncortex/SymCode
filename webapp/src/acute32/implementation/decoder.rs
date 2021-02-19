@@ -1,6 +1,6 @@
 use bit_vec::BitVec;
 
-use crate::scanning::Decoder;
+use crate::acute32::Decoder;
 
 pub struct SymcodeDecoder;
 

@@ -1,6 +1,6 @@
 use bit_vec::BitVec;
 
-use crate::encoder::Encoder as EncoderInterface;
+use crate::interfaces::encoder::Encoder as EncoderInterface;
 
 use super::GlyphLabel;
 

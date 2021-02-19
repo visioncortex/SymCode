@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use visioncortex::BinaryImage;
 
-use crate::symbol::Symbol as SymbolInterface;
+use crate::interfaces::symbol::Symbol as SymbolInterface;
 
 use super::{GlyphLabel, GlyphTrace};
 

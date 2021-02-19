@@ -4,21 +4,21 @@ use rand::{RngCore, SeedableRng, rngs::StdRng};
 use visioncortex::{BinaryImage, ColorImage, PointI32};
 use wasm_bindgen::prelude::*;
 
-use crate::{canvas::Canvas, scanner::interface::Finder as FinderInterface, util::console_log_util};
+use crate::{canvas::Canvas, interfaces::finder::Finder as FinderInterface, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLabel, Acute32Library, Recognizer, RecognizerInput, Acute32SymcodeConfig, SymcodeDecoder, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, render_binary_image_to_canvas};
+use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLabel, Recognizer, RecognizerInput, Acute32SymcodeConfig, SymcodeDecoder, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, render_binary_image_to_canvas};
 
-use crate::scanner::interface::SymcodeScanner as ScannerInterface;
-use crate::generator::interface::SymcodeGenerator as GeneratorInterface;
+use crate::interfaces::scanner::SymcodeScanner as ScannerInterface;
+use crate::interfaces::generator::SymcodeGenerator as GeneratorInterface;
 
 #[wasm_bindgen]
-pub struct Acute32SymcodeScanner {
+pub struct Acute32SymcodeMain {
     config: Acute32SymcodeConfig,
     rng: StdRng,
 }
 
 #[wasm_bindgen]
-impl Acute32SymcodeScanner {
+impl Acute32SymcodeMain {
     pub fn from_config(config: Acute32SymcodeConfig, seed: u64) -> Self {
         Self {
             config,
@@ -104,7 +104,7 @@ impl Acute32SymcodeScanner {
     }
 }
 
-impl ScannerInterface for Acute32SymcodeScanner {
+impl ScannerInterface for Acute32SymcodeMain {
     type SymcodeRepresentation = Vec<Option<GlyphLabel>>;
 
     type Err = JsValue;
@@ -170,7 +170,7 @@ impl ScannerInterface for Acute32SymcodeScanner {
     }
 }
 
-impl GeneratorInterface for Acute32SymcodeScanner {
+impl GeneratorInterface for Acute32SymcodeMain {
     type SymcodeRepresentation = Vec<Option<GlyphLabel>>;
 
     fn generate(&self, symcode: Self::SymcodeRepresentation) -> BinaryImage {

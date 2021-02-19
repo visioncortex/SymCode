@@ -1,5 +1,5 @@
 use bit_vec::BitVec;
-use visioncortex::{BinaryImage, ColorImage, Shape};
+use visioncortex::ColorImage;
 
 pub trait SymcodeScanner {
     type SymcodeRepresentation;
@@ -10,9 +10,4 @@ pub trait SymcodeScanner {
     }
     fn scan(&self, image: ColorImage) -> Result<Self::SymcodeRepresentation, Self::Err>;
     fn decode(&self, symcode: Self::SymcodeRepresentation) -> Result<BitVec, Self::Err>;
-}
-
-pub trait Finder {
-	fn to_image(&self, width: usize, height: usize) -> BinaryImage; // to be used by SymcodeGenerator
-	fn is_finder(&self, shape: Shape) -> bool; // to be used by SymcodeScanner
 }

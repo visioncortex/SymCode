@@ -3,12 +3,9 @@ use wasm_bindgen::prelude::*;
 mod canvas;
 mod common;
 mod crc;
-mod encoder;
-mod generator;
+mod interfaces;
 mod math;
-mod scanner;
-mod scanning;
-mod symbol;
+mod acute32;
 mod util;
 
 #[wasm_bindgen(start)]

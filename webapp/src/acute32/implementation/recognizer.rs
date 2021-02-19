@@ -1,6 +1,6 @@
 use visioncortex::{ColorImage};
 
-use crate::{math::PerspectiveTransform, scanning::{GlyphReader, Acute32SymcodeConfig}};
+use crate::{math::PerspectiveTransform, acute32::{GlyphReader, Acute32SymcodeConfig}};
 
 use super::{GlyphLabel, Acute32Library};
 
@@ -12,7 +12,7 @@ impl GlyphReader for Recognizer {
 
     type Library = Acute32Library;
 
-    fn find_most_similar_glyph(image: visioncortex::BinaryImage, glyph_library: &Self::Library, symcode_config: &crate::scanning::Acute32SymcodeConfig) -> Self::Label {
+    fn find_most_similar_glyph(image: visioncortex::BinaryImage, glyph_library: &Self::Library, symcode_config: &crate::acute32::Acute32SymcodeConfig) -> Self::Label {
         glyph_library.find_most_similar_glyph(
             image,
             symcode_config

@@ -1,6 +1,6 @@
 use visioncortex::{BinaryImage, Sampler};
 
-use crate::{scanning::{Symbol, Acute32SymcodeConfig, Trace, image_diff_area}};
+use crate::{acute32::{Symbol, Acute32SymcodeConfig, Trace, image_diff_area}};
 
 use super::{GlyphLabel, GlyphTrace};
 

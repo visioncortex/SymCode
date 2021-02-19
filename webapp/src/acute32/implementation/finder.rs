@@ -1,6 +1,6 @@
 use visioncortex::{BinaryImage, BoundingRect, ColorImage, Shape};
 
-use crate::{scanner::interface::Finder as FinderInterface, scanning::{Acute32SymcodeConfig, binarize_image_util, valid_pointf64_on_image}};
+use crate::{interfaces::finder::Finder as FinderInterface, acute32::{Acute32SymcodeConfig, binarize_image_util, valid_pointf64_on_image}};
 
 /// Specific implementation of Finder symbol element
 #[derive(Default)]
@@ -43,7 +43,7 @@ impl FinderCandidate {
         // Binarize
         let binary_raw_frame = binarize_image_util(raw_frame);
         if let Some(debug_canvas) = &params.debug_canvas {
-            crate::scanning::util::render_binary_image_to_canvas(&binary_raw_frame, debug_canvas);
+            crate::acute32::util::render_binary_image_to_canvas(&binary_raw_frame, debug_canvas);
         }
 
         // Processing starts
@@ -76,7 +76,7 @@ impl FinderCandidate {
 
     fn render_finder_candidates(finder_candidates: &[BoundingRect], canvas: &crate::canvas::Canvas) {
         finder_candidates.iter().for_each(|rect| {
-            crate::scanning::util::render_point_i32_to_canvas(rect.center(), canvas);
+            crate::acute32::util::render_point_i32_to_canvas(rect.center(), canvas);
         });
     }
 

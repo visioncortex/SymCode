@@ -86,7 +86,7 @@ pub trait GlyphReader {
         let top_left = center - PointI32::new((width >> 1) as i32, (height >> 1) as i32);
         let rect = BoundingRect::new_x_y_w_h(top_left.x, top_left.y, width as i32, height as i32);
         if let Some(debug_canvas) = &symcode_config.debug_canvas {
-            crate::scanning::util::render_bounding_rect_to_canvas(&rect, debug_canvas);
+            crate::acute32::util::render_bounding_rect_to_canvas(&rect, debug_canvas);
         }
         image.crop_with_rect(rect)
     }
@@ -95,7 +95,7 @@ pub trait GlyphReader {
     fn find_most_similar_glyph(image: BinaryImage, glyph_library: &Self::Library, symcode_config: &Acute32SymcodeConfig) -> Self::Label;
     
     /// Read all glyphs at the anchors on the input image
-    fn read_glyphs_from_raw_frame(image: ColorImage, image_to_object: PerspectiveTransform, glyph_library: &Self::Library, symcode_config: &crate::scanning::Acute32SymcodeConfig) -> Vec<Option<Self::Label>> {
+    fn read_glyphs_from_raw_frame(image: ColorImage, image_to_object: PerspectiveTransform, glyph_library: &Self::Library, symcode_config: &crate::acute32::Acute32SymcodeConfig) -> Vec<Option<Self::Label>> {
         let rectified_image = Self::rectify_image(image, image_to_object, symcode_config);
         if let Some(debug_canvas) = &symcode_config.debug_canvas {
             if render_binary_image_to_canvas(&rectified_image, debug_canvas).is_err() {

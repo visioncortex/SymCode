@@ -1,14 +1,14 @@
 use permutator::{Combination, Permutation};
 use visioncortex::{BoundingRect, PointF64};
 
-use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{Fitter, Acute32SymcodeConfig, valid_pointf64_on_image}};
+use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, acute32::{Fitter, Acute32SymcodeConfig, valid_pointf64_on_image}};
 
 /// Implementation of Transformer
 pub(crate) struct TransformFitter;
 
 impl TransformFitter {
     /// Use the top of each finder in object space as check points
-    fn calculate_check_points(symcode_config: &crate::scanning::Acute32SymcodeConfig) -> Vec<PointF64> {
+    fn calculate_check_points(symcode_config: &crate::acute32::Acute32SymcodeConfig) -> Vec<PointF64> {
         symcode_config.finder_positions.iter()
             .map(|p| PointF64::new(p.x, p.y - (symcode_config.symbol_height >> 1) as f64))
             .collect()
@@ -105,7 +105,7 @@ impl Fitter for TransformFitter {
             });
         });
         debug_min_err_src_pts.into_iter().enumerate().for_each(|(i, point)| {
-            crate::scanning::util::render_point_i32_to_canvas_with_size_color(
+            crate::acute32::util::render_point_i32_to_canvas_with_size_color(
                 point.to_point_i32(),
                 crate::canvas::Canvas::new_from_id("debug").as_ref().unwrap(),
                 4+i,

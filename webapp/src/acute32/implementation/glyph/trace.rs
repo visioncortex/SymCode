@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use bit_vec::BitVec;
 use visioncortex::{BinaryImage, PointI32};
 
-use crate::scanning::Trace;
+use crate::acute32::Trace;
 use super::ShapeStats;
 
 #[derive(Debug)]
