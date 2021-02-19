@@ -1,12 +1,18 @@
 use visioncortex::{BinaryImage, BoundingRect, ColorImage, Shape};
 
-use crate::scanning::{SymcodeConfig, binarize_image_util, finder::Finder, valid_pointf64_on_image};
+use crate::{scanner::interface::Finder as FinderInterface, scanning::{SymcodeConfig, binarize_image_util, valid_pointf64_on_image}};
 
-/// Specific implementation of Finder
-pub(crate) struct FinderCandidate;
+/// Specific implementation of Finder symbol element
+pub struct Finder;
 
-impl FinderCandidate {
-    fn shape_is_finder(image: BinaryImage) -> bool {
+impl FinderInterface for Finder {
+
+    fn to_image(width: usize, height: usize) -> BinaryImage {
+        Shape::circle(width, height).image
+    }
+
+    fn is_finder(shape: Shape) -> bool {
+        let image = shape.image;
         let steps = 6;
         for i in 0..steps {
             let angle = i as f64 * std::f64::consts::FRAC_PI_2 / (steps as f64);
@@ -23,24 +29,8 @@ impl FinderCandidate {
     }
 }
 
-impl Finder for FinderCandidate {
-
-    type FinderElement = BoundingRect;
-
-    fn extract_finder_positions(image: BinaryImage) -> Vec<Self::FinderElement> {
-        let clusters = image.to_clusters(false);
-        
-        clusters.clusters.iter()
-            .filter_map(|cluster| {
-                if Self::shape_is_finder(cluster.to_binary_image()) {
-                    Some(cluster.rect)
-                } else {
-                    None
-                }
-            })
-            .collect()
-    }
-}
+/// Specific implementation of Finder candidates
+pub(crate) struct FinderCandidate;
 
 impl FinderCandidate {
 
@@ -87,5 +77,19 @@ impl FinderCandidate {
         finder_candidates.iter().for_each(|rect| {
             crate::scanning::util::render_point_i32_to_canvas(rect.center(), canvas);
         });
+    }
+
+    fn extract_finder_positions(image: BinaryImage) -> Vec<BoundingRect> {
+        let clusters = image.to_clusters(false);
+        
+        clusters.clusters.iter()
+            .filter_map(|cluster| {
+                if Finder::is_finder(Shape::from(cluster.to_binary_image())) {
+                    Some(cluster.rect)
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 }

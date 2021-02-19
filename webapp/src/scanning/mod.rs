@@ -1,6 +1,5 @@
 pub mod implementation;
 pub mod decoder;
-pub mod finder;
 pub mod fitter;
 pub mod reader;
 pub mod scanner;

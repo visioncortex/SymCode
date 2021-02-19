@@ -1,7 +1,7 @@
-use visioncortex::{BinaryImage, PointF64};
+use visioncortex::{PointF64};
 use wasm_bindgen::prelude::*;
 
-use crate::canvas::Canvas;
+use crate::{canvas::Canvas};
 
 use super::valid_pointf64_on_image;
 
