@@ -1,10 +1,7 @@
 use std::fmt::Debug;
 use bit_vec::BitVec;
-use visioncortex::BinaryImage;
 
 use crate::util::console_log_util;
-
-use super::{GlyphTrace};
 
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};

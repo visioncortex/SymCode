@@ -1,6 +1,6 @@
 use visioncortex::{BinaryImage, BoundingRect, ColorImage, PointF64, PointI32};
 
-use crate::{math::PerspectiveTransform};
+use crate::math::PerspectiveTransform;
 
 use super::{Acute32SymcodeConfig, is_black_rgb, render_binary_image_to_canvas};
 
