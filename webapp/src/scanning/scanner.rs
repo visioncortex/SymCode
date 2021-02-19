@@ -1,12 +1,12 @@
 use std::borrow::BorrowMut;
 
 use rand::{RngCore, SeedableRng, rngs::StdRng};
-use visioncortex::{BinaryImage, ColorImage, PointI32, Shape};
+use visioncortex::{BinaryImage, ColorImage, PointI32};
 use wasm_bindgen::prelude::*;
 
-use crate::{canvas::Canvas, util::console_log_util};
+use crate::{canvas::Canvas, scanner::interface::Finder as FinderInterface, util::console_log_util};
 
-use super::{AlphabetReader, AlphabetReaderParams, FinderCandidate, GlyphLabel, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, SymcodeDecoder, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, render_binary_image_to_canvas};
+use super::{AlphabetReader, AlphabetReaderParams, Finder, FinderCandidate, GlyphLabel, GlyphLibrary, Recognizer, RecognizerInput, SymcodeConfig, SymcodeDecoder, implementation::transformer::{TransformFitter, TransformFitterInput}, is_black_hsv, render_binary_image_to_canvas};
 
 use crate::scanner::interface::SymcodeScanner as ScannerInterface;
 use crate::generator::interface::SymcodeGenerator as GeneratorInterface;
@@ -190,7 +190,7 @@ impl GeneratorInterface for SymcodeScanner {
         let mut symcode_image = BinaryImage::new_w_h(self.config.code_width, self.config.code_height);
 
         // Put in the finders
-        let finder_image = Shape::circle(self.config.symbol_width, self.config.symbol_height).image;
+        let finder_image = Finder::to_image(self.config.symbol_width, self.config.symbol_height);
         self.config.finder_positions.iter().for_each(|finder_center| {
             let top_left = finder_center.to_point_i32() - PointI32::new((self.config.symbol_width >> 1) as i32, (self.config.symbol_height >> 1) as i32);
             symcode_image.paste_from(&finder_image, top_left);
