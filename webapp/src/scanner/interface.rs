@@ -13,6 +13,6 @@ pub trait SymcodeScanner {
 }
 
 pub trait Finder {
-	fn to_image(width: usize, height: usize) -> BinaryImage; // to be used by SymcodeGenerator
-	fn is_finder(shape: Shape) -> bool; // to be used by SymcodeScanner
+	fn to_image(&self, width: usize, height: usize) -> BinaryImage; // to be used by SymcodeGenerator
+	fn is_finder(&self, shape: Shape) -> bool; // to be used by SymcodeScanner
 }

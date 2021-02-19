@@ -1,4 +1,4 @@
-import { SymcodeScanner, SymcodeConfig } from "symcode";
+import { SymcodeScanner, Acute32SymcodeConfig } from "symcode";
 import { SYMCODE_CONFIG } from "./config";
 import { loadAlphabet, loadBuffer } from "./load";
 import { rng, generate_perspective_with_image_src } from "./perspective";
@@ -17,8 +17,8 @@ const img = new Image();
 
 let finishScanning = false;
 
-const scannerConfig = SymcodeConfig.from_json_string(JSON.stringify(SYMCODE_CONFIG));
-const scanner = SymcodeScanner.from_config(scannerConfig, 125n);
+const symcodeConfig = Acute32SymcodeConfig.from_json_string(JSON.stringify(SYMCODE_CONFIG));
+const scanner = SymcodeScanner.from_config(symcodeConfig, 125n);
 
 const inputFrameSize = {
     width: 350,

@@ -1,14 +1,14 @@
 use permutator::{Combination, Permutation};
 use visioncortex::{BoundingRect, PointF64};
 
-use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{Fitter, SymcodeConfig, valid_pointf64_on_image}};
+use crate::{math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64}, scanning::{Fitter, Acute32SymcodeConfig, valid_pointf64_on_image}};
 
 /// Implementation of Transformer
 pub(crate) struct TransformFitter;
 
 impl TransformFitter {
     /// Use the top of each finder in object space as check points
-    fn calculate_check_points(symcode_config: &crate::scanning::SymcodeConfig) -> Vec<PointF64> {
+    fn calculate_check_points(symcode_config: &crate::scanning::Acute32SymcodeConfig) -> Vec<PointF64> {
         symcode_config.finder_positions.iter()
             .map(|p| PointF64::new(p.x, p.y - (symcode_config.symbol_height >> 1) as f64))
             .collect()
@@ -23,7 +23,7 @@ impl Fitter for TransformFitter {
         clockwise_points_f64(&finder_positions_image[2], &finder_positions_image[1], &finder_positions_image[3])
     }
 
-    fn evaluate_transform(img_to_obj: &PerspectiveTransform, finders_image: Vec<&Self::FinderElement>, image_width: usize, image_height: usize, symcode_config: &SymcodeConfig) -> f64 {
+    fn evaluate_transform(img_to_obj: &PerspectiveTransform, finders_image: Vec<&Self::FinderElement>, image_width: usize, image_height: usize, symcode_config: &Acute32SymcodeConfig) -> f64 {
         let check_points = &Self::calculate_check_points(symcode_config);
 
         let finder_positions_image: Vec<PointF64> = finders_image.iter().map(|finder| finder.center().to_point_f64()).collect();
@@ -79,7 +79,7 @@ impl Fitter for TransformFitter {
         (acc_dir_error / 3.0) * 0.7 + (1.0 - shortest_dist / longest_dist) * 0.3
     }
 
-    fn fit_transform(image_width: usize, image_height: usize, finder_positions_image: Vec<Self::FinderElement>, symcode_config: &SymcodeConfig) -> Result<PerspectiveTransform, &str> {
+    fn fit_transform(image_width: usize, image_height: usize, finder_positions_image: Vec<Self::FinderElement>, symcode_config: &Acute32SymcodeConfig) -> Result<PerspectiveTransform, &str> {
         let dst_pts = &symcode_config.finder_positions;
         let num_finders = dst_pts.len();
 
@@ -132,7 +132,7 @@ pub struct TransformFitterInput {
 }
 
 impl TransformFitter {
-    pub fn process(input: TransformFitterInput, params: &SymcodeConfig) -> Result<PerspectiveTransform, &str> {
+    pub fn process(input: TransformFitterInput, params: &Acute32SymcodeConfig) -> Result<PerspectiveTransform, &str> {
         // Processing starts
         Self::fit_transform(input.raw_image_width, input.raw_image_height, input.finder_positions_image, params)
     }

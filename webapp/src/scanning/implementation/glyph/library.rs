@@ -1,6 +1,6 @@
 use visioncortex::{BinaryImage, Sampler};
 
-use crate::{scanning::{Symbol, SymcodeConfig, Trace, image_diff_area}};
+use crate::{scanning::{Symbol, Acute32SymcodeConfig, Trace, image_diff_area}};
 
 use super::{GlyphLabel, GlyphTrace};
 
@@ -49,14 +49,14 @@ impl SymbolLibrary {
     }
 
     /// Takes the binary image of the template and the usize representation of the label
-    pub fn add_template(&mut self, image: BinaryImage, symcode_config: &SymcodeConfig) {
+    pub fn add_template(&mut self, image: BinaryImage, symcode_config: &Acute32SymcodeConfig) {
         let image = Sampler::resample_image(&image, symcode_config.symbol_width, symcode_config.symbol_height);
         let label = GlyphLabel::from_usize_representation(self.templates.len() + 1);
         //console_log_util(&format!("{:?}\n{}", label, image.to_string()));
         self.templates.push(Symbol::from_image_label(image, label, symcode_config.stat_tolerance));
     }
 
-    pub fn find_most_similar_glyph(&self, image: BinaryImage, symcode_config: &SymcodeConfig) -> GlyphLabel {
+    pub fn find_most_similar_glyph(&self, image: BinaryImage, symcode_config: &Acute32SymcodeConfig) -> GlyphLabel {
         let image = &Sampler::resample_image(&image, symcode_config.symbol_width, symcode_config.symbol_height);
         let input_encoding = &GlyphTrace::from_image(image, symcode_config.stat_tolerance);
         //console_log_util(&format!("{:?}", input_encoding));

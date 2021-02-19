@@ -62,7 +62,7 @@ impl SymcodeGenerator {
 
 ```rust
 struct SymcodeConfig {
-	symbol: Vec<Box<dyn Symbol>>,
+	symbols: Vec<Box<dyn Symbol>>,
 	finder: Box<dyn Finder>,
 	encoder: Box<dyn Encoder>,
 	// other configurations

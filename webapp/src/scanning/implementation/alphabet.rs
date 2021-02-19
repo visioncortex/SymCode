@@ -1,7 +1,7 @@
 use visioncortex::{BinaryImage, BoundingRect, PointI32};
 use wasm_bindgen::prelude::*;
 
-use crate::scanning::{SymcodeConfig, valid_pointi32_on_image};
+use crate::scanning::{Acute32SymcodeConfig, valid_pointi32_on_image};
 
 use super::SymbolLibrary;
 
@@ -83,7 +83,7 @@ impl AlphabetReaderParams {
 }
 
 impl<'a> AlphabetReader {
-    pub fn read_alphabet_to_library(library: &'a mut SymbolLibrary, image: BinaryImage, params: AlphabetReaderParams, symcode_config: &'a SymcodeConfig) -> Result<(), &'a str> {
+    pub fn read_alphabet_to_library(library: &'a mut SymbolLibrary, image: BinaryImage, params: AlphabetReaderParams, symcode_config: &'a Acute32SymcodeConfig) -> Result<(), &'a str> {
         crate::scanning::util::render_binary_image_to_canvas(&image, symcode_config.debug_canvas.as_ref().unwrap());
         for i in 0..params.num_rows {
             for j in 0..params.num_columns {

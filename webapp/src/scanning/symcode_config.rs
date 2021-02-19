@@ -3,10 +3,14 @@ use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas};
 
-use super::valid_pointf64_on_image;
+use super::{Acute32Encoder, CircleFinder, Symbol, valid_pointf64_on_image};
 
 #[wasm_bindgen]
-pub struct SymcodeConfig {
+pub struct Acute32SymcodeConfig {
+    symbols: Vec<Symbol>,
+    finder: CircleFinder,
+    encoder: Acute32Encoder,
+    
     pub code_width: usize,
     pub code_height: usize,
 
@@ -27,7 +31,17 @@ pub struct SymcodeConfig {
     pub empty_cluster_threshold: f64,
 }
 
-impl Default for SymcodeConfig {
+impl Acute32SymcodeConfig {
+    pub fn finder(&self) -> &CircleFinder {
+        &self.finder
+    }
+
+    pub fn encoder(&self) -> &Acute32Encoder {
+        &self.encoder
+    }
+}
+
+impl Default for Acute32SymcodeConfig {
     fn default() -> Self {
         Self {
             code_width: 400,
@@ -53,11 +67,14 @@ impl Default for SymcodeConfig {
             stat_tolerance: 0.2,
             max_encoding_difference: 1,
             empty_cluster_threshold: 0.2,
+            symbols: vec![],
+            finder: CircleFinder::default(),
+            encoder: Acute32Encoder::default(),
         }
     }
 }
 
-impl SymcodeConfig {
+impl Acute32SymcodeConfig {
     #[inline]
     pub fn max_finder_candidates(&self) -> usize {
         self.finder_positions.len() + self.max_extra_finder_candidates
@@ -75,7 +92,7 @@ impl SymcodeConfig {
 }
 
 #[wasm_bindgen]
-impl SymcodeConfig {
+impl Acute32SymcodeConfig {
     pub fn new() -> Self {
         Self::default()
     }
@@ -134,7 +151,7 @@ impl SymcodeConfig {
 }
 
 #[wasm_bindgen]
-impl SymcodeConfig {
+impl Acute32SymcodeConfig {
     pub fn add_finder_position(&mut self, x: f64, y: f64) -> String {
         let finder_position = PointF64::new(x, y);
         if valid_pointf64_on_image(finder_position, self.code_width, self.code_height) {
@@ -157,7 +174,7 @@ impl SymcodeConfig {
 }
 
 #[wasm_bindgen]
-impl SymcodeConfig {
+impl Acute32SymcodeConfig {
     pub fn from_json_string(json_string: &str) -> Self {
         let json: serde_json::Value = serde_json::from_str(json_string).unwrap();
 
@@ -182,6 +199,9 @@ impl SymcodeConfig {
             stat_tolerance: json["stat_tolerance"].as_f64().unwrap(),
             max_encoding_difference: json["max_encoding_difference"].as_i64().unwrap() as usize,
             empty_cluster_threshold: json["empty_cluster_threshold"].as_f64().unwrap(),
+            symbols: vec![],
+            finder: CircleFinder::default(),
+            encoder: Acute32Encoder::default(),
         }
     }
 }

@@ -1,17 +1,18 @@
 use visioncortex::{BinaryImage, BoundingRect, ColorImage, Shape};
 
-use crate::{scanner::interface::Finder as FinderInterface, scanning::{SymcodeConfig, binarize_image_util, valid_pointf64_on_image}};
+use crate::{scanner::interface::Finder as FinderInterface, scanning::{Acute32SymcodeConfig, binarize_image_util, valid_pointf64_on_image}};
 
 /// Specific implementation of Finder symbol element
-pub struct Finder;
+#[derive(Default)]
+pub struct CircleFinder;
 
-impl FinderInterface for Finder {
+impl FinderInterface for CircleFinder {
 
-    fn to_image(width: usize, height: usize) -> BinaryImage {
+    fn to_image(&self, width: usize, height: usize) -> BinaryImage {
         Shape::circle(width, height).image
     }
 
-    fn is_finder(shape: Shape) -> bool {
+    fn is_finder(&self, shape: Shape) -> bool {
         let image = shape.image;
         let steps = 6;
         for i in 0..steps {
@@ -34,7 +35,7 @@ pub(crate) struct FinderCandidate;
 
 impl FinderCandidate {
 
-    pub fn process(input: &ColorImage, params: &SymcodeConfig) -> Result<Vec<BoundingRect>, &'static str> {
+    pub fn process(input: &ColorImage, params: &Acute32SymcodeConfig) -> Result<Vec<BoundingRect>, &'static str> {
         Self::valid_params(params)?;
 
         // Get the reference to the input raw frame
@@ -46,7 +47,7 @@ impl FinderCandidate {
         }
 
         // Processing starts
-        let finder_candidates = Self::extract_finder_positions(binary_raw_frame);
+        let finder_candidates = Self::extract_finder_positions(binary_raw_frame, params.finder());
         if let Some(debug_canvas) = &params.debug_canvas {
             Self::render_finder_candidates(&finder_candidates, debug_canvas);
         }
@@ -58,7 +59,7 @@ impl FinderCandidate {
         }
     }
 
-    pub fn valid_params(params: &SymcodeConfig) -> Result<(), &'static str> {
+    pub fn valid_params(params: &Acute32SymcodeConfig) -> Result<(), &'static str> {
         if params.finder_positions.len() < 4 {
             return Err("Number of finder candidates specified in FinderCandidates' params is less than 4.");
         }
@@ -79,12 +80,12 @@ impl FinderCandidate {
         });
     }
 
-    fn extract_finder_positions(image: BinaryImage) -> Vec<BoundingRect> {
+    fn extract_finder_positions(image: BinaryImage, finder: &CircleFinder) -> Vec<BoundingRect> {
         let clusters = image.to_clusters(false);
         
         clusters.clusters.iter()
             .filter_map(|cluster| {
-                if Finder::is_finder(Shape::from(cluster.to_binary_image())) {
+                if finder.is_finder(Shape::from(cluster.to_binary_image())) {
                     Some(cluster.rect)
                 } else {
                     None
