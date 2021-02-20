@@ -1,6 +1,6 @@
 use visioncortex::{BinaryImage, BoundingRect, Color, ColorHsv, ColorImage, PointF64, PointI32};
 use wasm_bindgen::{Clamped, JsValue};
-use web_sys::{ImageData};
+use web_sys::ImageData;
 
 use crate::canvas::Canvas;
 

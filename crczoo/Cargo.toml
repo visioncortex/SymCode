@@ -8,7 +8,7 @@ license = "MIT OR Apache-2.0"
 homepage = "http://www.visioncortex.org/"
 repository = "https://github.com/visioncortex/crczoo/"
 categories = ["algorithms"]
-keywords = ["crc", "crc5", "crc16", "crc32", "crc64"]
+keywords = ["crc", "crc5", "crc8", "crc16", "crc32"]
 
 [lib]
 crate-type = ["rlib"]

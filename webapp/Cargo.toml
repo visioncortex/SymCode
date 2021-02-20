@@ -1,5 +1,5 @@
 [package]
-name = "symcode"
+name = "symcode-webapp"
 version = "0.1.0"
 authors = ["shpun"]
 edition = "2018"

@@ -2,7 +2,8 @@
 
 This crate provides a collection of Cyclic Redundancy Check (CRC) algorithms, including CRC5, CRC8, CRC16 and CRC32.
 
-Implementation is generated using https://pycrc.org/ using the bit-by-bit algorithm.
+Implementation is generated using https://pycrc.org/ using the bit-by-bit algorithm, which does not 
+use a lookup table, and is most suitable for checking small amounts of data.
 
 The Zoo is collected from https://crccalc.com/
 
@@ -67,10 +68,17 @@ crc32_xfer()
 
 # Usage
 
+Calling a predefined function
 ```rust
-use crczoo::crc8;
+use crczoo::{crc8, calculate_crc8};
 
 assert_eq!(crc8(&"123456789".to_owned().into_bytes()), 0xF4);
+```
+
+Specifying the polynomial parameters
+```rust
+pub fn calculate_crc8(data: &[u8], poly: u8, init: u8, ref_in: bool, ref_out: bool, xor_out: u8) -> u8;
+
 assert_eq!(calculate_crc8(&"123456789".to_owned().into_bytes(), 0x07, 0x00, false, false, 0x00), 0xF4);
 ```
 
