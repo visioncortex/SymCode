@@ -1,4 +1,4 @@
-use crate::{BinaryImage, BoundingRect, PointI32};
+use crate::{BinaryImage, BoundingRect, clusters::Cluster, PathSimplifyMode, PointI32};
 
 /// A conceptual object represented by an image
 #[derive(Clone)]
@@ -139,6 +139,22 @@ impl Shape {
             }
         }
         #[cfg(test)] { println!("sum={}", sum) }
+        true
+    }
+
+    pub fn is_quadrilateral(&self) -> bool {
+        let mut path = Cluster::image_to_compound_path(
+            &PointI32::default(),
+            &self.image,
+            PathSimplifyMode::None,
+            0.0,
+            0.0,
+            0,
+            0.0
+        );
+        path.paths.truncate(1);
+        let path = path.reduce((self.image.width + self.image.height) as f64);
+        // the path is reduced to a quadrilateral bound by the north most, east most, south most and west most point
         true
     }
 }
