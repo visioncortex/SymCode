@@ -1,7 +1,7 @@
 use permutator::{Combination, Permutation};
-use visioncortex::{BoundingRect, PointF64};
+use visioncortex::{BoundingRect, PointF64, PerspectiveTransform};
 
-use crate::math::{PerspectiveTransform, clockwise_points_f64, euclid_dist_f64, normalize_point_f64};
+use crate::math::{clockwise_points_f64, euclid_dist_f64, normalize_point_f64};
 
 use super::{Acute32SymcodeConfig, valid_pointf64_on_image};
 

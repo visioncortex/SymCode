@@ -1,2 +1,5 @@
-pub mod matrix;
-pub mod perspective;
+mod matrix;
+mod perspective;
+
+pub use matrix::*;
+pub use perspective::*;

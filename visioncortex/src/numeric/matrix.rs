@@ -1,82 +1,142 @@
-use crate::Field;
+pub struct Numeric;
 
-/// Constructs an `n`-by-`n` identity matrix.
-pub fn identity(n: usize) -> Field<f32> {
-    assert_ne!(n, 0);
+pub type Matrix = Vec<Vec<f64>>;
 
-    let mut f = Field::with_initial(n, n, 0.0f32);
-    for i in 0..n-1 {
-        let index = f.index_at(i, i);
-        f.set(index, &1.0);
+impl Numeric {
+    // adapted from numeric.js
+
+    pub fn dim(x: &Matrix) -> Vec<usize> {
+        return vec![x.len(), x[0].len()];
     }
-    f
-}
 
-pub fn transpose(matrix: &Field<f32>) -> Field<f32> {
-    let mut result = Field::with_default(matrix.height(), matrix.width());
-    for (i, x) in matrix.iter().enumerate() {
-        let pos = matrix.locate(i);
-        let index = result.index_at(pos.1, pos.0);
-        result.set(index, x);
-    }
-    result
-}
-
-pub fn dot_mm(lhs: &Field<f32>, rhs: &Field<f32>) -> Field<f32> {
-    assert_eq!(lhs.width(), rhs.height());
-
-    let mut result = Field::with_default(lhs.height(), rhs.width());
-
-    for i in 0..(lhs.height() * rhs.width()) {
-        let pos = result.locate(i);
-        let mut entry = 0.0f32;
-
-        for j in 0..lhs.width() {
-            entry += lhs.get(lhs.index_at(j, pos.1)).unwrap() * rhs.get(rhs.index_at(pos.0, j)).unwrap();
+    pub fn clone(x: &Matrix) -> Matrix {
+        let mut yy = Vec::new();
+        for xx in x.iter() {
+            yy.push(xx.clone());
         }
-
-        result.set(i, &entry);
+        return yy;
     }
-    
-    result
-}
 
-pub fn dot_mv(matrix: &Field<f32>, vector: &[f32]) -> Vec<f32> {
-    let cols = std::cmp::min(matrix.width(), vector.len());
+    pub fn identity(n: usize) -> Matrix {
+        let mut x = Vec::new();
+        for i in 0..n {
+            let mut yy = Vec::new();
+            for j in 0..n {
+                yy.push(if i == j {1.0} else {0.0});
+            }
+            x.push(yy);
+        }
+        return x;
+    }
 
-    (0..matrix.height())
-        .map(|row| (0..cols).
-            map(|col| matrix.get(matrix.index_at(row, col)).unwrap() * vector[col]).sum()
-        )
-        .collect()
-}
+    pub fn transpose(x: &Matrix) -> Matrix {
+        let mut yy = Vec::new();
+        for _j in 0..x[0].len() {
+            yy.push(Vec::new());
+        }
+        for j in 0..x[0].len() {
+            for i in 0..x.len() {
+                yy[j].push(x[i][j]);
+            }
+        }
+        return yy;
+    }
 
-pub fn dot_vv(row: &[f32], col: &[f32]) -> f32 {
-    row
-        .iter()
-        .zip(col.iter())
-        .map(|(a, b)| a*b)
-        .sum()
-}
+    pub fn inv(a: &Matrix) -> Option<Matrix> {
+        let s = Self::dim(a);
+        let m = s[0];
+        let n = s[1];
+        let mut A = Self::clone(a);
+        let mut I = Self::identity(m);
+        for j in 0..n {
+            let mut i0 = 0;
+            let mut v0 = -1.0;
+            for i in j..m {
+                let k = (A[i][j]).abs();
+                if k > v0 {
+                    i0 = i;
+                    v0 = k;
+                }
+            }
+            A.swap(i0, j);
+            I.swap(i0, j);
+            let x = A[j][j];
+            if x == 0.0 {
+                return None;
+            }
+            for k in j..n {
+                A[j][k] /= x; 
+            }
+            for k in (0..n).rev() {
+                I[j][k] /= x;
+            }
+            for i in (0..m).rev() {
+                if i != j {
+                    let x = A[i][j];
+                    for k in j+1..n {
+                        A[i][k] -= A[j][k]*x;
+                    }
+                    let mut k = n as i32 - 1;
+                    while k > 0 {
+                        I[i][k as usize] -= I[j][k as usize]*x;
+                        k -= 1;
+                        I[i][k as usize] -= I[j][k as usize]*x;
+                        k -= 1;
+                    }
+                    if k == 0 {
+                        I[i][0] -= I[j][0]*x;
+                    }
+                }
+            }
+        }
+        return Some(I);
+    }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    const EPS: f32 = 0.00005f32;
+    pub fn dot_mm_small(x: &Matrix, y: &Matrix) -> Matrix {
+        let p = x.len(); let q = y.len(); let r = y[0].len();
+        let mut ret = vec![Vec::new(); p];
+        for i in (0..p).rev() {
+            let mut foo = vec![0.0; r];
+            let ref bar = x[i];
+            for k in (0..r).rev() {
+                let mut woo = bar[q-1]*y[q-1][k];
+                let mut j = q as i32 - 2;
+                while j >= 1 {
+                    let i0 = j-1;
+                    woo += bar[j as usize]*y[j as usize][k] + bar[i0 as usize]*y[i0 as usize][k];
+                    j -= 2;
+                }
+                if j == 0 {
+                    woo += bar[0]*y[0][k];
+                }
+                foo[k] = woo;
+            }
+            ret[i] = foo;
+        }
+        return ret;
+    }
 
-    #[test]
-    fn test_mm() {
-        let m1 = Field::with_vec(3, 2, vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]).unwrap();
-        let m2 = Field::with_vec(2, 3, vec![-1.0, 3.0, -5.0, 7.0, -9.0, 11.0]).unwrap();
-        let m3 = dot_mm(&m1, &m2);
+    pub fn dot_mv(x: &Matrix, y: &Vec<f64>) -> Vec<f64> {
+        let p = x.len();
+        let mut ret = vec![0.0; p];
+        for i in (0..p).rev() {
+            ret[i] = Self::dot_vv(&x[i], y);
+        }
+        return ret;
+    }
 
-        println!("{}", m3.get(0).unwrap());
-        println!("{}", m3.get(1).unwrap());
-        println!("{}", m3.get(2).unwrap());
-        println!("{}", m3.get(3).unwrap());
-        assert!((m3.get(0).unwrap() + 38.0).abs() < EPS);
-        assert!((m3.get(1).unwrap() - 50.0).abs() < EPS);
-        assert!((m3.get(2).unwrap() + 83.0).abs() < EPS);
-        assert!((m3.get(3).unwrap() - 113.0).abs() < EPS);
+    pub fn dot_vv(x: &Vec<f64>, y: &Vec<f64>) -> f64 {
+        let n = x.len();
+        let mut ret = x[n-1]*y[n-1];
+        let mut i = n as i32 - 2;
+        while i >= 1 {
+            let i1 = i-1;
+            ret += x[i as usize]*y[i as usize] + x[i1 as usize]*y[i1 as usize];
+            i -= 2;
+        }
+        if i == 0 {
+            ret += x[0]*y[0];
+        }
+        return ret;
     }
 }

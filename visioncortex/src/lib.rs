@@ -1,4 +1,5 @@
 pub mod color_clusters;
+mod numeric;
 mod path;
 mod shape;
 mod artifact;
@@ -15,6 +16,7 @@ mod statistic;
 mod transform;
 
 // pub use color_clusters;
+pub use numeric::*;
 pub use path::*;
 pub use shape::*;
 pub use artifact::*;

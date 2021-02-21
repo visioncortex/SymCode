@@ -2,7 +2,6 @@ use wasm_bindgen::prelude::*;
 
 mod canvas;
 mod common;
-mod crc;
 mod interfaces;
 mod math;
 mod acute32;
