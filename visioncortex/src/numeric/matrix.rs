@@ -14,7 +14,7 @@ impl Numeric {
         for xx in x.iter() {
             yy.push(xx.clone());
         }
-        return yy;
+        yy
     }
 
     pub fn identity(n: usize) -> Matrix {
@@ -26,7 +26,7 @@ impl Numeric {
             }
             x.push(yy);
         }
-        return x;
+        x
     }
 
     pub fn transpose(x: &Matrix) -> Matrix {
@@ -39,7 +39,7 @@ impl Numeric {
                 yy[j].push(x[i][j]);
             }
         }
-        return yy;
+        yy
     }
 
     pub fn inv(a: &Matrix) -> Option<Matrix> {
@@ -89,7 +89,7 @@ impl Numeric {
                 }
             }
         }
-        return Some(I);
+        Some(I)
     }
 
     pub fn dot_mm_small(x: &Matrix, y: &Matrix) -> Matrix {
@@ -97,7 +97,7 @@ impl Numeric {
         let mut ret = vec![Vec::new(); p];
         for i in (0..p).rev() {
             let mut foo = vec![0.0; r];
-            let ref bar = x[i];
+            let bar = &x[i];
             for k in (0..r).rev() {
                 let mut woo = bar[q-1]*y[q-1][k];
                 let mut j = q as i32 - 2;
@@ -113,19 +113,19 @@ impl Numeric {
             }
             ret[i] = foo;
         }
-        return ret;
+        ret
     }
 
-    pub fn dot_mv(x: &Matrix, y: &Vec<f64>) -> Vec<f64> {
+    pub fn dot_mv(x: &Matrix, y: &[f64]) -> Vec<f64> {
         let p = x.len();
         let mut ret = vec![0.0; p];
         for i in (0..p).rev() {
             ret[i] = Self::dot_vv(&x[i], y);
         }
-        return ret;
+        ret
     }
 
-    pub fn dot_vv(x: &Vec<f64>, y: &Vec<f64>) -> f64 {
+    pub fn dot_vv(x: &[f64], y: &[f64]) -> f64 {
         let n = x.len();
         let mut ret = x[n-1]*y[n-1];
         let mut i = n as i32 - 2;
@@ -137,6 +137,6 @@ impl Numeric {
         if i == 0 {
             ret += x[0]*y[0];
         }
-        return ret;
+        ret
     }
 }
