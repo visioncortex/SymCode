@@ -99,6 +99,22 @@ mod tests {
     }
 
     #[test]
+    fn test_crc8_demo() {
+        let mut data = "123456789".to_owned().into_bytes();
+        let checksum = crc8(&data);
+        data.push(checksum);
+        assert_eq!(crc8(&data), 0);
+
+        let mut data = "023456789".to_owned().into_bytes();
+        data.push(checksum);
+        assert!(crc8(&data) != 0);
+
+        let mut data = "023456799".to_owned().into_bytes();
+        data.push(checksum);
+        assert!(crc8(&data) != 0);
+    }
+
+    #[test]
     fn test_crc8_cdma2000() {
         assert_eq!(crc8_cdma2000(&check_sequence()), 0xDA);
     }

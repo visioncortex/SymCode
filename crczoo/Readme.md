@@ -5,7 +5,7 @@ This crate provides a collection of Cyclic Redundancy Check (CRC) algorithms, in
 Implementation is generated using https://pycrc.org/ using the bit-by-bit algorithm, which does not 
 use a lookup table, and is most suitable for checking small amounts of data.
 
-The Zoo is collected from https://crccalc.com/
+The Zoo is collected from and verified against https://crccalc.com/
 
 CRC5
 ```
@@ -82,9 +82,42 @@ pub fn calculate_crc8(data: &[u8], poly: u8, init: u8, ref_in: bool, ref_out: bo
 assert_eq!(calculate_crc8(&"123456789".to_owned().into_bytes(), 0x07, 0x00, false, false, 0x00), 0xF4);
 ```
 
+# CRC Explained
+
+Example using CRC to detect errors in byte stream
+
+```rust
+use crczoo::crc8;
+
+// first this is the data to protect
+let mut data = "123456789".to_owned().into_bytes();
+// here we obtain the checksum
+let checksum = crc8(&data);
+data.push(checksum);
+// with the checksum appended to the original byte stream, the CRC should yield 0
+assert_eq!(crc8(&data), 0);
+
+// now let's introduce 1 bit error: i.e. '0' = 0x30, '1' = 0x31
+let mut data = "023456789".to_owned().into_bytes();
+data.push(checksum);
+// non zero value means there is error!
+assert!(crc8(&data) != 0);
+
+// rinse and repeat, introduce 2 bits error this time
+let mut data = "023456799".to_owned().into_bytes();
+data.push(checksum);
+// non zero value means there is error!
+assert!(crc8(&data) != 0);
+```
+
+As explained in https://users.ece.cmu.edu/~koopman/crc/ , different polynomials have different error 
+detection capability. Normally a good CRC should be able to detect all 1 and 2 bit errors for byte 
+stream up to a certain length, and then the error detection capability degrades when more bits are 
+flipped and the byte stream becomes longer.
+
 # CRC Parametrization Explained
 
-> From http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html#ch7
+From http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html#ch7
 
 Following standard parameters are used to define a CRC algorithm instance:
 
