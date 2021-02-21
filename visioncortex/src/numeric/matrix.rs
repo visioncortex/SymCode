@@ -1,9 +1,9 @@
+/// Matrix operations adapted from https://github.com/sloisel/numeric
 pub struct Numeric;
 
 pub type Matrix = Vec<Vec<f64>>;
 
 impl Numeric {
-    // adapted from numeric.js
 
     pub fn dim(x: &Matrix) -> Vec<usize> {
         return vec![x.len(), x[0].len()];

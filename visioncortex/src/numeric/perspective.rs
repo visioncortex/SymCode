@@ -2,6 +2,10 @@ use crate::PointF64;
 
 use super::Numeric;
 
+/// A perspective transform can easily be used to map one 2D quadrilateral to another, 
+/// given the corner coordinates for the source and destination quadrilaterals.
+///
+/// Adapted from https://github.com/jlouthan/perspective-transform
 pub struct PerspectiveTransform {
     src_pts: Vec<f64>,
     dst_pts: Vec<f64>,
@@ -10,7 +14,6 @@ pub struct PerspectiveTransform {
 }
 
 impl PerspectiveTransform {
-    // adapted from https://github.com/jlouthan/perspective-transform
 
     pub fn from_point_f64(src_pts: &[PointF64], dst_pts: &[PointF64]) -> Self {
         let mut src_f64 = vec![];
