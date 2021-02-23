@@ -242,20 +242,20 @@ mod tests {
 
     #[test]
     fn rasterize_triangle_3() {
-        let mut image = BinaryImage::new_w_h(5, 11);
+        let mut image = BinaryImage::new_w_h(6, 11);
         rasterize_triangle(&[PointI32::new(0, 0), PointI32::new(5, 5), PointI32::new(0, 10)], &mut image);
         assert_eq!(image.to_string(),
-            "*----\n".to_owned() +
-            "**---\n" +
-            "***--\n" +
-            "****-\n" +
-            "*****\n" +
-            "*****\n" +
-            "*****\n" +
-            "****-\n" +
-            "***--\n" +
-            "**---\n" +
-            "*----\n"
+            "*-----\n".to_owned() +
+            "**----\n" +
+            "***---\n" +
+            "****--\n" +
+            "*****-\n" +
+            "******\n" +
+            "*****-\n" +
+            "****--\n" +
+            "***---\n" +
+            "**----\n" +
+            "*-----\n"
         );
     }
 
