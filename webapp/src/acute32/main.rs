@@ -1,10 +1,11 @@
 use std::borrow::BorrowMut;
 
+use bit_vec::BitVec;
 use rand::{RngCore, SeedableRng, rngs::StdRng};
 use visioncortex::{BinaryImage, ColorImage, PointI32};
 use wasm_bindgen::prelude::*;
 
-use crate::{canvas::Canvas, interfaces::finder::Finder as FinderInterface, util::console_log_util};
+use crate::{canvas::Canvas, interfaces::{finder::Finder as FinderInterface, encoder::Encoder as EncoderInterface}, util::console_log_util};
 
 use super::{Acute32Decoder, Acute32FinderCandidate, Acute32Recognizer, Acute32SymcodeConfig, Acute32TransformFitter, AlphabetReader, AlphabetReaderParams, GlyphLabel, RecognizerInput, TransformFitterInput, is_black_hsv, render_binary_image_to_canvas};
 
@@ -79,24 +80,38 @@ impl Acute32SymcodeMain {
         Ok(ground_truth_code)
     }
 
+    /// Randomly generate a 20-bit bit string, calculate CRC5 checksum (which is 5 bits)
+    /// Then encode the 25-bit bit string into a symcode and generate the code image
     fn generate_symcode_random(&mut self) -> (BinaryImage, String) {
-        let mut ground_truth_code = vec![];
-        for _ in 0..self.config.num_glyphs_in_code() {
-            let glyph_index: usize = self.rng.next_u64() as usize;
-            let glyph_index = glyph_index % self.config.library().len();
-            
-            ground_truth_code.push(self.config.library().get_glyph_at(glyph_index).unwrap().label);
-        }
+        let symbol_num_bits = crate::math::num_bits_to_store(GlyphLabel::num_variants());
+        let num_symbols = self.config.num_glyphs_in_code();
+
+        // Dummy data
+        let payload = BitVec::from_fn(
+            symbol_num_bits*num_symbols - 5, // Reserve 5 bits for CRC5 checksum
+            |_| { self.rng.next_u32() < (std::u32::MAX >> 1) }
+        );
         
-        let ground_truth_code_as_string = format!("{:?}", ground_truth_code);
-        //console_log_util(&format!("Generated glyphs: {}", ground_truth_code_string));
+        let checksum = crate::math::into_bitvec(crczoo::crc5(&payload.to_bytes()) as usize, 5);
+        
+        // This payload is used to generate the code image
+        let payload_with_checksum = BitVec::from_fn(
+            payload.len() + checksum.len(),
+            |i| {
+                // Concatenate the data and checksum
+                if i < payload.len() {
+                    payload.get(i).unwrap()
+                } else {
+                    checksum.get(i - payload.len()).unwrap()
+                }
+            }
+        );
 
-        let ground_truth_code_as_bits = Acute32Decoder::process(ground_truth_code.clone()).unwrap();
-        //console_log_util(&format!("Generated code: {:?} with length {}.", ground_truth_code_as_bits, ground_truth_code_as_bits.len()));
+        let symcode_representation = self.config.encoder().encode(payload_with_checksum.clone(), num_symbols);
 
-        let symcode_image = self.generate(ground_truth_code);
-
-        (symcode_image, format!("{}\n{:?}", ground_truth_code_as_string, ground_truth_code_as_bits))
+        let code_image = self.generate(symcode_representation.clone());
+        
+        (code_image, format!("{:?}\n{:?}", symcode_representation, payload_with_checksum))
     }
 }
 

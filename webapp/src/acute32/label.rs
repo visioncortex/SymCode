@@ -110,7 +110,7 @@ impl GlyphLabel {
         primitive
     }
 
-    pub fn self_from_bit_vec(bit_vec: BitVec) -> Self {
+    pub fn from_bit_vec(bit_vec: BitVec) -> Self {
         Self::from_usize_representation(
             Self::bit_vec_to_primitive(bit_vec)
         )

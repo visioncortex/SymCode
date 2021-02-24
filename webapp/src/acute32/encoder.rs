@@ -23,7 +23,7 @@ impl EncoderInterface for Acute32Encoder {
                 let index = i*symbol_num_bits + j;
                 bits[index]
             });
-            result.push(GlyphLabel::self_from_bit_vec(symbol_bit_vec));
+            result.push(GlyphLabel::from_bit_vec(symbol_bit_vec));
         }
 
         result
