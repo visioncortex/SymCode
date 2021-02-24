@@ -45,8 +45,16 @@ pub(crate) fn clockwise_points_f64(p1: &PointF64, p2: &PointF64, p3: &PointF64) 
     cross_z > EPSILON && cross_z.is_sign_positive()
 }
 
-/// Returns the number of significant bits of n
-pub(crate) fn num_bits(n: usize) -> usize {
+/// Returns the minimum number of bits needed to store n elements
+pub(crate) fn num_bits_to_store(n: usize) -> usize {
+    // Special cases
+    if n == 0 {
+        return 0; // 0 bits are needed to store 0 elements
+    } else if n == 1 {
+        return 1; // 1 bit is needed to store 1 element
+    }
+    let n = n-1; // Given 32 elements, we can label them from 0-31
+    // Below is the number of significant bits of 31
     (0_usize.leading_zeros() - n.leading_zeros()) as usize
 }
 
@@ -96,11 +104,13 @@ mod tests {
     }
 
     #[test]
-    fn math_num_bits() {
-        assert_eq!(num_bits(0), 0); // 0
-        assert_eq!(num_bits(1), 1); // 01
-        assert_eq!(num_bits(2), 2); // 10
-        assert_eq!(num_bits(33), 6); // 100001
+    fn math_num_bits_to_store() {
+        assert_eq!(num_bits_to_store(0), 0); // 0 bits are needed to store 0 elements
+        assert_eq!(num_bits_to_store(1), 1); // 1 bit is needed to store 1 element
+        assert_eq!(num_bits_to_store(2), 1); // 0,1 are the two elements
+        assert_eq!(num_bits_to_store(3), 2); // 00,01,10 are the three elements
+        assert_eq!(num_bits_to_store(32), 5); // 00000 -> 11111 (31)
+        assert_eq!(num_bits_to_store(33), 6); // 000000 -> 100000 (32)
     }
 
     #[test]

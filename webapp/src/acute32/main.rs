@@ -70,7 +70,7 @@ impl Acute32SymcodeMain {
         } else {
             return Err("Code generation: Canvas does not exist.".into());
         };
-        let (symcode, ground_truth_code) = self.borrow_mut().generate_symcode();
+        let (symcode, ground_truth_code) = self.borrow_mut().generate_symcode_random();
 
         if render_binary_image_to_canvas(&symcode, &canvas).is_err() {
             return Err("Cannot render generated symcode to canvas.".into());
@@ -79,24 +79,20 @@ impl Acute32SymcodeMain {
         Ok(ground_truth_code)
     }
 
-    fn generate_symcode(&mut self) -> (BinaryImage, String) {
+    fn generate_symcode_random(&mut self) -> (BinaryImage, String) {
         let mut ground_truth_code = vec![];
         for _ in 0..self.config.num_glyphs_in_code() {
             let glyph_index: usize = self.rng.next_u64() as usize;
-            let glyph_index = glyph_index % (self.config.library().len() + 1);
+            let glyph_index = glyph_index % self.config.library().len();
             
-            // if glyph_index == glyph_library.len(), this will return None
-            if let Some(glyph) = self.config.library().get_glyph_at(glyph_index) {
-                ground_truth_code.push(glyph.label);
-            } else {
-                ground_truth_code.push(GlyphLabel::Empty);
-            }
+            ground_truth_code.push(self.config.library().get_glyph_at(glyph_index).unwrap().label);
         }
         
         let ground_truth_code_as_string = format!("{:?}", ground_truth_code);
         //console_log_util(&format!("Generated glyphs: {}", ground_truth_code_string));
 
         let ground_truth_code_as_bits = Acute32Decoder::process(ground_truth_code.clone()).unwrap();
+        //console_log_util(&format!("Generated code: {:?} with length {}.", ground_truth_code_as_bits, ground_truth_code_as_bits.len()));
 
         let symcode_image = self.generate(ground_truth_code);
 
@@ -185,7 +181,7 @@ impl GeneratorInterface for Acute32SymcodeMain {
 
         // Put in the glyphs
         symcode.iter().enumerate().for_each(|(i, &glyph_label)| {
-            if glyph_label != GlyphLabel::Empty {
+            if glyph_label != GlyphLabel::Invalid {
                 let glyph_top_left = self.config.glyph_anchors[i];
                 if let Some(glyph) = self.config.library().get_glyph_with_label(glyph_label) {
                     symcode_image.paste_from(&glyph.image, glyph_top_left.to_point_i32());

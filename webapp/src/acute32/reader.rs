@@ -123,12 +123,12 @@ impl Acute32Recognizer {
             if let Some(center) = center {
                 let glyph_image = Self::crop_glyph_at_center(&rectified_image, center, symcode_config);
                 if glyph_image.area() < symcode_config.absolute_empty_cluster_threshold(glyph_image.width, glyph_image.height) {
-                    GlyphLabel::Empty
+                    GlyphLabel::Invalid
                 } else {
                     Self::find_most_similar_glyph(glyph_image, glyph_library, symcode_config)
                 }
             } else {
-                GlyphLabel::Empty
+                GlyphLabel::Invalid
             }
         })
         .collect()

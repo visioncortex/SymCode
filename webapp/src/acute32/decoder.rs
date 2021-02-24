@@ -13,8 +13,7 @@ impl Decoder for Acute32Decoder {
     type Err = &'static str;
 
     fn decode(encoded_data: Vec<Self::Symbol>, num_templates: usize) -> Result<BitVec, Self::Err> {
-        let num_bits_per_glyph = crate::math::num_bits(num_templates);
-
+        let num_bits_per_glyph = crate::math::num_bits_to_store(num_templates);
         let mut decoded_data = vec![];
         for datum in encoded_data.iter() {
             if *datum == GlyphLabel::Invalid {

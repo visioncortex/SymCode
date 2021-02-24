@@ -12,9 +12,9 @@ use num_traits::{FromPrimitive, ToPrimitive};
 /// For a given alphabet image, the index should go from top to bottom, left to right.
 pub enum GlyphLabel {
     Invalid = -1,
-    Empty = 0,
+    //Empty = 0,
 
-    LongRR,
+    LongRR = 0,
     LongDD,
     LongLL,
     LongUU,
@@ -60,7 +60,7 @@ pub enum GlyphLabel {
 
 impl Default for GlyphLabel {
     fn default() -> Self {
-        Self::Empty
+        Self::Invalid
     }
 }
 
@@ -133,7 +133,7 @@ mod tests {
     #[test]
     fn glyph_label_conversion_from() {
         let label = 0;
-        assert_eq!(GlyphLabel::from_usize_representation(label), GlyphLabel::Empty);
+        assert_eq!(GlyphLabel::from_usize_representation(label), GlyphLabel::LongRR);
         let label = 5;
         assert_eq!(GlyphLabel::from_usize_representation(label), GlyphLabel::LongRL);
         let label = 32;
@@ -146,7 +146,7 @@ mod tests {
         assert_eq!(GlyphLabel::self_to_primitive(label), Some(20));
         let label = GlyphLabel::Invalid;
         assert_eq!(GlyphLabel::self_to_primitive(label), None);
-        let label = GlyphLabel::Empty;
+        let label = GlyphLabel::LongRR;
         assert_eq!(GlyphLabel::self_to_primitive(label), Some(0));
         let label = GlyphLabel::TriforceR;
         assert_eq!(GlyphLabel::self_to_primitive(label), Some(32));
@@ -179,7 +179,7 @@ mod tests {
     #[test]
     fn glyph_label_option_self_to_bit_vec() {
         const LENGTH: usize = 6;
-        let label = GlyphLabel::Empty;
+        let label = GlyphLabel::LongRR;
         assert!(!GlyphLabel::self_to_bit_vec(label, LENGTH).unwrap().any());
 
         let label = GlyphLabel::TriforceR;

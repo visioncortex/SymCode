@@ -11,7 +11,7 @@ impl EncoderInterface for Acute32Encoder {
     type SymcodeRepresentation = Vec<GlyphLabel>;
 
     fn encode(&self, bits: bit_vec::BitVec, num_symbols: usize) -> Self::SymcodeRepresentation {
-        let symbol_num_bits = crate::math::num_bits(GlyphLabel::num_variants());
+        let symbol_num_bits = crate::math::num_bits_to_store(GlyphLabel::num_variants());
         if bits.len() != symbol_num_bits*num_symbols {
             panic!("Input bits length and self-defined length do not agree!");
         }
