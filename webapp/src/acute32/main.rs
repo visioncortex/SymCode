@@ -107,6 +107,9 @@ impl Acute32SymcodeMain {
             }
         );
 
+        // Artificial data corruption
+        //payload_with_checksum.set(5, !payload_with_checksum.get(5).unwrap());
+
         let symcode_representation = self.config.encoder().encode(payload_with_checksum, num_symbols);
 
         // Sanity check
@@ -116,8 +119,12 @@ impl Acute32SymcodeMain {
         }
 
         let code_image = self.generate(symcode_representation.clone());
+
+        let msg = format!("{:?}\n{:?}", symcode_representation, payload);
+
+        //console_log_util(&msg);
         
-        (code_image, format!("{:?}\n{:?}", symcode_representation, payload))
+        (code_image, msg)
     }
 }
 
