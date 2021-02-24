@@ -22,7 +22,7 @@ export const SYMCODE_CONFIG = {
     rectify_error_threshold: 0.5,
     stat_tolerance: 0.36,
     max_encoding_difference: 3,
-    empty_cluster_threshold: 0.1,
+    empty_cluster_threshold: 0.15,
 };
     
 export const ALPHABET_CONFIG = {
