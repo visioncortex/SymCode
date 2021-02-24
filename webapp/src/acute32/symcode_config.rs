@@ -29,6 +29,7 @@ pub struct Acute32SymcodeConfig {
     pub stat_tolerance: f64,
     pub max_encoding_difference: usize,
     pub empty_cluster_threshold: f64,
+    pub quiet_zone_width: usize,
 }
 
 impl Default for Acute32SymcodeConfig {
@@ -60,6 +61,7 @@ impl Default for Acute32SymcodeConfig {
             symbol_library: Acute32Library::default(),
             finder: CircleFinder::default(),
             encoder: Acute32Encoder::default(),
+            quiet_zone_width: 5,
         }
     }
 }
@@ -192,6 +194,7 @@ impl Acute32SymcodeConfig {
             symbol_library: Acute32Library::default(),
             finder: CircleFinder::default(),
             encoder: Acute32Encoder::default(),
+            quiet_zone_width: json["quiet_zone_width"].as_i64().unwrap() as usize,
         }
     }
 }

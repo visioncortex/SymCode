@@ -9,8 +9,8 @@ impl Acute32Recognizer {
         let width = symcode_config.code_width;
         let height = symcode_config.code_height;
         let mut rectified_image = BinaryImage::new_w_h(width, height);
-        for y in 0..height {
-            for x in 0..width {
+        for y in symcode_config.quiet_zone_width..(height - symcode_config.quiet_zone_width) {
+            for x in symcode_config.quiet_zone_width..(width - symcode_config.quiet_zone_width) {
                 let sample_point = image_to_object.transform_inverse(PointF64::new(x as f64, y as f64)).to_point_f32();
                 let interpolated_color = match raw_image.sample_pixel_at_safe(sample_point) {
                     Some(color) => color,

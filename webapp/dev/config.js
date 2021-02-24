@@ -23,6 +23,7 @@ export const SYMCODE_CONFIG = {
     stat_tolerance: 0.36,
     max_encoding_difference: 3,
     empty_cluster_threshold: 0.15,
+    quiet_zone_width: 10,
 };
     
 export const ALPHABET_CONFIG = {
