@@ -41,13 +41,13 @@ impl Acute32SymcodeMain {
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
             .to_binary_image(|c| is_black_hsv(&c.to_hsv()));
         match AlphabetReader::read_alphabet_to_library(image, params, &self.config) {
-            Ok(library) => self.config.set_library(library),
+            Ok(library) => self.config.symbol_library = library,
             Err(e) => console_log_util(e),
         }
     }
 
     pub fn scan_from_canvas_id(&self, canvas_id: &str) -> Result<String, JsValue> {
-        if self.config.library().is_empty() {
+        if self.config.symbol_library.is_empty() {
             return Err("No templates loaded into the SymcodeScanner instance yet!".into());
         }
 
@@ -110,7 +110,7 @@ impl Acute32SymcodeMain {
         // Artificial data corruption
         //payload_with_checksum.set(5, !payload_with_checksum.get(5).unwrap());
 
-        let symcode_representation = self.config.encoder().encode(payload_with_checksum, num_symbols);
+        let symcode_representation = self.config.encoder.encode(payload_with_checksum, num_symbols);
 
         // Sanity check
         match Acute32Decoder::decode(symcode_representation.clone(), GlyphLabel::num_variants()) {
@@ -166,7 +166,7 @@ impl ScannerInterface for Acute32SymcodeMain {
             RecognizerInput {
                 raw_frame: image,
                 image_to_object,
-                glyph_library: self.config.library(),
+                glyph_library: &self.config.symbol_library,
             },
             symcode_config
         ) {
@@ -201,7 +201,7 @@ impl GeneratorInterface for Acute32SymcodeMain {
         let mut symcode_image = BinaryImage::new_w_h(self.config.code_width, self.config.code_height);
 
         // Put in the finders
-        let finder_image = self.config.finder().to_image(self.config.symbol_width, self.config.symbol_height);
+        let finder_image = self.config.finder.to_image(self.config.symbol_width, self.config.symbol_height);
         self.config.finder_positions.iter().for_each(|finder_center| {
             let top_left = finder_center.to_point_i32() - PointI32::new((self.config.symbol_width >> 1) as i32, (self.config.symbol_height >> 1) as i32);
             symcode_image.paste_from(&finder_image, top_left);
@@ -211,7 +211,7 @@ impl GeneratorInterface for Acute32SymcodeMain {
         symcode.iter().enumerate().for_each(|(i, &glyph_label)| {
             if glyph_label != GlyphLabel::Invalid {
                 let glyph_top_left = self.config.glyph_anchors[i];
-                if let Some(glyph) = self.config.library().get_glyph_with_label(glyph_label) {
+                if let Some(glyph) = self.config.symbol_library.get_glyph_with_label(glyph_label) {
                     symcode_image.paste_from(&glyph.image, glyph_top_left.to_point_i32());
                 }
             }

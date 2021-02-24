@@ -47,7 +47,7 @@ impl Acute32FinderCandidate {
         }
 
         // Processing starts
-        let finder_candidates = Self::extract_finder_positions(binary_raw_frame, params.finder());
+        let finder_candidates = Self::extract_finder_positions(binary_raw_frame, &params.finder);
         if let Some(debug_canvas) = &params.debug_canvas {
             Self::render_finder_candidates(&finder_candidates, debug_canvas);
         }

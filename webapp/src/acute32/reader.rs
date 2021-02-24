@@ -116,7 +116,7 @@ impl Acute32Recognizer {
             })
             .collect();
 
-        //cluster_rects.iter().for_each(|rect| crate::scanning::util::render_bounding_rect_to_canvas_with_color(rect, crate::canvas::Canvas::new_from_id("debug").as_ref().unwrap(), visioncortex::Color::new(0, 0, 255)));
+        cluster_rects.iter().for_each(|rect| crate::acute32::util::render_bounding_rect_to_canvas_with_color(rect, crate::canvas::Canvas::new_from_id("debug").as_ref().unwrap(), visioncortex::Color::new(0, 0, 255)));
         let grouped_cluster_rects = Self::group_cluster_rects_by_glyph_regions(cluster_rects, symcode_config);
         let centers_of_groups = Self::centers_of_merged_clusters_in_glyph_regions(grouped_cluster_rects);
         centers_of_groups.into_iter().map(|center| {

@@ -7,9 +7,9 @@ use super::{Acute32Encoder, Acute32Library, CircleFinder, valid_pointf64_on_imag
 
 #[wasm_bindgen]
 pub struct Acute32SymcodeConfig {
-    symbol_library: Acute32Library,
-    finder: CircleFinder,
-    encoder: Acute32Encoder,
+    pub(crate) symbol_library: Acute32Library,
+    pub(crate) finder: CircleFinder,
+    pub(crate) encoder: Acute32Encoder,
     
     pub code_width: usize,
     pub code_height: usize,
@@ -29,24 +29,6 @@ pub struct Acute32SymcodeConfig {
     pub stat_tolerance: f64,
     pub max_encoding_difference: usize,
     pub empty_cluster_threshold: f64,
-}
-
-impl Acute32SymcodeConfig {
-    pub fn library(&self) -> &Acute32Library {
-        &self.symbol_library
-    }
-    
-    pub fn finder(&self) -> &CircleFinder {
-        &self.finder
-    }
-
-    pub fn encoder(&self) -> &Acute32Encoder {
-        &self.encoder
-    }
-
-    pub fn set_library(&mut self, library: Acute32Library) {
-        self.symbol_library = library;
-    }
 }
 
 impl Default for Acute32SymcodeConfig {
