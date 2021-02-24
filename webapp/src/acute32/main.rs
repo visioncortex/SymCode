@@ -5,7 +5,7 @@ use rand::{RngCore, SeedableRng, rngs::StdRng};
 use visioncortex::{BinaryImage, ColorImage, PointI32};
 use wasm_bindgen::prelude::*;
 
-use crate::{canvas::Canvas, interfaces::{finder::Finder as FinderInterface, encoder::Encoder as EncoderInterface}, util::console_log_util};
+use crate::{canvas::Canvas, interfaces::{finder::Finder as FinderInterface, encoder::Encoder as EncoderInterface, decoder::Decoder}, util::console_log_util};
 
 use super::{Acute32Decoder, Acute32FinderCandidate, Acute32Recognizer, Acute32SymcodeConfig, Acute32TransformFitter, AlphabetReader, AlphabetReaderParams, GlyphLabel, RecognizerInput, TransformFitterInput, is_black_hsv, render_binary_image_to_canvas};
 
@@ -107,11 +107,17 @@ impl Acute32SymcodeMain {
             }
         );
 
-        let symcode_representation = self.config.encoder().encode(payload_with_checksum.clone(), num_symbols);
+        let symcode_representation = self.config.encoder().encode(payload_with_checksum, num_symbols);
+
+        // Sanity check
+        match Acute32Decoder::decode(symcode_representation.clone(), GlyphLabel::num_variants()) {
+            Ok(decoded_payload) => assert_eq!(payload, decoded_payload),
+            Err(e) => panic!(e),
+        }
 
         let code_image = self.generate(symcode_representation.clone());
         
-        (code_image, format!("{:?}\n{:?}", symcode_representation, payload_with_checksum))
+        (code_image, format!("{:?}\n{:?}", symcode_representation, payload))
     }
 }
 

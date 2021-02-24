@@ -15,25 +15,34 @@ impl Decoder for Acute32Decoder {
     fn decode(encoded_data: Vec<Self::Symbol>, num_templates: usize) -> Result<BitVec, Self::Err> {
         let num_bits_per_glyph = crate::math::num_bits_to_store(num_templates);
         let mut decoded_data = vec![];
-        for datum in encoded_data.iter() {
-            if *datum == GlyphLabel::Invalid {
-                return Err("Some recognized glyph is invalid.");
-            }
-            if let Some(bit_vec) = GlyphLabel::self_to_bit_vec(*datum, num_bits_per_glyph) {
+        for &symbol in encoded_data.iter() {
+            if let Some(bit_vec) = GlyphLabel::self_to_bit_vec(symbol, num_bits_per_glyph) {
                 decoded_data.push(bit_vec);
             } else {
-                panic!("Invalid glyphs fed into bit vec conversion.");
+                return Err("Decoder error: Some recognized glyph is invalid.");
             }
         }
-        
-        let total_bits = num_bits_per_glyph * decoded_data.len();
-        Ok(
-            BitVec::from_fn(total_bits, |i| {
-                let glyph_index = i / num_bits_per_glyph;
-                let within_glyph_offset = i % num_bits_per_glyph;
-                decoded_data[glyph_index].get(within_glyph_offset).unwrap()
-            })
-        )
+
+        // Extract the first 20 bits as data payload, and the rest (5 bits) as checksum
+        let mut payload = BitVec::from_elem(20, false);
+        let mut checksum: u8 = 0;
+        for i in 0..25 {
+            let glyph_index = i / num_bits_per_glyph;
+            let within_glyph_offset = i % num_bits_per_glyph;
+            let bit = decoded_data[glyph_index].get(within_glyph_offset).unwrap();
+            if i < 20 {
+                payload.set(i, bit);
+            } else {
+                checksum <<= 1;
+                checksum += if bit {1} else {0};
+            }
+        }
+
+        if crczoo::crc5(&payload.to_bytes()) != checksum {
+            Err("Decoder error: Checksum fail")
+        } else {
+            Ok(payload)
+        }
     }
 }
 
