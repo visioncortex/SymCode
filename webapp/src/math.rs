@@ -1,3 +1,4 @@
+use bit_vec::BitVec;
 use visioncortex::PointF64;
 
 pub(crate) const EPSILON: f64 = std::f64::EPSILON;
@@ -54,8 +55,24 @@ pub(crate) fn num_bits_to_store(n: usize) -> usize {
         return 1; // 1 bit is needed to store 1 element
     }
     let n = n-1; // Given 32 elements, we can label them from 0-31
-    // Below is the number of significant bits of 31
+    num_significant_bits(n)
+}
+
+pub(crate) fn num_significant_bits(n: usize) -> usize {
     (0_usize.leading_zeros() - n.leading_zeros()) as usize
+}
+
+/// Converts a usize into BitVec using the specified number of bits
+pub(crate) fn into_bitvec(mut n: usize, len: usize) -> BitVec {
+    if len < num_significant_bits(n) {
+        panic!(format!("Not enough bits to store {}", n));
+    }
+    let mut bitvec = BitVec::from_elem(len, false);
+    for i in (0..len).rev() {
+        bitvec.set(i, n % 2 == 1);
+        n >>= 1;
+    }
+    bitvec 
 }
 
 #[cfg(test)]
@@ -122,5 +139,19 @@ mod tests {
         let v2 = vec![2.0, 1.0, 3.0];
         println!("{}", euclid_dist_vec_f64(&v1, &v2));
         assert!(f64_approximately(euclid_dist_vec_f64(&v1, &v2), 2.29128784747792));
+    }
+
+    #[test]
+    fn math_into_bitvec() {
+        let n = 0;
+        assert!(into_bitvec(n, 1).eq_vec(&[false]));
+        let n = 1;
+        assert!(into_bitvec(n, 1).eq_vec(&[true]));
+        let n = 9;
+        assert!(into_bitvec(n, 4).eq_vec(&[true, false, false, true]));
+        let n = 14;
+        assert!(into_bitvec(n, 4).eq_vec(&[true, true, true, false])); 
+        let n = 20;
+        assert!(into_bitvec(n, 5).eq_vec(&[true, false, true, false, false])); 
     }
 }

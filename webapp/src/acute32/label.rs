@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use bit_vec::BitVec;
 
-use crate::util::console_log_util;
+use crate::{math::into_bitvec, util::console_log_util};
 
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
@@ -93,18 +93,9 @@ impl GlyphLabel {
         }
     }
 
-    pub fn primitive_to_bit_vec(mut primitive: usize, length: usize) -> BitVec {
-        let mut bit_vec = BitVec::from_elem(length, false);
-        for i in (0..length).rev() {
-            bit_vec.set(i, primitive % 2 == 1);
-            primitive >>= 1;
-        }
-        bit_vec
-    }
-
     pub fn self_to_bit_vec(label: Self, length: usize) -> Option<BitVec> {
         if let Some(primitive) = Self::self_to_primitive(label) {
-            Some(Self::primitive_to_bit_vec(primitive, length))
+            Some(into_bitvec(primitive, length))
         } else {
             None
         }
@@ -157,17 +148,17 @@ mod tests {
         const LENGTH: usize = 6;
 
         let primitive = 0;
-        assert!(!GlyphLabel::primitive_to_bit_vec(primitive, LENGTH).any());
+        assert!(!into_bitvec(primitive, LENGTH).any());
 
         let primitive = 32;
-        let bit_vec = GlyphLabel::primitive_to_bit_vec(primitive, LENGTH); // 100000
+        let bit_vec = into_bitvec(primitive, LENGTH); // 100000
         assert_eq!(bit_vec.get(0).unwrap(), true);
         for i in 1..LENGTH {
             assert_eq!(bit_vec.get(i).unwrap(), false);
         }
 
         let primitive = 11;
-        let bit_vec = GlyphLabel::primitive_to_bit_vec(primitive, LENGTH); // 001011
+        let bit_vec = into_bitvec(primitive, LENGTH); // 001011
         assert_eq!(bit_vec.get(0).unwrap(), false);
         assert_eq!(bit_vec.get(1).unwrap(), false);
         assert_eq!(bit_vec.get(2).unwrap(), true);
@@ -207,7 +198,7 @@ mod tests {
         let mut bit_vec = BitVec::from_elem(LENGTH, false);
         bit_vec.set(3, true);
         bit_vec.set(LENGTH-1, true);
-        assert_eq!(GlyphLabel::primitive_to_bit_vec(primitive, LENGTH), bit_vec);
+        assert_eq!(into_bitvec(primitive, LENGTH), bit_vec);
         assert_eq!(primitive, GlyphLabel::bit_vec_to_primitive(bit_vec));
 
         let primitive = 15;
@@ -215,7 +206,7 @@ mod tests {
         for i in 2..LENGTH {
             bit_vec.set(i, true);
         }
-        assert_eq!(GlyphLabel::primitive_to_bit_vec(primitive, LENGTH), bit_vec);
+        assert_eq!(into_bitvec(primitive, LENGTH), bit_vec);
         assert_eq!(primitive, GlyphLabel::bit_vec_to_primitive(bit_vec)); 
     }
 }
