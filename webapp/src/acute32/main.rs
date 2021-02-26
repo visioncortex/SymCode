@@ -1,4 +1,4 @@
-use std::borrow::BorrowMut;
+use std::{borrow::BorrowMut, rc::Rc};
 
 use bit_vec::BitVec;
 use rand::{RngCore, SeedableRng, rngs::StdRng};
@@ -41,7 +41,7 @@ impl Acute32SymcodeMain {
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
             .to_binary_image(|c| is_black_hsv(&c.to_hsv()));
         match AlphabetReader::read_alphabet_to_library(image, params, &self.config) {
-            Ok(library) => self.config.symbol_library = library,
+            Ok(library) => self.config.symbol_library = Rc::new(library),
             Err(e) => console_log_util(e),
         }
     }
@@ -142,7 +142,7 @@ impl ScannerInterface for Acute32SymcodeMain {
             RecognizerInput {
                 raw_frame: image,
                 image_to_object,
-                glyph_library: &self.config.symbol_library,
+                glyph_library: Rc::clone(&self.config.symbol_library),
             },
             symcode_config
         ) {

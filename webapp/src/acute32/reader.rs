@@ -1,3 +1,5 @@
+use std::{borrow::Borrow, rc::Rc};
+
 use visioncortex::{BinaryImage, BoundingRect, ColorImage, PointF64, PointI32, PerspectiveTransform};
 
 use super::{Acute32Library, Acute32SymcodeConfig, GlyphLabel, is_black_rgb, render_binary_image_to_canvas};
@@ -135,16 +137,16 @@ impl Acute32Recognizer {
     }
 }
 
-pub struct RecognizerInput<'a> {
+pub struct RecognizerInput {
     pub raw_frame: ColorImage,
     pub image_to_object: PerspectiveTransform,
-    pub glyph_library: &'a Acute32Library,
+    pub glyph_library: Rc<Acute32Library>,
 }
 
-impl<'a> Acute32Recognizer {
-    pub fn process(input: RecognizerInput<'a>, params: &Acute32SymcodeConfig) -> Result<Vec<GlyphLabel>, &'static str> {
+impl Acute32Recognizer {
+    pub fn process(input: RecognizerInput, params: &Acute32SymcodeConfig) -> Result<Vec<GlyphLabel>, &'static str> {
         // Processing starts
-        let glyph_library = input.glyph_library;
+        let glyph_library = input.glyph_library.borrow();
         let glyphs = Self::read_glyphs_from_raw_frame(input.raw_frame, input.image_to_object, glyph_library, params);
         //crate::util::console_log_util(&format!("Recognized glyphs: {:?}", glyphs));
         Ok(glyphs)
