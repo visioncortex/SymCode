@@ -10,7 +10,7 @@ pub struct Acute32Encoder;
 impl EncoderInterface for Acute32Encoder {
     type SymcodeRepresentation = Vec<GlyphLabel>;
 
-    fn encode(&self, payload: bit_vec::BitVec, num_symbols: usize) -> Self::SymcodeRepresentation {
+    fn encode(&self, payload: bit_vec::BitVec, num_symbols: usize) -> Result<Self::SymcodeRepresentation, &str> {
         let symbol_num_bits = crate::math::num_bits_to_store(GlyphLabel::num_variants());
         if payload.len() != (symbol_num_bits*num_symbols - 5) { // Reserve 5 bits for CRC5 checksum
             panic!("Input bits length and self-defined length do not agree!");
@@ -50,7 +50,7 @@ impl EncoderInterface for Acute32Encoder {
             Err(e) => panic!(e),
         }
 
-        result
+        Ok(result)
     }
 }
 
@@ -61,10 +61,10 @@ mod tests {
 
     #[test]
     fn encoder_symcode_from_bitvec() {
-        let encoder = Acute32Encoder {}; 
+        let encoder = Acute32Encoder::default(); 
         let mut bits = BitVec::from_bytes(&[0b01001010, 0b00000001, 0b10000011, 0b01000100]); // Will be 32 bits
         bits.truncate(30); // Only wants the first 30 bits (last two 0's are dummy)
-        let symcode = encoder.encode(bits, 5);
+        let symcode = encoder.encode(bits, 5).unwrap();
         assert_eq!(symcode, &[ArrowDD, TriforceR, LongDU, LongLL, ArrowRR]);
     }
 }

@@ -71,7 +71,7 @@ impl Acute32SymcodeMain {
         } else {
             return Err("Code generation: Canvas does not exist.".into());
         };
-        let (symcode, ground_truth_code) = self.borrow_mut().generate_symcode_random();
+        let (symcode, ground_truth_code) = self.borrow_mut().generate_symcode_random()?;
 
         if render_binary_image_to_canvas(&symcode, &canvas).is_err() {
             return Err("Cannot render generated symcode to canvas.".into());
@@ -82,7 +82,7 @@ impl Acute32SymcodeMain {
 
     /// Randomly generate a 20-bit bit string, calculate CRC5 checksum (which is 5 bits)
     /// Then encode the 25-bit bit string into a symcode and generate the code image
-    fn generate_symcode_random(&mut self) -> (BinaryImage, String) {
+    fn generate_symcode_random(&mut self) -> Result<(BinaryImage, String), &str> {
         let symbol_num_bits = crate::math::num_bits_to_store(GlyphLabel::num_variants());
         let num_symbols = self.config.num_glyphs_in_code();
 
@@ -92,15 +92,15 @@ impl Acute32SymcodeMain {
             |_| { self.rng.next_u32() < (std::u32::MAX >> 1) }
         );
 
-        let symcode_representation = self.config.encoder.encode(payload.clone(), num_symbols);
+        let symcode_representation = self.config.encoder.encode(payload.clone(), num_symbols)?;
 
         let code_image = self.generate(symcode_representation.clone());
 
         let msg = format!("{:?}\n{:?}", symcode_representation, payload);
 
         //console_log_util(&msg);
-        
-        (code_image, msg)
+
+        Ok((code_image, msg))
     }
 }
 

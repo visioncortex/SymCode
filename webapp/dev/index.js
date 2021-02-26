@@ -52,8 +52,7 @@ function runOneTestCase(consoleOutput, testConfig) {
         try {
             groundTruthCode = scanner.generate_symcode_to_canvas("loadBuffer");
         } catch (e) {
-            handleError(e);
-            return;
+            reject(e);
         }
         if (consoleOutput) {
             console.log("Generated code: " + groundTruthCode);
@@ -77,7 +76,7 @@ function runOneTestCase(consoleOutput, testConfig) {
                             resolve({isCorrect: false, groundTruth: groundTruthCode, recognized: result.code});
                         }
                     })
-                    .catch(e => { reject(e);});
+                    .catch(reject);
             });
     });
 }
