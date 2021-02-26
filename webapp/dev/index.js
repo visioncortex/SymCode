@@ -50,7 +50,8 @@ function runOneTestCase(consoleOutput, testConfig) {
     return new Promise((resolve, reject) => {
         let groundTruthCode = "";
         try {
-            groundTruthCode = scanner.generate_symcode_to_canvas("loadBuffer");
+            groundTruthCode = scanner.generate_random_symcode_to_canvas("loadBuffer");
+            //groundTruthCode = scanner.generate_symcode_to_canvas("loadBuffer", Math.pow(2, 20)-1);
         } catch (e) {
             reject(e);
         }

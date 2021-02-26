@@ -65,7 +65,28 @@ impl Acute32SymcodeMain {
         Ok(format!("{}\n{:?}", debug_code_string, decoded_bit_string))
     }
 
-    pub fn generate_symcode_to_canvas(&mut self, canvas_id: &str) -> Result<String, JsValue> {
+    // Payload should be encodable in 20 bits max
+    pub fn generate_symcode_to_canvas(&self, canvas_id: &str, payload: usize) -> Result<String, JsValue> {
+        if crate::math::num_significant_bits(payload) > 20 {
+            return Err("Payload has too many bits!".into());
+        }
+
+        let canvas = if let Some(canvas) = Canvas::new_from_id(canvas_id) {
+            canvas
+        } else {
+            return Err("Code generation: Canvas does not exist.".into());
+        };
+
+        let (symcode, ground_truth_code) = self.generate_symcode_with_payload(payload)?;
+
+        if render_binary_image_to_canvas(&symcode, &canvas).is_err() {
+            return Err("Cannot render generated symcode to canvas.".into());
+        }
+
+        Ok(ground_truth_code)
+    }
+
+    pub fn generate_random_symcode_to_canvas(&mut self, canvas_id: &str) -> Result<String, JsValue> {
         let canvas = if let Some(canvas) = Canvas::new_from_id(canvas_id) {
             canvas
         } else {
@@ -80,6 +101,24 @@ impl Acute32SymcodeMain {
         Ok(ground_truth_code)
     }
 
+    fn generate_symcode_with_payload(&self, payload: usize) -> Result<(BinaryImage, String), &str> {
+        let payload = crate::math::into_bitvec(payload, 20);
+        let payload_bit_string = format!("{:?}", payload);
+
+        let num_symbols = self.config.num_glyphs_in_code();
+
+        let symcode_representation = self.config.encoder.encode(payload, num_symbols)?;
+        let symcode_string = format!("{:?}", symcode_representation);
+
+        let code_image = self.generate(symcode_representation);
+
+        let msg = format!("{}\n{}", symcode_string, payload_bit_string);
+
+        //console_log_util(&msg);
+
+        Ok((code_image, msg)) 
+    }
+
     /// Randomly generate a 20-bit bit string, calculate CRC5 checksum (which is 5 bits)
     /// Then encode the 25-bit bit string into a symcode and generate the code image
     fn generate_symcode_random(&mut self) -> Result<(BinaryImage, String), &str> {
@@ -91,12 +130,14 @@ impl Acute32SymcodeMain {
             symbol_num_bits*num_symbols - 5, // Reserve 5 bits for CRC5 checksum
             |_| { self.rng.next_u32() < (std::u32::MAX >> 1) }
         );
+        let payload_bit_string = format!("{:?}", payload);
 
-        let symcode_representation = self.config.encoder.encode(payload.clone(), num_symbols)?;
+        let symcode_representation = self.config.encoder.encode(payload, num_symbols)?;
+        let symcode_string = format!("{:?}", symcode_representation);
 
-        let code_image = self.generate(symcode_representation.clone());
+        let code_image = self.generate(symcode_representation);
 
-        let msg = format!("{:?}\n{:?}", symcode_representation, payload);
+        let msg = format!("{}\n{}", symcode_string, payload_bit_string);
 
         //console_log_util(&msg);
 
