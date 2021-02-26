@@ -100,7 +100,7 @@ impl AlphabetReader {
                 library.add_template(glyph_image, symcode_config);
             }
         }
-        //crate::util::console_log_util(&library.print_label_and_trace());
+        crate::util::console_log_util(&library.get_labels_grouped_by_trace());
         Ok(library)
     }
 }

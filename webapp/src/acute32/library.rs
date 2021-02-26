@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+
+use bit_vec::BitVec;
 use visioncortex::{BinaryImage, Sampler};
 
 use crate::{acute32::{Symbol, Acute32SymcodeConfig, Trace, image_diff_area}};
@@ -45,6 +48,27 @@ impl Acute32Library {
         let list: Vec<String> = self.templates.iter().map(|glyph| {
             format!("{:?}: {:?}\n", glyph.label, glyph.encoding.bits)
         }).collect();
+        list.join("")
+    }
+
+    pub fn get_labels_grouped_by_trace(&self) -> String {
+        let mut map: HashMap<BitVec, Vec<GlyphLabel>> = HashMap::new();
+
+        self.templates.iter().for_each(|glyph| {
+            match map.get_mut(&glyph.encoding.bits) {
+                Some(labels) => {
+                    labels.push(glyph.label);
+                },
+                None => {
+                    map.insert(glyph.encoding.bits.clone(), vec![glyph.label]);
+                }
+            }
+        });
+
+        let list: Vec<String> = map.iter().map(|(bits, labels)| {
+            format!("{:?}: {}\n", bits, labels.len())
+        }).collect();
+
         list.join("")
     }
 
