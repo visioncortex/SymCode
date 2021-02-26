@@ -65,19 +65,19 @@ function runOneTestCase(consoleOutput, testConfig) {
         generate_perspective_with_image_src("frame", loadBuffer.toDataURL(), testConfig)
             .then(() => {
                 addNoiseToCanvas("frame", testConfig.noiseMaxOpacity, testConfig.seed);
-                scan()
-                    .then((result) => {
-                        if (consoleOutput) {
-                            console.log("Recognition result: " + result.code);
-                        }
-                        if (result.code.localeCompare(groundTruthCode) == 0) {
-                            resolve({isCorrect: true, groundTruth: groundTruthCode, recognized: result.code, time: result.time});
-                        } else {
-                            resolve({isCorrect: false, groundTruth: groundTruthCode, recognized: result.code});
-                        }
-                    })
-                    .catch(reject);
-            });
+                return scan(); // Return a promise
+            })
+            .then((result) => {
+                if (consoleOutput) {
+                    console.log("Recognition result: " + result.code);
+                }
+                if (result.code.localeCompare(groundTruthCode) == 0) {
+                    resolve({isCorrect: true, groundTruth: groundTruthCode, recognized: result.code, time: result.time});
+                } else {
+                    resolve({isCorrect: false, groundTruth: groundTruthCode, recognized: result.code});
+                }
+            })
+            .catch(reject);
     });
 }
 
