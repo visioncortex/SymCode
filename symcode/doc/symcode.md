@@ -211,6 +211,8 @@ Another important thing to note is that traces, in both construction (evaluating
 
 The trace partitions the character sets into smaller, mutually-exclusive subsets. Provided that **searching through traces is faster than searching through the actual characters** (there are various ways to implement this, such as hash tables or decision trees), traces facilitate symbol comparison in the library.
 
+The trace partitions the character sets into smaller, mutually-exclusive subsets. Provided that **searching through traces is faster than searching through the actual symbols** (there are various ways to implement this, such as hash tables or decision trees, but **even a linear scan over the traces is already much faster than a linear scan over the symbols by image XOR**), traces facilitate symbol comparison in the library.
+
 In the next section, we are going to look into the engineering of the image processing pipeline of SymCode and how it is implemented for Acute32.
 
 ## Image Processing Pipeline
