@@ -46,8 +46,8 @@ impl EncoderInterface for Acute32Encoder {
 
         // Sanity check
         match Acute32Decoder::decode(result.clone(), GlyphLabel::num_variants()) {
-            Ok(decoded_payload) => assert_eq!(payload, decoded_payload),
-            Err(e) => panic!(e),
+            Ok(decoded_payload) => if payload != decoded_payload {return Err("Encoder error: sanity check failed.")},
+            Err(e) => return Err(e),
         }
 
         Ok(result)
