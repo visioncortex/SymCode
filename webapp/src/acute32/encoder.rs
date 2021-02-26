@@ -1,8 +1,8 @@
 use bit_vec::BitVec;
 
-use crate::interfaces::encoder::Encoder as EncoderInterface;
+use crate::interfaces::{decoder::Decoder as DecoderInterface, encoder::Encoder as EncoderInterface};
 
-use super::GlyphLabel;
+use super::{Acute32Decoder, GlyphLabel};
 
 #[derive(Default)]
 pub struct Acute32Encoder;
@@ -10,20 +10,44 @@ pub struct Acute32Encoder;
 impl EncoderInterface for Acute32Encoder {
     type SymcodeRepresentation = Vec<GlyphLabel>;
 
-    fn encode(&self, bits: bit_vec::BitVec, num_symbols: usize) -> Self::SymcodeRepresentation {
+    fn encode(&self, payload: bit_vec::BitVec, num_symbols: usize) -> Self::SymcodeRepresentation {
         let symbol_num_bits = crate::math::num_bits_to_store(GlyphLabel::num_variants());
-        if bits.len() != symbol_num_bits*num_symbols {
+        if payload.len() != (symbol_num_bits*num_symbols - 5) { // Reserve 5 bits for CRC5 checksum
             panic!("Input bits length and self-defined length do not agree!");
         }
+        
+        let checksum = crate::math::into_bitvec(crczoo::crc5(&payload.to_bytes()) as usize, 5);
+        
+        // This payload is used to generate the code image
+        let payload_with_checksum = BitVec::from_fn(
+            payload.len() + checksum.len(),
+            |i| {
+                // Concatenate the data and checksum
+                if i < payload.len() {
+                    payload.get(i).unwrap()
+                } else {
+                    checksum.get(i - payload.len()).unwrap()
+                }
+            }
+        );
+
+        // Artificial data corruption
+        //payload_with_checksum.set(5, !payload_with_checksum.get(5).unwrap());
 
         let mut result: Self::SymcodeRepresentation = Vec::with_capacity(num_symbols);
 
         for i in 0..num_symbols {
             let symbol_bit_vec = BitVec::from_fn(symbol_num_bits, |j| { // j is in [0, symbol_num_bits-1]
                 let index = i*symbol_num_bits + j;
-                bits[index]
+                payload_with_checksum[index]
             });
             result.push(GlyphLabel::from_bit_vec(symbol_bit_vec));
+        }
+
+        // Sanity check
+        match Acute32Decoder::decode(result.clone(), GlyphLabel::num_variants()) {
+            Ok(decoded_payload) => assert_eq!(payload, decoded_payload),
+            Err(e) => panic!(e),
         }
 
         result

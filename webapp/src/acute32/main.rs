@@ -5,7 +5,7 @@ use rand::{RngCore, SeedableRng, rngs::StdRng};
 use visioncortex::{BinaryImage, ColorImage, PointI32};
 use wasm_bindgen::prelude::*;
 
-use crate::{canvas::Canvas, interfaces::{finder::Finder as FinderInterface, encoder::Encoder as EncoderInterface, decoder::Decoder}, util::console_log_util};
+use crate::{canvas::Canvas, interfaces::{finder::Finder as FinderInterface, encoder::Encoder as EncoderInterface}, util::console_log_util};
 
 use super::{Acute32Decoder, Acute32FinderCandidate, Acute32Recognizer, Acute32SymcodeConfig, Acute32TransformFitter, AlphabetReader, AlphabetReaderParams, GlyphLabel, RecognizerInput, TransformFitterInput, is_black_hsv, render_binary_image_to_canvas};
 
@@ -91,32 +91,8 @@ impl Acute32SymcodeMain {
             symbol_num_bits*num_symbols - 5, // Reserve 5 bits for CRC5 checksum
             |_| { self.rng.next_u32() < (std::u32::MAX >> 1) }
         );
-        
-        let checksum = crate::math::into_bitvec(crczoo::crc5(&payload.to_bytes()) as usize, 5);
-        
-        // This payload is used to generate the code image
-        let payload_with_checksum = BitVec::from_fn(
-            payload.len() + checksum.len(),
-            |i| {
-                // Concatenate the data and checksum
-                if i < payload.len() {
-                    payload.get(i).unwrap()
-                } else {
-                    checksum.get(i - payload.len()).unwrap()
-                }
-            }
-        );
 
-        // Artificial data corruption
-        //payload_with_checksum.set(5, !payload_with_checksum.get(5).unwrap());
-
-        let symcode_representation = self.config.encoder.encode(payload_with_checksum, num_symbols);
-
-        // Sanity check
-        match Acute32Decoder::decode(symcode_representation.clone(), GlyphLabel::num_variants()) {
-            Ok(decoded_payload) => assert_eq!(payload, decoded_payload),
-            Err(e) => panic!(e),
-        }
+        let symcode_representation = self.config.encoder.encode(payload.clone(), num_symbols);
 
         let code_image = self.generate(symcode_representation.clone());
 
