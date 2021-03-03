@@ -184,7 +184,7 @@ If you are looking to design your own alphabet, trace collisions should really b
 
 ![Acute32 complete alphabet](img/alphabet2.png)
 
-In Acute32 (above), traces collide. Our engineering solution is to simply define the traces with more comparisons. Apart from the three basic comparisons explained in the previous section, we also compare every pair of the four quadrants (each quadrant is compared to every other quadrant exactly once), requiring **an extra of 4 choose 2 = 6 comparisons**.
+In Acute32 (above), traces collide. Our engineering solution is to simply define the traces with more comparisons. Apart from the three basic comparisons explained in the previous section, we also compare every pair of the four quadrants (each quadrant is compared to every other quadrant exactly once), requiring **an extra of *4 choose 2* = 6 comparisons**.
 
 > ##### Adding extra comparisons
 >
@@ -221,7 +221,7 @@ Now we have a relatively balanced partition.
 
 Of course it can be further optimized by defining even more comparisons, but we settle for this result for the sake of illustration here.
 
-### Noise robustness
+### Robustness
 
 Usually, it may be a good idea for traces, in both construction (evaluating for templates in symbol library) and application (evaluating for input shape when scanning), to allow **tolerances** (the *stat_tolerance* parameter in *Acute32SymcodeConfig*. This is to provide an elastic net to enhance robustness against noisy inputs.
 
@@ -265,7 +265,41 @@ The disadvantage, however, is the lack of features of circles, which by definiti
 
 ### Stage 2: Fit Perspective Transform
 
+We define the "**image space**" as the space of pixels on the **input frame** (or equivalently the binarized input frame), and the "**object space**" as the space of pixels on the **code image** (whose size is predefined). An image space is obtained from (or is simply) the input frame image. An object space can either be **generated using a code instance**, or by **rectifying the corresponding image space**.
+
+Below is an example of image space (left) vs object space (right). Note that this object space is obtained from rectification, hence it doesn't look perfect.
+
+![An example of image space (input frame)](img/image_object_space_example.png)
+
+In essence, this stage chooses the correct [perspective transform](https://en.wikipedia.org/wiki/3D_projection#Perspective_projection) to be used in the next stage.
+
+The least you need to know about perspective transforms for the scope of this section is simple: each perspective transform **converts the image space into *an* object space** (but not necessarily the correct one) and **is defined by (at least) 4 point pairs**, which each pair consists of **a point in the image space** and **the other one in the object space**.
+
+> In the most general sense, a perspective transform converts the set of points in a quadrilateral into the set of points in another quadrilateral. It is called "perspective" because it models mathematically how shapes change with respect to changes in perspectives. The classic example is when you look at railway tracks perpendicularly from the above, they are perfectly parallel (like a rectangle), but when your line of sight is in the same direction as the railway, they appear to be converging in a distant point (like a trapezium).
+
+Since we have obtained a list of finder candidates from the previous stage, we can extract ***n* feature points in the image space** from them. Matching the 4-permutations(or combinations) of them to the **4 predefined feature points in the object space** gives us at most *n permute (or choose) 4 = k* perspective transforms (deriving the transform from point pairs is purely mathematics and is beyond the scope of this article).
+
+> You can impose restrictions on the spatial configuration of the points (such as clockwise-ness) to reduce the complexity from permutations to combinations. This is implemented in *Acute32TransformFitter::correct_spatial_arrangement*.
+
+It is indeed infeasible to apply each transformation and generate *k* object spaces to choose the correct one. Therefore, we need to design some methods to evaluate each transform. The simplest way is to **define some extra feature points in the object space as *check points***, which are **re-projected to the image space**, and **check if the feature exists there** (if the feature exists there, you are more confident that the transform is the correct one).
+
+<ins>*Acute32*</ins>
+
+The re-projection method mentioned above hardly works on *CircleFinder* because each circle finder only gives 1 feature point. The only way to obtain more feature points as check points is to add even more finders into the code image.
+
+*Acute32TransformFitter::evaluate_transform* takes each of the *k* perspective transform and calculates an error value.
+
+We define 4 *object check points* as the **top positions of the 4 circle finders** in the object space. Re-projecting these 4 points to the image space, we obtain the *image check points (i1 to i4)*. Furthermore, we denote the **centres of the circle finders** in the **image space**, in the same order as the previously defined points, by *c1 to c4*.
+
+Our metric of evaluation relies on the most basic properties of vectors: direction and norm. Only 4 vectors interest us here: *c1i1*, *c2i2*, *c3i3*, and *c4i4* (the vectors from the centres of finders to the image check points), we denote them by *v1* to *v4* respectively. For each vector *v*, we compute its unit vector (direction) *u* and norm (magnitude) *n*. Now we have 4 (vector, scalar) pairs *(u1, n1)* to *(u4, n4)* to work with.
+
+If the transformation is correct, i.e. the transformed object space is exactly the code image, each *v* should be approximately the same (if perspective distortion is not too large), meaning all *u* and *n* should be too. Therefore, choosing the most correct transform is equivalent to minimizing the variances in *u* and *n*, and the rest of the implementation are too detailed to be discussed here.
+
 ### Stage 3: Recognize Glyphs
+
+#### Rectify the image space
+
+Once we have a transform that we believe is correct, the object space can be obtained by applying it on the image space (**put a pixel located in the image space** to the object space), or, equivalently, applying the inverse of it on the object space (**ask for a pixel located in the object space** to choose its value from the image space). Due to errors
 
 ### Stage 4: Decode the SymCode
 
