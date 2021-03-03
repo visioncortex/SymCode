@@ -88,6 +88,7 @@ impl Trace for LayerTrace {
         set_bits!(b_c_comparison);
         set_bits!(b_d_comparison);
         set_bits!(c_d_comparison);
+        set_bits!(ef_gh_comparison);
 
         Self {
             bits
@@ -103,9 +104,12 @@ impl Default for LayerTrace {
     }
 }
 
+// Partition the symbol image into 2x2 = 4 big blocks
 // Denote top-left, top-right, bottom-left, bottom-right weights by a,b,c,d respectively
+// Partition the symbol image into 4x4 = 16 small blocks
+// Denote top two, bottom two, left two, right two weights by e,f,g,h respectively
 impl LayerTrace {
-    /// 2 bits each for a+b <> c+d, a+c <> b+d, a+d <> b+c, a <> b, c <> d, a <> c, b <> d, a <> d, b <> c
+    /// 2 bits each for a+b <> c+d, a+c <> b+d, a+d <> b+c, a <> b, c <> d, a <> c, b <> d, a <> d, b <> c, e+f <> g+h
     const LENGTH: usize = ShapeStats::NUM_COMPARISONS << 1;
 }
 
@@ -228,26 +232,49 @@ mod stats {
         bot_left: usize,
         // d
         bot_right: usize,
+        // e
+        top: usize,
+        // f
+        bottom: usize,
+        // g
+        left: usize,
+        // h
+        right: usize,
         tolerance: f64,
     }
 
     impl ShapeStats {
         pub fn from_image(image: &BinaryImage, tolerance: f64) -> Self {
-            // Upscale so that the image can be divided into 4 quadrants
-            let horiz_mid = image.width;
-            let vert_mid = image.height;
-            let image = &Sampler::resample_image(image, image.width*2, image.height*2);
+            // Upscale so that the image can be divided into 4x4 = 16 blocks
+            let horiz_q1 = image.width;
+            let vert_q1 = image.height;
+            let horiz_mid = image.width << 1;
+            let vert_mid = image.height << 1;
+            let horiz_q3 = horiz_mid + horiz_q1;
+            let vert_q3 = vert_mid + vert_q1;
+
+            let image = &Sampler::resample_image(image, image.width*4, image.height*4);
             let sampler = Sampler::new(image);
 
             let top_left = sampler.sample(0, 0, horiz_mid, vert_mid);
             let top_right = sampler.sample(horiz_mid, 0, sampler.image.width, vert_mid);
             let bot_left = sampler.sample(0, vert_mid, horiz_mid, sampler.image.height);
             let bot_right = sampler.sample(horiz_mid,vert_mid, sampler.image.width, sampler.image.height);
+           
+            let top = sampler.sample(horiz_q1, 0, horiz_q3, vert_q1);
+            let bottom = sampler.sample(horiz_q1, vert_q3, horiz_q3, sampler.image.height);
+            let left = sampler.sample(0, vert_q1, horiz_q1, vert_q3);
+            let right = sampler.sample(horiz_q3, vert_q1, sampler.image.width, vert_q3);
+
             Self {
                 top_left,
                 top_right,
                 bot_left,
                 bot_right,
+                top,
+                bottom,
+                left,
+                right,
                 tolerance,
             }
         }
@@ -256,7 +283,7 @@ mod stats {
             self.top_left + self.top_right + self.bot_left + self.bot_right == 0
         }
 
-        pub const NUM_COMPARISONS: usize = 9;
+        pub const NUM_COMPARISONS: usize = 10;
 
         /// Returns an Ordering based on top vs bottom
         pub fn vertical_comparison(&self) -> Ordering {
@@ -295,6 +322,10 @@ mod stats {
 
         pub fn b_c_comparison(&self) -> Ordering {
             Self::approximate_compare(self.top_right, self.bot_left, self.tolerance)
+        }
+
+        pub fn ef_gh_comparison(&self) -> Ordering {
+            Self::approximate_compare(self.top + self.bottom, self.left + self.right, self.tolerance)
         }
 
         /// The higher the tolerance, the easier it is for a,b to be considered equal
