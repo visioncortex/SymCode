@@ -214,9 +214,7 @@ impl ScannerInterface for Acute32SymcodeMain {
 impl GeneratorInterface for Acute32SymcodeMain {
     type SymcodeRepresentation = Vec<GlyphLabel>;
 
-    type SymcodeImage = BinaryImage;
-
-    fn generate(&self, symcode: Self::SymcodeRepresentation) -> Self::SymcodeImage {
+    fn generate(&self, symcode: Self::SymcodeRepresentation) -> BinaryImage {
         let mut symcode_image = BinaryImage::new_w_h(self.config.code_width, self.config.code_height);
 
         // Put in the finders
