@@ -233,7 +233,41 @@ In the next section, we are going to look into the engineering of the image proc
 
 ## Image Processing Pipeline
 
-[Sanford]
+The processing pipeline of SymCode consists of 4 stages. For simplicity's sake, we name the main driver class which runs the pipeline as the "scanner", but keep in mind that it in fact handles both scanning (stages 1-3) and decoding (stage 4), as required in the *ScannerInterface*.
+
+> As the system is modelled as a pipeline, each stage feeds its output to the next stage as its input, even though this may not be explicitly specified in this article. An example implementation of the system is *Acute32SymcodeMain*, which implements both the *ScannerInterface* and the *GeneratorInterface*, which is relatively trivial and is not discussed in this article.
+
+### Colour image vs Binary image
+
+We started off trying to operate on RGB/grayscale images, which carry more useful information such as colour/intensity gradients, and our core library *visioncortex* supports all the necessary functionalities for both kinds of images.
+
+However, we saw a performance bottleneck (in terms of efficiency) in the middle of development when we used test cases with higher resolutions. We figured it would be wise to switch to binary images, which are much more efficient and easier to work with.
+
+> Each subsection below begins with a more general description of the processing stage (what are consistent across any SymCode scanner implementations), followed by an explanation of the specific implementation of our *Acute32SymcodeScanner* system.
+
+### Stage 1: Locate Finder Candidates
+
+> If the raw frame input is RGB, we first binarize it using appropriate thresholds.
+
+Clusters can be easily extracted from a binary image by finding "pixel islands". Each cluster is tested by *is_finder* in *FinderInterface* to see if it is a **finder candidate**. The goal of this stage is to find the positions of all finder candidates in the frame, but other information such as shape of the cluster should be returned as well if they are needed in the next stage.
+
+It may be a good idea to throw an error on **invalid numbers** of finder candidates. Make sure you can identify **at least 4 feature points** from your finder candidates for stage 2. On the other hand, **too many finder candidates** may lead to performance issues in stage 2, depending on your implementation.
+
+> A minimum of 4 feature points is needed because **at least 4 point correspondences are required to fit a perspective transform**. More on this in the next stage.
+
+<ins>*Acute32*</ins>
+
+The class we use for the finder is *CircleFinder*, which is basically just a circle.
+
+The advantage of using a circle is that, in general, it always transforms into an ellipse under any **perspective distortion**, making it relatively easy to detect. Our implementation looks at each cluster in 6 **rotations from 0 to &pi; radians**, and see if its **image delta** with a **generated ellipse** exceeds a certain threshold (both *BinaryImage::rotate* and *Shape::is_ellipse* are available in the core library *visioncortex*, which is also a major reason why we chose circle for finder).
+
+The disadvantage, however, is the lack of features of circles, which by definition have no corners. The best we can do is to use the **centres of bounding boxes** of the finder candidates as their feature points, absorbing the errors. Also, under this scheme, each finder candidate gives **only 1 feature point**, which is not the most optimal because it implies that **we need to put at least 4 finders on a code image**.
+
+### Stage 2: Fit Perspective Transform
+
+### Stage 3: Recognize Glyphs
+
+### Stage 4: Decode the SymCode
 
 ## AcuteCode and ReversiCode
 
