@@ -209,7 +209,7 @@ Below is the distribution of traces for Acute32:
 
 The trace of all 1's, which happens when all four quadrants of the symbol share (approximately) the same number of dots, represents about one-third of the entire Acute32. This makes approximately one-third of the searches scan through 12 symbol images, which is 4 times that of most of the rest, which only scan through 3 symbol images.
 
-Our solution here is once again adding more comparisons... well, it turns out only one extra comparison suffices.
+Our solution here is one more comparison.
 
 ![efgh (top/bottom/left/right) grid](img/efgh_grid.png)
 
@@ -221,9 +221,9 @@ Now we have a relatively balanced partition.
 
 Of course it can be further optimized by defining even more comparisons, but we settle for this result for the sake of illustration here.
 
-### Robustness
+### Noise robustness
 
-Another important thing to note is that traces, in both construction (evaluating for templates in symbol library) and application (evaluating for input shape when scanning), should allow **tolerances** (the *stat_tolerance* parameter in *Acute32SymcodeConfig*. This is to provide an elastic net to enhance robustness against noisy inputs.
+Usually, it may be a good idea for traces, in both construction (evaluating for templates in symbol library) and application (evaluating for input shape when scanning), to allow **tolerances** (the *stat_tolerance* parameter in *Acute32SymcodeConfig*. This is to provide an elastic net to enhance robustness against noisy inputs.
 
 ### Conclusion
 
