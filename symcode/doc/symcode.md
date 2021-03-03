@@ -203,13 +203,29 @@ Below is the distribution of traces for Acute32:
 > * 01 means "U < V"
 > * 00 is invalid
 
-![Acute32 trace counts](img/trace_counts.png)
+![Acute32 trace counts (one count is 12 while the rest are 1's and 3's)](img/trace_counts_unbalanced.png)
 
-> The trace of all 1's, which happens when all four quadrants of the symbol share (approximately) the same number of dots, represents about one-third of the entire Acute32. This can certainly be improved by designing the symbols even more strategically, but we settle for the current result.
+### Further improvement
+
+The trace of all 1's, which happens when all four quadrants of the symbol share (approximately) the same number of dots, represents about one-third of the entire Acute32. This makes approximately one-third of the searches scan through 12 symbol images, which is 4 times that of most of the rest, which only scan through 3 symbol images.
+
+Our solution here is once again adding more comparisons... well, it turns out only one extra comparison suffices.
+
+![efgh (top/bottom/left/right) grid](img/efgh_grid.png)
+
+We further partition the grid of each symbol image so that there are 4x4 = 16 small blocks, and denote the top/bottom/left/right blocks along the edge by e,f,g,h respectively, as illustrated in the figure above. Next, we define an "ef/gh comparison" which is essentially (e+f) vs (g+h) using the previously defined comparison operation notation. 
+
+Now we have a relatively balanced partition.
+
+![Acute32 trace counts](img/trace_counts_balanced.png)
+
+Of course it can be further optimized by defining even more comparisons, but we settle for this result for the sake of illustration here.
+
+### Robustness
 
 Another important thing to note is that traces, in both construction (evaluating for templates in symbol library) and application (evaluating for input shape when scanning), should allow **tolerances** (the *stat_tolerance* parameter in *Acute32SymcodeConfig*. This is to provide an elastic net to enhance robustness against noisy inputs.
 
-The trace partitions the character sets into smaller, mutually-exclusive subsets. Provided that **searching through traces is faster than searching through the actual characters** (there are various ways to implement this, such as hash tables or decision trees), traces facilitate symbol comparison in the library.
+### Conclusion
 
 The trace partitions the character sets into smaller, mutually-exclusive subsets. Provided that **searching through traces is faster than searching through the actual symbols** (there are various ways to implement this, such as hash tables or decision trees, but **even a linear scan over the traces is already much faster than a linear scan over the symbols by image XOR**), traces facilitate symbol comparison in the library.
 
