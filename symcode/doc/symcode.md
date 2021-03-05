@@ -184,7 +184,7 @@ If you are looking to design your own alphabet, trace collisions should really b
 
 ![Acute32 complete alphabet](img/alphabet2.png)
 
-In Acute32 (above), traces collide. Our engineering solution is to simply define the traces with more comparisons. Apart from the three basic comparisons explained in the previous section, we also compare every pair of the four quadrants (each quadrant is compared to every other quadrant exactly once), requiring **an extra of *4 choose 2* = 6 comparisons**.
+In Acute32 (above), many traces collide under the current setting. Our solution is to simply define the traces with more comparisons. Apart from the three basic comparisons explained in the previous section, we also compare every pair of the four quadrants (each quadrant is compared to every other quadrant exactly once), requiring **an extra of *4 choose 2* = 6 comparisons**.
 
 > ##### Adding extra comparisons
 >
@@ -301,11 +301,65 @@ If the transformation is correct, i.e. the transformed object space is exactly t
 
 ### Stage 3: Recognize Glyphs
 
+> During the development of SymCode, we came up of names to define different entities. "Glyphs" refer to the symbols on a code image which are not finders. In other words, **a sequence of glyphs on the code image define the code to be decoded**.
+
+In the previous stage, we have obtained a perspective transform which converts between the image and object spaces. Next, we're going to rectify the input image into a code image, and recognize the glyphs on it.
+
 #### Rectify the image space
 
-Once we have a transform that we believe is correct, the object space can be obtained by applying it on the image space (**put a pixel located in the image space** to the object space), or, equivalently, applying the inverse of it on the object space (**ask for a pixel located in the object space** to choose its value from the image space). Due to errors
+> The assumption here is that our transforms are calculated in a way such that the resulting transforms **convert the image space into object spaces** (i.e. the source points are the feature points in the image space and the destination points are those in the (correct/target) object space). Note that inverses always exist for perspective transforms in general, meaning you can always perform pixel conversions both ways.
+
+Once we have a transform that we believe is correct, the object space can be obtained by applying it on the image space (**put the value of a pixel located in the image space** into the object space), or, equivalently, applying the inverse of it on the object space (**ask for a pixel located in the object space** to choose its value from the image space). The latter is less computationally expensive, as we are only calculating the pixel values that we are interested in (i.e. those within the code image boundary in the object space).
+
+Note that the decimal places inevitably occur in pixel locations after transformation. You should interpolate the values there (e.g. bilinear interpolation).
+
+#### Recognition
+
+![Rectified image (code image in the correct object space)](img/object_space_example.png)
+
+> The pixel values are interpolated from the image space and then binarized. That's why there is (usually neglectable) noise in the rectified code image.
+
+Assuming the transform is correct, the coordinates of the glyphs on the code image should be close to the ones we defined in the object space (meaning the layout is correct). We've tried numerous ways to obtain and recognize the glyph images, namely region cropping, closest clusters, and merging bounding boxes of near clusters.
+
+![Recognition demonstration by showing bounding boxes of clusters](img/recognition_demo.png)
+
+The image above showcases how only the relevant clusters are selected for the recognition of each glyph. The bounding boxes in blue are all clusters found on the code image. The boxes in red are the clusters used to recognize each glyph. Below is the algorithm of glyph image extraction.
+
+```pseudocode
+glyph_images := []
+
+clusters := code_image.to_clusters() // Those in blue
+for anchor in config.glyph_anchors:
+	region := region centred at anchor with size of config.symbol_size
+	// Find all clusters inside the region
+	relevant_boxes := []
+	for cluster in clusters:
+		if cluster.centre is in region:
+			relevant_boxes.push(cluster.bounding_box)
+	// Compute the boxes in red
+	merged_box := minimum-sized bounding box which encloses all boxes in relevant_boxes
+	glyph_images.push(code_image.crop(merged_box))
+
+return glyph_images
+```
+
+Once we have the images, we can evaluate their traces and compare them with the ones in our symbol library, obtaining a number of candidates for each glyph image. Each of these candidates is compared to the glyph image using image XOR, and the one with the lowest delta is the final predicted symbol.
+
+Each symbol in the library is mapped to a unique bit string, so each SymCode instance concatenates a sequence of bit strings into a longer one. This long bit string is the information carried by the SymCode instance.
 
 ### Stage 4: Decode the SymCode
+
+What happens in this stage is arguably entirely implementation-specific. Basically we're concerned with how to interpret the information we've extracted from the previous stage, which is directly related to (and is the inverse process of) how encoding is done for your SymCode system. Any error detection/correction schemes can be freely integrated as SymCode simply provides a visually appealing way to represent the bits.
+
+<ins>*Acute32*</ins>
+
+As there are 32 symbols in Acute32, each takes exactly 5 bits (*log2(32) = 5*) to represent. **Each SymCode instance encodes exactly *5n* bits**, where n is the number of glyphs on your SymCode design.
+
+In *Acute32Encoder*, each payload (data we want to protect and transmit) is encoded in *5n - 5* bits. The *-5* is to reserve **5 bits for CRC5 checksum**.  The 5-bit checksum is calculated on the payload and the two are concatenated to form the *5n*-bit string, which can be converted into a SymCode instance by inverse mapping in the symbol library.
+
+In the examples above, each SymCode instance encodes *25* bits, in which the first *20* bits are the payload and the remaining *5* bits are CRC5 checksum.
+
+In scanner stage 4 decoding, the first *20 (5n - 5)* bits are extracted as the payload, which is considered to be valid only if its CRC5 checksum matches the last 5 bits of the recognition result.
 
 ## AcuteCode and ReversiCode
 
