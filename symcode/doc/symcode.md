@@ -188,7 +188,7 @@ In Acute32 (above), traces collide. Our engineering solution is to simply define
 
 > ##### Adding extra comparisons
 >
-> It is important to note that **not any arbitrary extra comparisons** are effective. The rule of thumb is each extra comparison should introduce new information than the existing ones, making them **(at least partially) independent** of each other. In general, comparisons that use **different numbers of blocks** should be independent. For example, in the previous section all comparisons used 2 blocks vs 2 blocks, so the extra ones in this section, which use 1 block vs 1 block, are all (partially) independent of the previous ones. This is because as more blocks are being considered at once, the scope of analysis becomes irreversibly broader - just like how you cannot retrieve neither x nor y from the sum (x+y).
+> It is important to note that not any arbitrary extra comparisons are effective. The rule of thumb is each extra comparison should introduce new information than the existing ones, making them **(at least partially) independent** of each other. In general, comparisons that use **different numbers of blocks** should be independent. For example, in the previous section all comparisons used 2 blocks vs 2 blocks, so the extra ones in this section, which use 1 block vs 1 block, are all (partially) independent of the previous ones. This is because as more blocks are being considered at once, the scope of analysis becomes irreversibly broader - just like how you cannot retrieve neither x nor y from the sum (x+y).
 
 Adding the extra ones results in a total of 3 + 6 = 9 comparisons. Using 2 bits to encode each, we are using 9 * 2 = **18 bits** to store each trace in Acute32.
 
@@ -213,7 +213,7 @@ Our solution here is one more comparison.
 
 ![efgh (top/bottom/left/right) grid](img/efgh_grid.png)
 
-We further partition the grid of each symbol image so that there are 4x4 = 16 small blocks, and denote the top/bottom/left/right blocks along the edge by e,f,g,h respectively, as illustrated in the figure above. Next, we define an "ef/gh comparison" which is essentially (e+f) vs (g+h) using the previously defined comparison operation notation. 
+We further partition the grid of each symbol image so that there are 4x4 = 16 small blocks, and denote the top/bottom/left/right blocks along the edge by e,f,g,h respectively, as illustrated in the figure above. Next, we define an "ef/gh comparison" which is essentially (e+f) vs (g+h). 
 
 Now we have a relatively balanced partition.
 
@@ -239,9 +239,9 @@ The processing pipeline of SymCode consists of 4 stages. For simplicity's sake, 
 
 ### Colour image vs Binary image
 
-We started off trying to operate on RGB/grayscale images, which carry more useful information such as colour/intensity gradients, and our core library *visioncortex* supports all the necessary functionalities for both kinds of images.
+We started off trying to operate on RGB/grayscale images, which carry more useful information such as colour/intensity gradients, and our core library *visioncortex* supports all the necessary functionalities for both colour and binary images.
 
-However, we saw a performance bottleneck (in terms of efficiency) in the middle of development when we used test cases with higher resolutions. We figured it would be wise to switch to binary images, which are much more efficient and easier to work with.
+However, we saw a performance bottleneck (in terms of efficiency) in the middle of development when we used test cases with higher resolutions. We figured it would be wiser to switch to binary images, which are much more efficient and easier to work with.
 
 > Each subsection below begins with a more general description of the processing stage (what are consistent across any SymCode scanner implementations), followed by an explanation of the specific implementation of our *Acute32SymcodeScanner* system.
 
