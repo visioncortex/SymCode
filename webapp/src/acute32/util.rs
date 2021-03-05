@@ -80,7 +80,6 @@ pub(crate) fn render_bounding_rect_to_canvas(rect: &BoundingRect, canvas: &Canva
 }
 
 pub(crate) fn render_bounding_rect_to_canvas_with_color(rect: &BoundingRect, canvas: &Canvas, color: Color) {
-    return;
     let ctx = canvas.get_rendering_context_2d();
     ctx.set_stroke_style(JsValue::from_str(
         &color.to_color_string()
