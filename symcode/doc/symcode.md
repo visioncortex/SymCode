@@ -293,7 +293,11 @@ We define 4 *object check points* as the **top positions of the 4 circle finders
 
 Our metric of evaluation relies on the most basic properties of vectors: direction and norm. Only 4 vectors interest us here: *c1i1*, *c2i2*, *c3i3*, and *c4i4* (the vectors from the centres of finders to the image check points), we denote them by *v1* to *v4* respectively. For each vector *v*, we compute its unit vector (direction) *u* and norm (magnitude) *n*. Now we have 4 (vector, scalar) pairs *(u1, n1)* to *(u4, n4)* to work with.
 
-If the transformation is correct, i.e. the transformed object space is exactly the code image, each *v* should be approximately the same (if perspective distortion is not too large), meaning all *u* and *n* should be too. Therefore, choosing the most correct transform is equivalent to minimizing the variances in *u* and *n*, and the rest of the implementation are too detailed to be discussed here.
+![Transform evaluation points and vectors](img/transform_evaluation.png)
+
+> The four vectors in green are *v1* to *v4*.
+
+If the transformation is correct, i.e. the transformed object space is exactly the code image, each *v* should be (sufficiently) similar to each other (if perspective distortion is not too large), meaning all *u* and *n* should be too. Therefore, choosing the most correct transform is equivalent to minimizing the variances in *u* and *n*, and the rest of the implementation are too detailed to be discussed here.
 
 ### Stage 3: Recognize Glyphs
 
