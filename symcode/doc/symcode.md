@@ -342,7 +342,8 @@ for anchor in config.glyph_anchors:
 			relevant_boxes.push(cluster.bounding_box)
 	// Compute the boxes in red
 	merged_box := minimum-sized bounding box which encloses all boxes in relevant_boxes
-	glyph_images.push(code_image.crop(merged_box))
+	glyph_frame := bounding box centered at merged_box.centre with size of region
+	glyph_images.push(code_image.crop(glyph_frame))
 
 return glyph_images
 ```
