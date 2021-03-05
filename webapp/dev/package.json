@@ -1,11 +1,11 @@
 {
-  "name": "locate-finder",
+  "name": "symcode",
   "version": "1.0.0",
   "description": "",
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server",
+    "start": "webpack-dev-server --mode development --host 0.0.0.0 --useLocalIp",
     "build": "webpack"
   },
   "author": "",
