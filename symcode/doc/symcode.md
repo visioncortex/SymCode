@@ -138,17 +138,7 @@ Which is a surprisingly good classifier using only three comparisons. We can do 
 
 ### SymCode
 
-Our trace for SymCode symbols follows a similar scheme:
-
-> For illustration purpose, we are using a subset of Acute32, a symbol set we designed specifically for SymCode. A grid of 4 squares is put behind each symbol.
->
-> The complete alphabet of Acute32 is available in the next section.
-
-![Acute32 subset](img/alphabet1.png)
-
-This symbol subset is in fact the first prototype alphabet that we used to test and debug the earliest versions of the scanner.
-
-In early stage of development, we defined the symbol traces using only three comparisons (shape/weight analyses), namely vertical, horizontal, and diagonal comparisons.
+Our trace for SymCode symbols follows a similar scheme. We defined the symbol traces using only three comparisons (shape/weight analyses), namely vertical, horizontal, and diagonal comparisons.
 
 > If the "number of dots" in each of the four quadrants of a symbol (in order of top-left, top-right, bottom-left, bottom-right) are denoted by non-negative quantities a,b,c,d respectively, the three comparisons are defined as follows:
 >
@@ -184,12 +174,14 @@ If you are looking to design your own alphabet, trace collisions should really b
 
 In Acute32 (above), many traces collide under the current setting. Our solution is to simply define the traces with more comparisons. Apart from the three basic comparisons explained in the previous section, we also compare every pair of the four quadrants (each quadrant is compared to every other quadrant exactly once), requiring **an extra of *4 choose 2* = 6 comparisons**.
 
-> ##### Adding extra comparisons
+![Acute32 trace counts](img/trace_counts_balanced.png)
+
+> ##### Side note: `efgh`
 >
 > It is important to note that not any arbitrary extra comparisons are effective. The rule of thumb is each extra comparison should introduce new information than the existing ones, making them **(at least partially) independent** of each other. In general, comparisons that use **different numbers of blocks** should be independent. For example, in the previous section all comparisons used 2 blocks vs 2 blocks, so the extra ones in this section, which use 1 block vs 1 block, are all (partially) independent of the previous ones. This is because as more blocks are being considered at once, the scope of analysis becomes irreversibly broader - just like how you cannot retrieve neither *x* nor *y* from the sum *x+y*.
-
-Adding the extra ones results in a total of 3 + 6 = 9 comparisons. Using 2 bits to encode each, we are using 9 * 2 = **18 bits** to store each trace in Acute32.
-
+> 
+>  Adding the extra ones results in a total of 3 + 6 = 9 comparisons. Using 2 bits to encode each, we are using 9 * 2 = **18 bits** to store each trace in Acute32.
+> 
 > Denote a comparison operation by "U vs V". The vertical, horizontal, and diagonal comparisons become "Top vs Bottom", "Left vs Right", and "Backslash vs Slash" respectively. The rest of the comparisons become "a vs b", "c vs d", and so on. We set the bits as follows:
 >
 > ##### For each comparison U vs V
@@ -198,32 +190,22 @@ Adding the extra ones results in a total of 3 + 6 = 9 comparisons. Using 2 bits 
 > * 10 means "U > V"
 > * 01 means "U < V"
 > * 00 is invalid
-
-Below is the distribution of traces for Acute32:
-
-![Acute32 trace counts (one count is 12 while the rest are 1's and 3's)](img/trace_counts_unbalanced.png)
-
-### Further improvement
-
-The trace of all 1's, which happens when all four quadrants of the symbol share (approximately) the same number of dots, is shared by about one-third of the entire Acute32. This makes approximately one-third of the searches scan through 12 symbol images, which is 4 times that of most of the rest, which only scan through 3 symbol images.
-
-Our solution here is one more comparison.
-
-![efgh (top/bottom/left/right) grid](img/efgh_grid.png)
-
-We further partition the grid of each symbol image so that there are 4x4 = 16 small blocks, and denote the top/bottom/left/right blocks along the edge by *e,f,g,h* respectively, as illustrated in the figure above. Next, we define an "*ef/gh* comparison" which compares *e+f* to *g+h*. 
-
-Now we have a more balanced distribution.
-
-![Acute32 trace counts](img/trace_counts_balanced.png)
+> 
+>  The trace of all 1's, which happens when all four quadrants of the symbol share (approximately) the same number of dots, is shared by about one-third of the entire Acute32. This makes approximately one-third of the searches scan through 12 symbol images, which is 4 times that of most of the rest, which only scan through 3 symbol images.
+> 
+> Our solution here is one more comparison.
+> 
+> ![efgh (top/bottom/left/right) grid](img/efgh_grid.png)
+> 
+> We further partition the grid of each symbol image so that there are 4x4 = 16 small blocks, and denote the top/bottom/left/right blocks along the edge by *e,f,g,h* respectively, as illustrated in the figure above. Next, we define an "*ef/gh* comparison" which compares *e+f* to *g+h*. 
+> 
+> Now we have a more balanced distribution.
 
 Of course it can be further optimized by defining even more comparisons, but we settle for this result for the sake of illustration here.
 
-### Robustness
+### Conclusion
 
 Usually, it may be a good idea for traces, in both construction (evaluating for templates in symbol library) and application (evaluating for input shape when scanning), to allow **tolerances** (the *stat_tolerance* parameter in *Acute32SymcodeConfig*. This is to provide an elastic net to enhance robustness against noisy inputs.
-
-### Conclusion
 
 The trace partitions the symbol set into smaller, mutually-exclusive subsets. Provided that **searching through traces is faster than searching through the actual symbols** (there are various ways to implement this, such as hash tables or Huffman trees, but **even a linear scan over the traces is already much faster than a linear scan over the symbols by image XOR**), traces facilitate symbol comparison in the library.
 
@@ -253,7 +235,7 @@ It may be a good idea to throw an error on **invalid numbers** of finder candida
 
 > A minimum of 4 feature points is needed because **at least 4 point correspondences are required to fit a perspective transform**. More on this in the next stage.
 
-<u>*Acute32*</u>
+#### Acute32
 
 The class we use for finder is *CircleFinder*, which is basically just a circle.
 
@@ -278,6 +260,8 @@ The least you need to know about perspective transforms for the scope of this se
 > ![Railway perspective illustration](img/railway_perspective.jpg)
 >
 > (Credit: https://www.uidownload.com/en/vector-jrxfh)
+> 
+> The assumption here is that our transforms are calculated in a way such that the resulting transform **converts the image space into object spaces** (i.e. the source points are the feature points in the image space and the destination points are those in the (correct/target) object space). Note that inverses always exist for perspective transforms in general, meaning **you can always perform pixel conversions both ways**.
 
 Since we have obtained a list of finder candidates from the previous stage, we can extract ***n* feature points in the image space** from them. Matching the 4-permutations(or combinations) of them to the **4 predefined feature points in the object space** gives us at most *n permute (or choose) 4 = k* perspective transforms (deriving the transform from point pairs is purely mathematics and is beyond the scope of this article).
 
@@ -285,7 +269,7 @@ Since we have obtained a list of finder candidates from the previous stage, we c
 
 It is indeed infeasible to apply each transformation and generate *k* object spaces to choose the correct one. Therefore, we need to design some methods to evaluate each transform. The simplest way is to **define some extra feature points in the object space as *check points***, which are **re-projected to the image space**, and **check if the feature exists there** (if the feature exists there, you are more confident that the transform is the correct one).
 
-<u>*Acute32*</u>
+#### Acute32
 
 The re-projection method mentioned above hardly works on *CircleFinder* because each circle finder only gives 1 feature point. The only way to obtain more feature points as check points is to add even more finders into the code image.
 
@@ -301,19 +285,13 @@ Our metric of evaluation relies on the most basic properties of vectors: **direc
 
 If the **correct feature points are used** (and are in the correct order), the transformation is correct, i.e. the transformed object space is exactly the code image, and **each *v* should be (sufficiently) similar to each other** (if perspective distortion is not too large). Therefore, choosing the most correct transform is equivalent to **minimizing the variances in the directions and norms of *v1* to *v4***, and the rest of the implementation are too detailed to be discussed here.
 
-### Stage 3: Recognize Glyphs
+### Stage 3: Recognize Symbols
 
-> During the development of SymCode, we came up of names to identify different entities. "Glyphs" refer to the symbols on a code image which are not finders. In other words, **a sequence of glyphs on the code image define the code to be decoded**.
-
-In the previous stage, we have obtained a perspective transform which converts between the image and object spaces. Next, we're going to rectify the input image into a code image, and recognize the glyphs on it.
+In the previous stage, we have obtained a perspective transform which converts between the image and object spaces. Next, we're going to rectify the input image into a code image, and recognize the symbols on it.
 
 #### Rectify the image space
 
-> The assumption here is that our transforms are calculated in a way such that the resulting transform **converts the image space into object spaces** (i.e. the source points are the feature points in the image space and the destination points are those in the (correct/target) object space). Note that inverses always exist for perspective transforms in general, meaning **you can always perform pixel conversions both ways**.
-
-Once we have a transform that we believe is correct, the object space can be obtained by applying it on the image space (**put the value of a pixel located in the image space** into the object space), or, equivalently, applying the inverse of it on the object space (**ask for a pixel located in the object space** to choose its value from the image space). The latter is less computationally expensive, as we are **only calculating the pixel values that we are interested in** (i.e. those within the code image boundary in the object space).
-
-Note that decimal places inevitably occur in pixel locations after transformation. You should **interpolate the values** there (e.g. bilinear interpolation).
+Once we have a transform that we believe is correct, the object space can be obtained by applying it on the image space. We sample the image with bilinear interpolation.
 
 #### Recognition
 
@@ -321,34 +299,13 @@ Note that decimal places inevitably occur in pixel locations after transformatio
 
 > The pixel values are interpolated from the image space and then binarized. That's why there is (usually neglectable) noise in the rectified code image.
 
-Assuming the transform is correct, the coordinates of the glyphs on the code image should be close to the ones (the *anchors*) we defined in the object space (meaning the layout is correct). We've tried numerous ways to obtain and recognize the glyph images, namely region cropping, closest clusters to the anchors, and merging bounding boxes of near clusters.
+Assuming the transform is correct, the coordinates of the symbols on the code image should be close to the ones (the *anchors*) we defined in the object space (meaning the layout is correct).
 
 ![Recognition demonstration by showing bounding boxes of clusters](img/recognition_demo.png)
 
-The image above showcases how only the relevant clusters are selected for the recognition of each glyph. The bounding boxes in blue are all clusters found on the code image. The boxes in red are the grouped clusters used to recognize each glyph. Below is the general algorithm of glyph image extraction.
+The image above showcases how only the relevant clusters are selected for the recognition of each symbol. The bounding boxes in blue are all clusters found on the code image. The boxes in red are the grouped clusters used to recognize each symbol.
 
-> In practice, there are other factors (e.g. cluster size, cluster area to bounding box ratio) to take into account. *Acute32Recognizer* includes those which we found it effective to consider after experimentation.
-
-```pseudocode
-glyph_images := []
-
-clusters := code_image.to_clusters() // Those in blue
-for anchor in config.glyph_anchors:
-	region := region centred at anchor with size of config.symbol_size
-	// Find all clusters inside the region
-	relevant_boxes := []
-	for cluster in clusters:
-		if cluster.bounding_box overlaps with region:
-			relevant_boxes.push(cluster.bounding_box)
-	// Compute the boxes in red
-	merged_box := minimum-sized bounding box which encloses all boxes in relevant_boxes
-	glyph_frame := bounding box centered at merged_box.centre with size of region
-	glyph_images.push(code_image.crop(glyph_frame))
-
-return glyph_images
-```
-
-Once we have the images, we can **evaluate their traces** and compare them with the ones in our symbol library, obtaining **a small number of candidates** for each glyph image. Each of these candidates is compared to the glyph image using XOR, and the **one with the lowest delta is the final predicted symbol**.
+Once we have the images, we can **evaluate their traces** and compare them with the ones in our symbol library, obtaining **a small number of candidates** for each symbol image. Each of these candidates is compared to the symbol image using XOR, and the **one with the lowest delta is the final predicted symbol**.
 
 Each symbol in the symbol set is mapped to a unique bit string, so each SymCode instance concatenates a sequence of bit strings into a longer one. This long bit string is the information carried by the SymCode instance.
 
@@ -356,9 +313,9 @@ Each symbol in the symbol set is mapped to a unique bit string, so each SymCode 
 
 What happens in this stage is arguably entirely implementation-specific. Basically we're concerned with **how to interpret the information we've extracted** from the previous stage, which is directly related to (and is the inverse process of) how encoding is done for your SymCode system. Any error detection/correction schemes can be freely integrated as SymCode simply provides a aesthetically appealing way to represent the bits.
 
-<u>*Acute32*</u>
+#### Acute32
 
-As there are 32 symbols in Acute32, each takes exactly *5* bits (*log2(32) = 5*) to represent. **Each SymCode instance encodes exactly *5n* bits**, where n is the number of glyphs on your SymCode design.
+As there are 32 symbols in Acute32, each takes exactly *5* bits (*log2(32) = 5*) to represent. **Each SymCode instance encodes exactly *5n* bits**, where n is the number of symbols on your SymCode design.
 
 In *Acute32Encoder*, each payload (data we want to protect and transmit) is encoded in *5n - 5* bits. The *-5* is to reserve **5 bits for CRC5 checksum**.  The 5-bit checksum is calculated on the payload and the two are concatenated to form the *5n*-bit string, which can be converted into a SymCode instance by inverse mapping in the symbol set.
 
