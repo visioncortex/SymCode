@@ -338,7 +338,7 @@ for anchor in config.glyph_anchors:
 	// Find all clusters inside the region
 	relevant_boxes := []
 	for cluster in clusters:
-		if cluster.centre is in region:
+		if cluster.bounding_box overlaps with region:
 			relevant_boxes.push(cluster.bounding_box)
 	// Compute the boxes in red
 	merged_box := minimum-sized bounding box which encloses all boxes in relevant_boxes
