@@ -16,10 +16,7 @@ default = ["console_error_panic_hook"]
 bit-vec = "0.6.3"
 cfg-if = "0.1"
 console_log = { version = "0.2", features = ["color"] }
-image = "0.23.10"
 rand = { version = "0.7.3", features = ["wasm-bindgen"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
 symcode = { path = "../symcode" }
 visioncortex = { path = "../visioncortex" }
 wasm-bindgen = { version = "0.2", features = ["serde-serialize"]  }
