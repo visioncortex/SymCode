@@ -47,7 +47,8 @@ impl Acute32SymcodeMain {
     } 
 
     /// Takes the id of the canvas element storing the alphabet.
-    pub fn load_alphabet_from_canvas_id(&mut self, canvas_id: &str, params: AlphabetReaderParams) {
+    pub fn load_alphabet_from_canvas_id(&mut self, canvas_id: &str) {
+        let params = AlphabetReaderParams::default();
         let canvas = &match Canvas::new_from_id(canvas_id) {
             Some(c) => c,
             None => panic!("Canvas with id ".to_owned() + canvas_id + " is not found!"),

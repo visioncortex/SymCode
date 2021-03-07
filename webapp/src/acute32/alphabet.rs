@@ -1,13 +1,9 @@
 use visioncortex::{BinaryImage, BoundingRect, PointI32};
-use wasm_bindgen::prelude::*;
-
 use crate::acute32::{Acute32SymcodeConfig, valid_pointi32_on_image};
-
 use super::Acute32Library;
 
-pub struct AlphabetReader {}
+pub struct AlphabetReader;
 
-#[wasm_bindgen]
 pub struct AlphabetReaderParams {
     // top-left point of the top-left glyph
     pub(crate) top_left: PointI32,
@@ -22,24 +18,21 @@ pub struct AlphabetReaderParams {
 impl Default for AlphabetReaderParams {
     fn default() -> Self {
         Self {
-            top_left: PointI32::new(0, 0),
-            symbol_width:80,
-            symbol_height: 80,
-            offset_x: 115.0,
-            offset_y: 115.0,
+            top_left: PointI32::new(100, 100),
+            symbol_width: 155,
+            symbol_height: 155,
+            offset_x: 155.0*1.5,
+            offset_y: 155.0*1.5,
             num_columns: 4,
-            num_rows: 4,
+            num_rows: 8,
         }
     }
 }
 
-#[wasm_bindgen]
 impl AlphabetReaderParams {
     pub fn new() -> Self {
         Self::default()
     }
-
-    // Can't use macros inside wasm_bindgen impls
 
     pub fn top_left(mut self, x: i32, y: i32) -> Self {
         self.top_left = PointI32::new(x, y);
@@ -65,27 +58,10 @@ impl AlphabetReaderParams {
     }
 }
 
-#[wasm_bindgen]
-impl AlphabetReaderParams {
-    pub fn from_json_string(json_string: &str) -> Self {
-        let json: serde_json::Value = serde_json::from_str(json_string).unwrap();
-
-        Self {
-            top_left: PointI32::new(json["top_left"]["x"].as_i64().unwrap() as i32, json["top_left"]["y"].as_i64().unwrap() as i32),
-            symbol_width: json["symbol_width"].as_i64().unwrap() as usize,
-            symbol_height: json["symbol_height"].as_i64().unwrap() as usize,
-            offset_x: json["offset_x"].as_f64().unwrap(),
-            offset_y: json["offset_y"].as_f64().unwrap(),
-            num_columns: json["num_columns"].as_i64().unwrap() as usize,
-            num_rows: json["num_rows"].as_i64().unwrap() as usize,
-        }
-    }
-}
-
 impl AlphabetReader {
     pub fn read_alphabet_to_library(image: BinaryImage, params: AlphabetReaderParams, symcode_config: &Acute32SymcodeConfig) -> Result<Acute32Library, &'static str> {
         let mut library = Acute32Library::default();
-        symcode_config.debugger.render_binary_image_to_canvas(&image);
+        symcode_config.debugger.render_binary_image_to_canvas(&image)?;
         for i in 0..params.num_rows {
             for j in 0..params.num_columns {
                 let offset = PointI32::new((j as f64 * params.offset_x) as i32, (i as f64 * params.offset_y) as i32);

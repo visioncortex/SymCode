@@ -1,5 +1,4 @@
 import { Acute32SymcodeMain } from "symcode";
-import { SYMCODE_CONFIG } from "./config";
 import { loadAlphabet, loadBuffer } from "./load";
 import { rng, generate_perspective_with_image_src } from "./perspective";
 import { calculateConfusionMatrix } from "./confusion";
