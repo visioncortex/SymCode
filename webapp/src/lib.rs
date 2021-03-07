@@ -1,11 +1,13 @@
 use wasm_bindgen::prelude::*;
 
-mod canvas;
-mod common;
-mod interfaces;
-mod math;
-mod acute32;
-mod util;
+pub mod acute32;
+pub mod interfaces;
+pub mod app;
+pub mod canvas;
+pub mod common;
+pub mod debugger;
+pub mod math;
+pub mod util;
 
 #[wasm_bindgen(start)]
 pub fn main() {

@@ -1,13 +1,12 @@
 use std::{borrow::BorrowMut, rc::Rc};
-
 use bit_vec::BitVec;
 use rand::{RngCore, SeedableRng, rngs::StdRng};
 use visioncortex::{BinaryImage, ColorImage, PointI32};
 use wasm_bindgen::prelude::*;
 
 use crate::{canvas::Canvas, interfaces::{Finder as FinderInterface, Encoder as EncoderInterface}, util::console_log_util};
-
-use super::{Acute32Decoder, Acute32FinderCandidate, Acute32Recognizer, Acute32SymcodeConfig, Acute32TransformFitter, AlphabetReader, AlphabetReaderParams, Debugger, GlyphLabel, RecognizerInput, TransformFitterInput, is_black_hsv, debugger::render_binary_image_to_canvas};
+use crate::acute32::{Acute32Decoder, Acute32FinderCandidate, Acute32Recognizer, Acute32SymcodeConfig, Acute32TransformFitter, AlphabetReader, AlphabetReaderParams, GlyphLabel, RecognizerInput, TransformFitterInput, is_black_hsv};
+use crate::debugger::{Debugger, render_binary_image_to_canvas};
 
 use crate::interfaces::SymcodeScanner as ScannerInterface;
 use crate::interfaces::SymcodeGenerator as GeneratorInterface;
