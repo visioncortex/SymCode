@@ -1,7 +1,7 @@
 use visioncortex::{BinaryImage, BoundingRect, ColorImage, Shape};
 
 pub trait Finder {
-    fn process(&self, input: &ColorImage) -> Result<Vec<BoundingRect>, &'static str>;
+    fn find(&self, input: &ColorImage) -> Result<Vec<BoundingRect>, &'static str>;
 }
 
 pub trait FinderElement {

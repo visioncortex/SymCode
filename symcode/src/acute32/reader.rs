@@ -1,12 +1,17 @@
-use std::{borrow::Borrow, rc::Rc};
-
 use visioncortex::{BinaryImage, BoundingRect, ColorImage, PointF64, PointI32, PerspectiveTransform};
-
+use crate::interfaces::Reader;
 use super::{Acute32Library, Acute32SymcodeConfig, GlyphLabel, is_black_rgb};
 
-pub struct Acute32Recognizer;
+pub struct Acute32Recognizer<'a> {
+    params: &'a Acute32SymcodeConfig,
+}
 
-impl Acute32Recognizer {
+impl<'a> Acute32Recognizer<'a> {
+
+    pub fn new(params: &'a Acute32SymcodeConfig) -> Acute32Recognizer<'a> {
+        Self { params }
+    }
+
     pub fn rectify_image(raw_image: ColorImage, image_to_object: PerspectiveTransform, symcode_config: &Acute32SymcodeConfig) -> BinaryImage {
         let width = symcode_config.code_width;
         let height = symcode_config.code_height;
@@ -133,17 +138,12 @@ impl Acute32Recognizer {
     }
 }
 
-pub struct RecognizerInput {
-    pub raw_frame: ColorImage,
-    pub image_to_object: PerspectiveTransform,
-    pub glyph_library: Rc<Acute32Library>,
-}
+impl Reader for Acute32Recognizer<'_> {
+    type Symbol = GlyphLabel;
 
-impl Acute32Recognizer {
-    pub fn process(input: RecognizerInput, params: &Acute32SymcodeConfig) -> Result<Vec<GlyphLabel>, &'static str> {
-        // Processing starts
-        let glyph_library = input.glyph_library.borrow();
-        let glyphs = Self::read_glyphs_from_raw_frame(input.raw_frame, input.image_to_object, glyph_library, params);
+    fn read(&self, raw_frame: ColorImage, image_to_object: PerspectiveTransform) -> Result<Vec<GlyphLabel>, &'static str> {
+        let glyph_library = self.params.symbol_library.as_ref();
+        let glyphs = Self::read_glyphs_from_raw_frame(raw_frame, image_to_object, glyph_library, self.params);
         //log::error!(&format!("Recognized glyphs: {:?}", glyphs));
         Ok(glyphs)
     }

@@ -1,6 +1,7 @@
 use visioncortex::{BinaryImage, BoundingRect, Color, ColorImage, PointI32};
 
 pub trait Debugger {
+
     fn render_color_image_to_canvas(&self, image: &ColorImage) -> Result<(), &'static str>;
 
     fn render_binary_image_to_canvas(&self, image: &BinaryImage) -> Result<(), &'static str> {

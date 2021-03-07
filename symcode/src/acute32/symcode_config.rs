@@ -1,10 +1,9 @@
-use std::rc::Rc;
 use visioncortex::PointF64;
 use crate::interfaces::{Debugger, DummyDebugger};
 use super::{Acute32Encoder, Acute32Library, CircleFinder};
 
 pub struct Acute32SymcodeConfig {
-    pub symbol_library: Rc<Acute32Library>, // To be referenced in RecognizerInput
+    pub symbol_library: Box<Acute32Library>, // To be referenced in RecognizerInput
     pub finder: CircleFinder,
     pub encoder: Acute32Encoder,
     
@@ -54,7 +53,7 @@ impl Default for Acute32SymcodeConfig {
             stat_tolerance: 0.36,
             max_encoding_difference: 3,
             empty_cluster_threshold: 0.15,
-            symbol_library: Rc::new(Acute32Library::default()),
+            symbol_library: Box::new(Acute32Library::default()),
             finder: CircleFinder::default(),
             encoder: Acute32Encoder::default(),
             quiet_zone_width: 10,

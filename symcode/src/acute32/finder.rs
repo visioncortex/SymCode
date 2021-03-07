@@ -78,7 +78,7 @@ impl<'a> Acute32FinderCandidate<'a> {
 }
 
 impl<'a> FinderInterface for Acute32FinderCandidate<'a> {
-    fn process(&self, input: &ColorImage) -> Result<Vec<BoundingRect>, &'static str> {
+    fn find(&self, input: &ColorImage) -> Result<Vec<BoundingRect>, &'static str> {
         let params = self.params;
         Acute32FinderCandidate::valid_params(params)?;
 

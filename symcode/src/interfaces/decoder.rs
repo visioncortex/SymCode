@@ -8,6 +8,9 @@ pub trait Decoder {
 
     type Err;
 
-    /// Decode the data given how many bits one glyph represents
-    fn decode(encoded_data: Vec<Self::Symbol>, num_bits: usize) -> Result<DecodedData, Self::Err>;
+    /// Decode the data
+    fn decode(&self, encoded_data: Vec<Self::Symbol>) -> Result<DecodedData, Self::Err>;
+
+    /// How many bits one symbol encodes
+    fn num_bits_per_symbol(&self) -> usize;
 }

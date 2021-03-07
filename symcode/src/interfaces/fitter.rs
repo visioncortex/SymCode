@@ -1,7 +1,7 @@
 use visioncortex::{BoundingRect, PerspectiveTransform};
 
 pub trait Fitter {
-    fn process(
-    	&self, finder_positions_image: Vec<BoundingRect>, raw_image_width: usize, raw_image_height: usize
+    fn fit(
+    	&self, finder_positions: Vec<BoundingRect>, image_width: usize, image_height: usize
     ) -> Result<PerspectiveTransform, &str>;
 }

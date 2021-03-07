@@ -6,17 +6,29 @@ use super::GlyphLabel;
 
 pub struct Acute32Decoder;
 
+impl Default for Acute32Decoder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Acute32Decoder {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
 // Dummy implementation, error detection/correction will be supported later
 impl Decoder for Acute32Decoder {
     type Symbol = GlyphLabel;
 
     type Err = &'static str;
 
-    fn decode(encoded_data: Vec<Self::Symbol>, num_templates: usize) -> Result<BitVec, Self::Err> {
-        let num_bits_per_glyph = crate::math::num_bits_to_store(num_templates);
+    fn decode(&self, encoded_data: Vec<Self::Symbol>) -> Result<BitVec, Self::Err> {
+        let num_bits_per_symbol = self.num_bits_per_symbol();
         let mut decoded_data = vec![];
         for &symbol in encoded_data.iter() {
-            if let Some(bit_vec) = GlyphLabel::self_to_bit_vec(symbol, num_bits_per_glyph) {
+            if let Some(bit_vec) = GlyphLabel::self_to_bit_vec(symbol, num_bits_per_symbol) {
                 decoded_data.push(bit_vec);
             } else {
                 return Err("Decoder error: Some recognized glyph is invalid.");
@@ -27,8 +39,8 @@ impl Decoder for Acute32Decoder {
         let mut payload = BitVec::from_elem(20, false);
         let mut checksum: u8 = 0;
         for i in 0..25 {
-            let glyph_index = i / num_bits_per_glyph;
-            let within_glyph_offset = i % num_bits_per_glyph;
+            let glyph_index = i / num_bits_per_symbol;
+            let within_glyph_offset = i % num_bits_per_symbol;
             let bit = decoded_data[glyph_index].get(within_glyph_offset).unwrap();
             if i < 20 {
                 payload.set(i, bit);
@@ -44,10 +56,8 @@ impl Decoder for Acute32Decoder {
             Ok(payload)
         }
     }
-}
 
-impl Acute32Decoder {
-    pub fn process(input: Vec<GlyphLabel>) -> Result<BitVec, &'static str> {
-        Self::decode(input, GlyphLabel::num_variants())
+    fn num_bits_per_symbol(&self) -> usize {
+        crate::math::num_bits_to_store(GlyphLabel::num_variants())
     }
 }

@@ -1,11 +1,10 @@
-use std::{borrow::BorrowMut, rc::Rc};
 use bit_vec::BitVec;
 use rand::{RngCore, SeedableRng, rngs::StdRng};
 use visioncortex::{BinaryImage, ColorImage, PointI32};
 use wasm_bindgen::prelude::*;
 
-use symcode::acute32::{Acute32Decoder, Acute32FinderCandidate, Acute32Recognizer, Acute32SymcodeConfig, Acute32TransformFitter, AlphabetReader, AlphabetReaderParams, GlyphLabel, RecognizerInput};
-use symcode::interfaces::{Finder, FinderElement, Fitter, Encoder as EncoderInterface, SymcodeScanner as ScannerInterface, SymcodeGenerator as GeneratorInterface};
+use symcode::acute32::{Acute32Decoder, Acute32FinderCandidate, Acute32Recognizer, Acute32SymcodeConfig, Acute32TransformFitter, AlphabetReader, AlphabetReaderParams, GlyphLabel};
+use symcode::interfaces::{Finder, FinderElement, Fitter, Reader, Encoder, Decoder, SymcodeScanner, SymcodeGenerator};
 use symcode::math::{into_bitvec, num_bits_to_store, num_significant_bits};
 use crate::{canvas::Canvas, util::console_log_util};
 use crate::debugger::{Debugger, render_binary_image_to_canvas};
@@ -57,7 +56,7 @@ impl Acute32SymcodeMain {
             .get_image_data_as_color_image(0, 0, canvas.width() as u32, canvas.height() as u32)
             .to_binary_image(|c| is_black_hsv(&c.to_hsv()));
         match AlphabetReader::read_alphabet_to_library(image, params, &self.config) {
-            Ok(library) => self.config.symbol_library = Rc::new(library),
+            Ok(library) => self.config.symbol_library = Box::new(library),
             Err(e) => console_log_util(e),
         }
     }
@@ -108,7 +107,7 @@ impl Acute32SymcodeMain {
         } else {
             return Err("Code generation: Canvas does not exist.".into());
         };
-        let (symcode, ground_truth_code) = self.borrow_mut().generate_symcode_random()?;
+        let (symcode, ground_truth_code) = self.generate_symcode_random()?;
 
         if render_binary_image_to_canvas(&canvas, &symcode).is_err() {
             return Err("Cannot render generated symcode to canvas.".into());
@@ -161,7 +160,7 @@ impl Acute32SymcodeMain {
     }
 }
 
-impl ScannerInterface for Acute32SymcodeMain {
+impl SymcodeScanner for Acute32SymcodeMain {
     type SymcodeRepresentation = Vec<GlyphLabel>;
 
     type Err = JsValue;
@@ -169,7 +168,7 @@ impl ScannerInterface for Acute32SymcodeMain {
     fn scan(&self, image: ColorImage) -> Result<Self::SymcodeRepresentation, Self::Err> {
         let symcode_config = &self.config;
         // Stage 1: Locate finder candidates
-        let finder_positions = match Acute32FinderCandidate::new(symcode_config).process(
+        let finder_positions = match Acute32FinderCandidate::new(symcode_config).find(
             &image
         ) {
             Ok(finder_positions) => finder_positions,
@@ -179,7 +178,7 @@ impl ScannerInterface for Acute32SymcodeMain {
         };
 
         // Stage 2: Fit a perspective transform from the image space to the object space
-        let image_to_object = match Acute32TransformFitter::new(symcode_config).process(
+        let image_to_object = match Acute32TransformFitter::new(symcode_config).fit(
             finder_positions,
             image.width,
             image.height
@@ -191,13 +190,9 @@ impl ScannerInterface for Acute32SymcodeMain {
         };
 
         // Stage 3: Recognize the glyphs
-        let symcode_instance = match Acute32Recognizer::process(
-            RecognizerInput {
-                raw_frame: image,
-                image_to_object,
-                glyph_library: Rc::clone(&self.config.symbol_library),
-            },
-            symcode_config
+        let symcode_instance = match Acute32Recognizer::new(symcode_config).read(
+            image,
+            image_to_object
         ) {
             Ok(symcode_instance) => symcode_instance,
             Err(e) => {
@@ -210,7 +205,7 @@ impl ScannerInterface for Acute32SymcodeMain {
 
     fn decode(&self, symcode: Self::SymcodeRepresentation) -> Result<bit_vec::BitVec, Self::Err> {
         // Stage 4: Decode the Symcode
-        match Acute32Decoder::process(
+        match Acute32Decoder::new().decode(
             symcode
         ) {
             Ok(decoded_symcode) => {
@@ -223,7 +218,7 @@ impl ScannerInterface for Acute32SymcodeMain {
     }
 }
 
-impl GeneratorInterface for Acute32SymcodeMain {
+impl SymcodeGenerator for Acute32SymcodeMain {
     type SymcodeRepresentation = Vec<GlyphLabel>;
 
     fn generate(&self, symcode: Self::SymcodeRepresentation) -> BinaryImage {

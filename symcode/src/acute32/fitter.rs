@@ -164,7 +164,7 @@ impl<'a> Acute32TransformFitter<'a> {
 }
 
 impl Fitter for Acute32TransformFitter<'_> {
-    fn process(
+    fn fit(
         &self, finder_positions_image: Vec<BoundingRect>, raw_image_width: usize, raw_image_height: usize
     ) -> Result<PerspectiveTransform, &str> {
         Self::fit_transform(raw_image_width, raw_image_height, finder_positions_image, &self.params)

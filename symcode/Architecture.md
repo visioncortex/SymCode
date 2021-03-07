@@ -17,5 +17,4 @@ A second configuration able to encode more bits is also planned:
 
 The `/interfaces` module defines the abstract concepts of different components composing a scanner.
 
-The `/acute32` modules implements this interface. Other implementations can be based on it, and only 
-modifying desired parts.
+The `/acute32` modules implements this interface. Other implementations can base themselves on it.
