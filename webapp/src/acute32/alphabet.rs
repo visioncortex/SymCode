@@ -85,13 +85,13 @@ impl AlphabetReaderParams {
 impl AlphabetReader {
     pub fn read_alphabet_to_library(image: BinaryImage, params: AlphabetReaderParams, symcode_config: &Acute32SymcodeConfig) -> Result<Acute32Library, &'static str> {
         let mut library = Acute32Library::default();
-        crate::acute32::util::render_binary_image_to_canvas(&image, symcode_config.debug_canvas.as_ref().unwrap())?;
+        symcode_config.debugger.render_binary_image_to_canvas(&image);
         for i in 0..params.num_rows {
             for j in 0..params.num_columns {
                 let offset = PointI32::new((j as f64 * params.offset_x) as i32, (i as f64 * params.offset_y) as i32);
                 let top_left = params.top_left + offset;
                 let rect = BoundingRect::new_x_y_w_h(top_left.x, top_left.y, params.symbol_width as i32, params.symbol_height as i32);
-                crate::acute32::util::render_bounding_rect_to_canvas(&rect, symcode_config.debug_canvas.as_ref().unwrap());
+                symcode_config.debugger.render_bounding_rect_to_canvas(&rect);
                 if !valid_pointi32_on_image(top_left, image.width, image.height) || !valid_pointi32_on_image(PointI32::new(rect.right, rect.bottom), image.width, image.height) {
                     return Err("AlphabetReader error: trying to crop out of image bound.");
                 }

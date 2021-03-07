@@ -5,12 +5,12 @@ use rand::{RngCore, SeedableRng, rngs::StdRng};
 use visioncortex::{BinaryImage, ColorImage, PointI32};
 use wasm_bindgen::prelude::*;
 
-use crate::{canvas::Canvas, interfaces::{finder::Finder as FinderInterface, encoder::Encoder as EncoderInterface}, util::console_log_util};
+use crate::{canvas::Canvas, interfaces::{Finder as FinderInterface, Encoder as EncoderInterface}, util::console_log_util};
 
-use super::{Acute32Decoder, Acute32FinderCandidate, Acute32Recognizer, Acute32SymcodeConfig, Acute32TransformFitter, AlphabetReader, AlphabetReaderParams, GlyphLabel, RecognizerInput, TransformFitterInput, is_black_hsv, render_binary_image_to_canvas};
+use super::{Acute32Decoder, Acute32FinderCandidate, Acute32Recognizer, Acute32SymcodeConfig, Acute32TransformFitter, AlphabetReader, AlphabetReaderParams, Debugger, GlyphLabel, RecognizerInput, TransformFitterInput, is_black_hsv, debugger::render_binary_image_to_canvas};
 
-use crate::interfaces::scanner::SymcodeScanner as ScannerInterface;
-use crate::interfaces::generator::SymcodeGenerator as GeneratorInterface;
+use crate::interfaces::SymcodeScanner as ScannerInterface;
+use crate::interfaces::SymcodeGenerator as GeneratorInterface;
 
 #[wasm_bindgen]
 pub struct Acute32SymcodeMain {
@@ -24,17 +24,23 @@ impl Default for Acute32SymcodeMain {
     }
 }
 
-#[wasm_bindgen]
 impl Acute32SymcodeMain {
-    pub fn new() -> Self {
-        Self::from_config(Acute32SymcodeConfig::default(), 125)
-    }
-
     pub fn from_config(config: Acute32SymcodeConfig, seed: u64) -> Self {
         Self {
             config,
             rng: StdRng::seed_from_u64(seed),
         }
+    }
+}
+
+#[wasm_bindgen]
+impl Acute32SymcodeMain {
+    pub fn new() -> Self {
+        let mut config = Acute32SymcodeConfig::default();
+        if let Some(debug_canvas) = Canvas::new_from_id("debug") {
+            config.debugger = Box::new(Debugger{ debug_canvas });
+        }
+        Self::from_config(config, 125)
     }
 
     pub fn seed_rng(&mut self, seed: u64) {
@@ -89,7 +95,7 @@ impl Acute32SymcodeMain {
 
         let (symcode, ground_truth_code) = self.generate_symcode_with_payload(payload)?;
 
-        if render_binary_image_to_canvas(&symcode, &canvas).is_err() {
+        if render_binary_image_to_canvas(&canvas, &symcode).is_err() {
             return Err("Cannot render generated symcode to canvas.".into());
         }
 
@@ -104,7 +110,7 @@ impl Acute32SymcodeMain {
         };
         let (symcode, ground_truth_code) = self.borrow_mut().generate_symcode_random()?;
 
-        if render_binary_image_to_canvas(&symcode, &canvas).is_err() {
+        if render_binary_image_to_canvas(&canvas, &symcode).is_err() {
             return Err("Cannot render generated symcode to canvas.".into());
         }
 

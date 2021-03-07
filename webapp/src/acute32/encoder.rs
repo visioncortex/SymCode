@@ -1,6 +1,6 @@
 use bit_vec::BitVec;
 
-use crate::interfaces::{decoder::Decoder as DecoderInterface, encoder::Encoder as EncoderInterface};
+use crate::interfaces::{Decoder as DecoderInterface, Encoder as EncoderInterface};
 
 use super::{Acute32Decoder, GlyphLabel};
 

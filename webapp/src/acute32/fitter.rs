@@ -137,9 +137,8 @@ impl Acute32TransformFitter {
             });
         });
         debug_min_err_src_pts.into_iter().enumerate().for_each(|(i, point)| {
-            crate::acute32::util::render_point_i32_to_canvas_with_size_color(
+            symcode_config.debugger.render_point_i32_to_canvas_with_size_color(
                 point.to_point_i32(),
-                crate::canvas::Canvas::new_from_id("debug").as_ref().unwrap(),
                 4+i,
                 visioncortex::Color::new(0, 255, 0));
         });

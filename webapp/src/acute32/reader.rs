@@ -80,9 +80,7 @@ impl Acute32Recognizer {
         let height = symcode_config.symbol_height;
         let top_left = center - PointI32::new((width >> 1) as i32, (height >> 1) as i32);
         let rect = BoundingRect::new_x_y_w_h(top_left.x, top_left.y, width as i32, height as i32);
-        if let Some(debug_canvas) = &symcode_config.debug_canvas {
-            crate::acute32::util::render_bounding_rect_to_canvas(&rect, debug_canvas);
-        }
+        symcode_config.debugger.render_bounding_rect_to_canvas(&rect);
         image.crop_with_rect(rect)
     }
 
@@ -97,10 +95,8 @@ impl Acute32Recognizer {
     /// Read all glyphs at the anchors on the input image
     pub fn read_glyphs_from_raw_frame(image: ColorImage, image_to_object: PerspectiveTransform, glyph_library: &Acute32Library, symcode_config: &crate::acute32::Acute32SymcodeConfig) -> Vec<GlyphLabel> {
         let rectified_image = Self::rectify_image(image, image_to_object, symcode_config);
-        if let Some(debug_canvas) = &symcode_config.debug_canvas {
-            if render_binary_image_to_canvas(&rectified_image, debug_canvas).is_err() {
-                crate::util::console_log_util("Cannot render rectified code image to debug canvas.");
-            }
+        if symcode_config.debugger.render_binary_image_to_canvas(&rectified_image).is_err() {
+            crate::util::console_log_util("Cannot render rectified code image to debug canvas.");
         }
         let cluster_rects: Vec<BoundingRect> = rectified_image.to_clusters(true).clusters.into_iter()
             .filter_map(|cluster| {
@@ -118,7 +114,7 @@ impl Acute32Recognizer {
             })
             .collect();
 
-        cluster_rects.iter().for_each(|rect| crate::acute32::util::render_bounding_rect_to_canvas_with_color(rect, crate::canvas::Canvas::new_from_id("debug").as_ref().unwrap(), visioncortex::Color::new(0, 0, 255)));
+        cluster_rects.iter().for_each(|rect| symcode_config.debugger.render_bounding_rect_to_canvas_with_color(rect, visioncortex::Color::new(0, 0, 255)));
         let grouped_cluster_rects = Self::group_cluster_rects_by_glyph_regions(cluster_rects, symcode_config);
         let centers_of_groups = Self::centers_of_merged_clusters_in_glyph_regions(grouped_cluster_rects);
         centers_of_groups.into_iter().map(|center| {

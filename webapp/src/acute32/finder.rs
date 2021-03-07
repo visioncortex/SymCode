@@ -1,6 +1,6 @@
 use visioncortex::{BinaryImage, BoundingRect, ColorImage, Shape};
-
-use crate::{interfaces::finder::Finder as FinderInterface, acute32::{Acute32SymcodeConfig, binarize_image_util, valid_pointf64_on_image}};
+use crate::{interfaces::Finder as FinderInterface, interfaces::Debugger};
+use super::{Acute32SymcodeConfig, binarize_image_util, valid_pointf64_on_image};
 
 /// Specific implementation of Finder symbol element
 #[derive(Default)]
@@ -42,15 +42,11 @@ impl Acute32FinderCandidate {
         let raw_frame = input;
         // Binarize
         let binary_raw_frame = binarize_image_util(raw_frame);
-        if let Some(debug_canvas) = &params.debug_canvas {
-            crate::acute32::util::render_binary_image_to_canvas(&binary_raw_frame, debug_canvas)?;
-        }
+        params.debugger.render_binary_image_to_canvas(&binary_raw_frame);
 
         // Processing starts
         let finder_candidates = Self::extract_finder_positions(binary_raw_frame, &params.finder);
-        if let Some(debug_canvas) = &params.debug_canvas {
-            Self::render_finder_candidates(&finder_candidates, debug_canvas);
-        }
+        Self::render_finder_candidates(params.debugger.as_ref(), &finder_candidates);
 
         if finder_candidates.len() > params.max_finder_candidates() {
             Err("Too many finder candidates!")
@@ -74,9 +70,9 @@ impl Acute32FinderCandidate {
         Ok(())
     }
 
-    fn render_finder_candidates(finder_candidates: &[BoundingRect], canvas: &crate::canvas::Canvas) {
+    fn render_finder_candidates(debugger: &dyn Debugger, finder_candidates: &[BoundingRect]) {
         finder_candidates.iter().for_each(|rect| {
-            crate::acute32::util::render_point_i32_to_canvas(rect.center(), canvas);
+            debugger.render_point_i32_to_canvas(rect.center());
         });
     }
 

@@ -1,4 +1,5 @@
 pub mod alphabet;
+pub mod debugger;
 pub mod decoder;
 pub mod encoder;
 pub mod fitter;
@@ -13,6 +14,7 @@ pub mod trace;
 pub mod util;
 
 pub use alphabet::*;
+pub use debugger::*;
 pub use decoder::*;
 pub use encoder::*;
 pub use finder::*;
@@ -24,4 +26,4 @@ pub use main::*;
 pub use symbol::*;
 pub use symcode_config::*;
 pub use trace::*;
-pub(crate) use util::*;
+pub use util::*;
