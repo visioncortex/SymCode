@@ -42,54 +42,54 @@ impl Numeric {
         yy
     }
 
-    pub fn inv(a: &Matrix) -> Option<Matrix> {
-        let s = Self::dim(a);
-        let m = s[0];
-        let n = s[1];
-        let mut A = Self::clone(a);
-        let mut I = Self::identity(m);
+    pub fn inv(mx: &Matrix) -> Option<Matrix> {
+        let dim = Self::dim(mx);
+        let m = dim[0];
+        let n = dim[1];
+        let mut mx = Self::clone(mx);
+        let mut ii = Self::identity(m);
         for j in 0..n {
             let mut i0 = 0;
             let mut v0 = -1.0;
             for i in j..m {
-                let k = (A[i][j]).abs();
+                let k = (mx[i][j]).abs();
                 if k > v0 {
                     i0 = i;
                     v0 = k;
                 }
             }
-            A.swap(i0, j);
-            I.swap(i0, j);
-            let x = A[j][j];
+            mx.swap(i0, j);
+            ii.swap(i0, j);
+            let x = mx[j][j];
             if x == 0.0 {
                 return None;
             }
             for k in j..n {
-                A[j][k] /= x; 
+                mx[j][k] /= x; 
             }
             for k in (0..n).rev() {
-                I[j][k] /= x;
+                ii[j][k] /= x;
             }
             for i in (0..m).rev() {
                 if i != j {
-                    let x = A[i][j];
+                    let x = mx[i][j];
                     for k in j+1..n {
-                        A[i][k] -= A[j][k]*x;
+                        mx[i][k] -= mx[j][k]*x;
                     }
                     let mut k = n as i32 - 1;
                     while k > 0 {
-                        I[i][k as usize] -= I[j][k as usize]*x;
+                        ii[i][k as usize] -= ii[j][k as usize]*x;
                         k -= 1;
-                        I[i][k as usize] -= I[j][k as usize]*x;
+                        ii[i][k as usize] -= ii[j][k as usize]*x;
                         k -= 1;
                     }
                     if k == 0 {
-                        I[i][0] -= I[j][0]*x;
+                        ii[i][0] -= ii[j][0]*x;
                     }
                 }
             }
         }
-        Some(I)
+        Some(ii)
     }
 
     pub fn dot_mm_small(x: &Matrix, y: &Matrix) -> Matrix {
