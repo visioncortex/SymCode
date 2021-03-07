@@ -1,13 +1,19 @@
 use permutator::{Combination, Permutation};
 use visioncortex::{BoundingRect, PointF64, PerspectiveTransform};
-
 use crate::math::{clockwise_points_f64, euclid_dist_f64, normalize_point_f64};
-
+use crate::interfaces::Fitter;
 use super::{Acute32SymcodeConfig, valid_pointf64_on_image};
 
-pub struct Acute32TransformFitter;
+pub struct Acute32TransformFitter<'a> {
+    params: &'a Acute32SymcodeConfig,
+}
 
-impl Acute32TransformFitter {
+impl<'a> Acute32TransformFitter<'a> {
+
+    pub fn new(params: &'a Acute32SymcodeConfig) -> Acute32TransformFitter<'a> {
+        Self { params }
+    }
+
     /// Use the top of each finder in object space as check points
     fn calculate_check_points(symcode_config: &crate::acute32::Acute32SymcodeConfig) -> Vec<PointF64> {
         symcode_config.finder_positions.iter()
@@ -157,15 +163,10 @@ impl Acute32TransformFitter {
     }
 }
 
-pub struct TransformFitterInput {
-    pub finder_positions_image: Vec<BoundingRect>,
-    pub raw_image_width: usize,
-    pub raw_image_height: usize,
-}
-
-impl Acute32TransformFitter {
-    pub fn process(input: TransformFitterInput, params: &Acute32SymcodeConfig) -> Result<PerspectiveTransform, &str> {
-        // Processing starts
-        Self::fit_transform(input.raw_image_width, input.raw_image_height, input.finder_positions_image, params)
+impl Fitter for Acute32TransformFitter<'_> {
+    fn process(
+        &self, finder_positions_image: Vec<BoundingRect>, raw_image_width: usize, raw_image_height: usize
+    ) -> Result<PerspectiveTransform, &str> {
+        Self::fit_transform(raw_image_width, raw_image_height, finder_positions_image, &self.params)
     }
 }

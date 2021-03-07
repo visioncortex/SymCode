@@ -1,12 +1,12 @@
 use visioncortex::{BinaryImage, BoundingRect, ColorImage, Shape};
-use crate::{interfaces::Finder as FinderInterface, interfaces::Debugger};
+use crate::{interfaces::Finder as FinderInterface, interfaces::FinderElement, interfaces::Debugger};
 use super::{Acute32SymcodeConfig, binarize_image_util, valid_pointf64_on_image};
 
 /// Specific implementation of Finder symbol element
 #[derive(Default)]
 pub struct CircleFinder;
 
-impl FinderInterface for CircleFinder {
+impl FinderElement for CircleFinder {
 
     fn to_image(&self, width: usize, height: usize) -> BinaryImage {
         Shape::circle(width, height).image
@@ -31,28 +31,14 @@ impl FinderInterface for CircleFinder {
 }
 
 /// Specific implementation of Finder candidates
-pub struct Acute32FinderCandidate;
+pub struct Acute32FinderCandidate<'a> {
+    params: &'a Acute32SymcodeConfig,
+}
 
-impl Acute32FinderCandidate {
+impl<'a> Acute32FinderCandidate<'a> {
 
-    pub fn process(input: &ColorImage, params: &Acute32SymcodeConfig) -> Result<Vec<BoundingRect>, &'static str> {
-        Self::valid_params(params)?;
-
-        // Get the reference to the input raw frame
-        let raw_frame = input;
-        // Binarize
-        let binary_raw_frame = binarize_image_util(raw_frame);
-        params.debugger.render_binary_image_to_canvas(&binary_raw_frame);
-
-        // Processing starts
-        let finder_candidates = Self::extract_finder_positions(binary_raw_frame, &params.finder);
-        Self::render_finder_candidates(params.debugger.as_ref(), &finder_candidates);
-
-        if finder_candidates.len() > params.max_finder_candidates() {
-            Err("Too many finder candidates!")
-        } else {
-            Ok(finder_candidates)
-        }
+    pub fn new(params: &'a Acute32SymcodeConfig) -> Acute32FinderCandidate<'a> {
+        Self { params }
     }
 
     pub fn valid_params(params: &Acute32SymcodeConfig) -> Result<(), &'static str> {
@@ -88,5 +74,28 @@ impl Acute32FinderCandidate {
                 }
             })
             .collect()
+    }
+}
+
+impl<'a> FinderInterface for Acute32FinderCandidate<'a> {
+    fn process(&self, input: &ColorImage) -> Result<Vec<BoundingRect>, &'static str> {
+        let params = self.params;
+        Acute32FinderCandidate::valid_params(params)?;
+
+        // Get the reference to the input raw frame
+        let raw_frame = input;
+        // Binarize
+        let binary_raw_frame = binarize_image_util(raw_frame);
+        params.debugger.render_binary_image_to_canvas(&binary_raw_frame)?;
+
+        // Processing starts
+        let finder_candidates = Acute32FinderCandidate::extract_finder_positions(binary_raw_frame, &params.finder);
+        Acute32FinderCandidate::render_finder_candidates(params.debugger.as_ref(), &finder_candidates);
+
+        if finder_candidates.len() > params.max_finder_candidates() {
+            Err("Too many finder candidates!")
+        } else {
+            Ok(finder_candidates)
+        }
     }
 }

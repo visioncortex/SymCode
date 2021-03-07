@@ -4,8 +4,8 @@ use rand::{RngCore, SeedableRng, rngs::StdRng};
 use visioncortex::{BinaryImage, ColorImage, PointI32};
 use wasm_bindgen::prelude::*;
 
-use symcode::acute32::{Acute32Decoder, Acute32FinderCandidate, Acute32Recognizer, Acute32SymcodeConfig, Acute32TransformFitter, AlphabetReader, AlphabetReaderParams, GlyphLabel, RecognizerInput, TransformFitterInput};
-use symcode::interfaces::{Finder as FinderInterface, Encoder as EncoderInterface, SymcodeScanner as ScannerInterface, SymcodeGenerator as GeneratorInterface};
+use symcode::acute32::{Acute32Decoder, Acute32FinderCandidate, Acute32Recognizer, Acute32SymcodeConfig, Acute32TransformFitter, AlphabetReader, AlphabetReaderParams, GlyphLabel, RecognizerInput};
+use symcode::interfaces::{Finder, FinderElement, Fitter, Encoder as EncoderInterface, SymcodeScanner as ScannerInterface, SymcodeGenerator as GeneratorInterface};
 use symcode::math::{into_bitvec, num_bits_to_store, num_significant_bits};
 use crate::{canvas::Canvas, util::console_log_util};
 use crate::debugger::{Debugger, render_binary_image_to_canvas};
@@ -169,24 +169,20 @@ impl ScannerInterface for Acute32SymcodeMain {
     fn scan(&self, image: ColorImage) -> Result<Self::SymcodeRepresentation, Self::Err> {
         let symcode_config = &self.config;
         // Stage 1: Locate finder candidates
-        let finder_positions = match Acute32FinderCandidate::process(
-            &image,
-            symcode_config
+        let finder_positions = match Acute32FinderCandidate::new(symcode_config).process(
+            &image
         ) {
             Ok(finder_positions) => finder_positions,
             Err(e) => {
                 return Err(("Failed at Stage 1: ".to_owned() + e).into());
             }
         };
-        
+
         // Stage 2: Fit a perspective transform from the image space to the object space
-        let image_to_object = match Acute32TransformFitter::process(
-            TransformFitterInput {
-                finder_positions_image: finder_positions,
-                raw_image_width: image.width,
-                raw_image_height: image.height,
-            },
-            symcode_config
+        let image_to_object = match Acute32TransformFitter::new(symcode_config).process(
+            finder_positions,
+            image.width,
+            image.height
         ) {
             Ok(image_to_object) => image_to_object,
             Err(e) => {
