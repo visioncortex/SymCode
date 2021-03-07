@@ -18,8 +18,18 @@ pub struct Acute32SymcodeMain {
     rng: StdRng,
 }
 
+impl Default for Acute32SymcodeMain {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[wasm_bindgen]
 impl Acute32SymcodeMain {
+    pub fn new() -> Self {
+        Self::from_config(Acute32SymcodeConfig::default(), 125)
+    }
+
     pub fn from_config(config: Acute32SymcodeConfig, seed: u64) -> Self {
         Self {
             config,

@@ -45,7 +45,7 @@ impl Default for Acute32SymcodeConfig {
                 PointF64::new(200.0, 80.0),
                 PointF64::new(200.0, 200.0),
                 PointF64::new(80.0, 320.0),
-                PointF64::new(320.0, 320.0)
+                PointF64::new(320.0, 320.0),
             ],
             glyph_anchors: vec![
                 PointF64::new(40.0, 40.0),
@@ -54,16 +54,16 @@ impl Default for Acute32SymcodeConfig {
                 PointF64::new(280.0, 160.0),
                 PointF64::new(280.0, 40.0),
             ],
-            debug_canvas: None,
+            debug_canvas: Canvas::new_from_id("debug"),
             max_extra_finder_candidates: 3,
-            rectify_error_threshold: 20.0,
-            stat_tolerance: 0.2,
-            max_encoding_difference: 1,
-            empty_cluster_threshold: 0.2,
+            rectify_error_threshold: 0.5,
+            stat_tolerance: 0.36,
+            max_encoding_difference: 3,
+            empty_cluster_threshold: 0.15,
             symbol_library: Rc::new(Acute32Library::default()),
             finder: CircleFinder::default(),
             encoder: Acute32Encoder::default(),
-            quiet_zone_width: 5,
+            quiet_zone_width: 10,
         }
     }
 }
