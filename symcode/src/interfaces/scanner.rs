@@ -1,6 +1,5 @@
 use bit_vec::BitVec;
 use visioncortex::ColorImage;
-use super::*;
 
 pub trait SymcodeScanner {
 

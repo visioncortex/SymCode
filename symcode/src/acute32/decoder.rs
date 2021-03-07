@@ -3,6 +3,7 @@ use crate::interfaces::Decoder;
 use super::{Acute32SymcodeConfig, GlyphLabel};
 
 pub struct Acute32Decoder<'a> {
+    #[allow(dead_code)]
     config: &'a Acute32SymcodeConfig,
 }
 

@@ -22,7 +22,7 @@ pub use reader::*;
 pub use symbol::*;
 pub use symcode_config::*;
 pub use trace::*;
-pub use util::*;
+use util::*;
 
 pub struct Acute32<'a> {
     config: &'a Acute32SymcodeConfig,
