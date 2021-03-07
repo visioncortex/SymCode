@@ -1,25 +1,19 @@
 use bit_vec::BitVec;
-
 use crate::interfaces::Decoder;
+use super::{Acute32SymcodeConfig, GlyphLabel};
 
-use super::GlyphLabel;
-
-pub struct Acute32Decoder;
-
-impl Default for Acute32Decoder {
-    fn default() -> Self {
-        Self::new()
-    }
+pub struct Acute32Decoder<'a> {
+    params: &'a Acute32SymcodeConfig,
 }
 
-impl Acute32Decoder {
-    pub fn new() -> Self {
-        Self
+impl<'a> Acute32Decoder<'a> {
+    pub fn new(params: &'a Acute32SymcodeConfig) -> Acute32Decoder<'a> {
+        Self { params }
     }
 }
 
 // Dummy implementation, error detection/correction will be supported later
-impl Decoder for Acute32Decoder {
+impl Decoder for Acute32Decoder<'_> {
     type Symbol = GlyphLabel;
 
     type Err = &'static str;

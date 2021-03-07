@@ -2,15 +2,22 @@ use bit_vec::BitVec;
 
 use crate::interfaces::{Decoder as DecoderInterface, Encoder as EncoderInterface};
 
-use super::{Acute32Decoder, GlyphLabel};
+use super::{Acute32SymcodeConfig, Acute32Decoder, GlyphLabel};
 
-#[derive(Default)]
-pub struct Acute32Encoder;
+pub struct Acute32Encoder<'a> {
+    params: &'a Acute32SymcodeConfig,
+}
 
-impl EncoderInterface for Acute32Encoder {
+impl<'a> Acute32Encoder<'a> {
+    pub fn new(params: &'a Acute32SymcodeConfig) -> Acute32Encoder<'a> {
+        Self { params }
+    }
+}
+
+impl EncoderInterface for Acute32Encoder<'_> {
     type SymcodeRepresentation = Vec<GlyphLabel>;
 
-    fn encode(&self, payload: bit_vec::BitVec, num_glyphs: usize) -> Result<Self::SymcodeRepresentation, &str> {
+    fn encode(&self, payload: bit_vec::BitVec, num_glyphs: usize) -> Result<Self::SymcodeRepresentation, &'static str> {
         let symbol_num_bits = crate::math::num_bits_to_store(GlyphLabel::num_variants());
         if payload.len() != (symbol_num_bits*num_glyphs - 5) { // Reserve 5 bits for CRC5 checksum
             panic!("Input bits length and self-defined length do not agree!");
@@ -45,7 +52,7 @@ impl EncoderInterface for Acute32Encoder {
         }
 
         // Sanity check
-        match Acute32Decoder::new().decode(result.clone()) {
+        match Acute32Decoder::new(self.params).decode(result.clone()) {
             Ok(decoded_payload) => if payload != decoded_payload {return Err("Encoder error: sanity check failed.")},
             Err(e) => return Err(e),
         }

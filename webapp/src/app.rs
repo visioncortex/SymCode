@@ -3,8 +3,8 @@ use rand::{RngCore, SeedableRng, rngs::StdRng};
 use visioncortex::{BinaryImage, ColorImage, PointI32};
 use wasm_bindgen::prelude::*;
 
-use symcode::acute32::{Acute32Decoder, Acute32FinderCandidate, Acute32Recognizer, Acute32SymcodeConfig, Acute32TransformFitter, AlphabetReader, AlphabetReaderParams, GlyphLabel};
-use symcode::interfaces::{Finder, FinderElement, Fitter, Reader, Encoder, Decoder, SymcodeScanner, SymcodeGenerator};
+use symcode::acute32::{Acute32, Acute32SymcodeConfig, AlphabetReader, AlphabetReaderParams, GlyphLabel};
+use symcode::interfaces::{Decoder, Finder, FinderElement, Fitter, Reader, Encoder, SymcodeScanner, SymcodeGenerator};
 use symcode::math::{into_bitvec, num_bits_to_store, num_significant_bits};
 use crate::{canvas::Canvas, util::console_log_util};
 use crate::debugger::{Debugger, render_binary_image_to_canvas};
@@ -122,7 +122,8 @@ impl Acute32SymcodeMain {
 
         let num_symbols = self.config.num_glyphs_in_code();
 
-        let symcode_representation = self.config.encoder.encode(payload, num_symbols)?;
+        let acute32 = Acute32::new(&self.config);
+        let symcode_representation = acute32.get_encoder().encode(payload, num_symbols)?;
         let symcode_string = format!("{:?}", symcode_representation);
 
         let code_image = self.generate(symcode_representation);
@@ -147,7 +148,8 @@ impl Acute32SymcodeMain {
         );
         let payload_bit_string = format!("{:?}", payload);
 
-        let symcode_representation = self.config.encoder.encode(payload, num_symbols)?;
+        let acute32 = Acute32::new(&self.config);
+        let symcode_representation = acute32.get_encoder().encode(payload, num_symbols)?;
         let symcode_string = format!("{:?}", symcode_representation);
 
         let code_image = self.generate(symcode_representation);
@@ -166,9 +168,10 @@ impl SymcodeScanner for Acute32SymcodeMain {
     type Err = JsValue;
 
     fn scan(&self, image: ColorImage) -> Result<Self::SymcodeRepresentation, Self::Err> {
-        let symcode_config = &self.config;
+        let acute32 = Acute32::new(&self.config);
+
         // Stage 1: Locate finder candidates
-        let finder_positions = match Acute32FinderCandidate::new(symcode_config).find(
+        let finder_positions = match acute32.get_finder().find(
             &image
         ) {
             Ok(finder_positions) => finder_positions,
@@ -178,7 +181,7 @@ impl SymcodeScanner for Acute32SymcodeMain {
         };
 
         // Stage 2: Fit a perspective transform from the image space to the object space
-        let image_to_object = match Acute32TransformFitter::new(symcode_config).fit(
+        let image_to_object = match acute32.get_fitter().fit(
             finder_positions,
             image.width,
             image.height
@@ -190,7 +193,7 @@ impl SymcodeScanner for Acute32SymcodeMain {
         };
 
         // Stage 3: Recognize the glyphs
-        let symcode_instance = match Acute32Recognizer::new(symcode_config).read(
+        let symcode_instance = match acute32.get_reader().read(
             image,
             image_to_object
         ) {
@@ -204,8 +207,10 @@ impl SymcodeScanner for Acute32SymcodeMain {
     }
 
     fn decode(&self, symcode: Self::SymcodeRepresentation) -> Result<bit_vec::BitVec, Self::Err> {
+        let acute32 = Acute32::new(&self.config);
+
         // Stage 4: Decode the Symcode
-        match Acute32Decoder::new().decode(
+        match acute32.get_decoder().decode(
             symcode
         ) {
             Ok(decoded_symcode) => {
