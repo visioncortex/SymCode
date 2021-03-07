@@ -25,7 +25,6 @@ pub(crate) fn euclid_dist_vec_f64(v1: &[f64], v2: &[f64]) -> f64 {
     if v1.len() != v2.len() {
         panic!("Lengths of vectors do not agree.");
     }
-    let len = v1.len();
     v1.iter().enumerate()
         .fold(0.0, |acc, (i, element)| acc + (element - v2[i])*(element - v2[i]))
         .sqrt()
