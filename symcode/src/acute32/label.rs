@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 use bit_vec::BitVec;
 
-use crate::{math::into_bitvec, util::console_log_util};
+use crate::math::into_bitvec;
 
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
@@ -74,7 +74,7 @@ impl GlyphLabel {
         match FromPrimitive::from_usize(label) {
             Some(glyph_label) => glyph_label,
             None => {
-                console_log_util(&format!("No corresponding label for {}.", label));
+                log::error!("No corresponding label for {}.", label);
                 panic!();
             },
         }
@@ -87,7 +87,7 @@ impl GlyphLabel {
         match ToPrimitive::to_usize(&label) {
             Some(primitive) => Some(primitive),
             None => {
-                console_log_util(&format!("Cannot convert {:?} to primitive.", label));
+                log::error!("Cannot convert {:?} to primitive.", label);
                 None
             }
         }

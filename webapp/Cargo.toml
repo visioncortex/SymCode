@@ -16,16 +16,13 @@ default = ["console_error_panic_hook"]
 bit-vec = "0.6.3"
 cfg-if = "0.1"
 console_log = { version = "0.2", features = ["color"] }
-crczoo = { path = "../crczoo" }
-wasm-bindgen = { version = "0.2", features = ["serde-serialize"]  }
+image = "0.23.10"
+rand = { version = "0.7.3", features = ["wasm-bindgen"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+symcode = { path = "../symcode" }
 visioncortex = { path = "../visioncortex" }
-permutator = "0.4.0"
-image = "0.23.10"
-num-traits = "0.2"
-num-derive = "0.3"
-rand = { version = "0.7.3", features = ["wasm-bindgen"] }
+wasm-bindgen = { version = "0.2", features = ["serde-serialize"]  }
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires

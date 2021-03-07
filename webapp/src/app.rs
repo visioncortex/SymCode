@@ -4,12 +4,12 @@ use rand::{RngCore, SeedableRng, rngs::StdRng};
 use visioncortex::{BinaryImage, ColorImage, PointI32};
 use wasm_bindgen::prelude::*;
 
-use crate::{canvas::Canvas, interfaces::{Finder as FinderInterface, Encoder as EncoderInterface}, util::console_log_util};
-use crate::acute32::{Acute32Decoder, Acute32FinderCandidate, Acute32Recognizer, Acute32SymcodeConfig, Acute32TransformFitter, AlphabetReader, AlphabetReaderParams, GlyphLabel, RecognizerInput, TransformFitterInput, is_black_hsv};
+use symcode::acute32::{Acute32Decoder, Acute32FinderCandidate, Acute32Recognizer, Acute32SymcodeConfig, Acute32TransformFitter, AlphabetReader, AlphabetReaderParams, GlyphLabel, RecognizerInput, TransformFitterInput};
+use symcode::interfaces::{Finder as FinderInterface, Encoder as EncoderInterface, SymcodeScanner as ScannerInterface, SymcodeGenerator as GeneratorInterface};
+use symcode::math::{into_bitvec, num_bits_to_store, num_significant_bits};
+use crate::{canvas::Canvas, util::console_log_util};
 use crate::debugger::{Debugger, render_binary_image_to_canvas};
-
-use crate::interfaces::SymcodeScanner as ScannerInterface;
-use crate::interfaces::SymcodeGenerator as GeneratorInterface;
+use super::helper::is_black_hsv;
 
 #[wasm_bindgen]
 pub struct Acute32SymcodeMain {
@@ -83,7 +83,7 @@ impl Acute32SymcodeMain {
 
     // Payload should be encodable in 20 bits max
     pub fn generate_symcode_to_canvas(&self, canvas_id: &str, payload: usize) -> Result<String, JsValue> {
-        if crate::math::num_significant_bits(payload) > 20 {
+        if num_significant_bits(payload) > 20 {
             return Err("Payload has too many bits!".into());
         }
 
@@ -118,7 +118,7 @@ impl Acute32SymcodeMain {
     }
 
     fn generate_symcode_with_payload(&self, payload: usize) -> Result<(BinaryImage, String), &str> {
-        let payload = crate::math::into_bitvec(payload, 20);
+        let payload = into_bitvec(payload, 20);
         let payload_bit_string = format!("{:?}", payload);
 
         let num_symbols = self.config.num_glyphs_in_code();
@@ -138,7 +138,7 @@ impl Acute32SymcodeMain {
     /// Randomly generate a 20-bit bit string, calculate CRC5 checksum (which is 5 bits)
     /// Then encode the 25-bit bit string into a symcode and generate the code image
     fn generate_symcode_random(&mut self) -> Result<(BinaryImage, String), &str> {
-        let symbol_num_bits = crate::math::num_bits_to_store(GlyphLabel::num_variants());
+        let symbol_num_bits = num_bits_to_store(GlyphLabel::num_variants());
         let num_symbols = self.config.num_glyphs_in_code();
 
         // Dummy data

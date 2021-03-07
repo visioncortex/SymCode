@@ -1,12 +1,10 @@
 use wasm_bindgen::prelude::*;
 
-pub mod acute32;
-pub mod interfaces;
 pub mod app;
 pub mod canvas;
 pub mod common;
 pub mod debugger;
-pub mod math;
+pub mod helper;
 pub mod util;
 
 #[wasm_bindgen(start)]

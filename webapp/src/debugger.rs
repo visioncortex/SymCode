@@ -1,7 +1,7 @@
 use wasm_bindgen::{Clamped, JsValue};
 use web_sys::ImageData;
 use visioncortex::{BoundingRect, Color, BinaryImage, ColorImage};
-use crate::interfaces::Debugger as DebuggerInterface;
+use symcode::interfaces::Debugger as DebuggerInterface;
 use crate::canvas::Canvas;
 
 pub struct Debugger {

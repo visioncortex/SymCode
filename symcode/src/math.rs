@@ -1,27 +1,27 @@
 use bit_vec::BitVec;
 use visioncortex::PointF64;
 
-pub(crate) const EPSILON: f64 = std::f64::EPSILON;
+pub const EPSILON: f64 = std::f64::EPSILON;
 
-pub(crate) fn f64_approximately(a: f64, b: f64) -> bool {
+pub fn f64_approximately(a: f64, b: f64) -> bool {
     (a - b).abs() <= EPSILON
 }
 
-pub(crate) fn normalize_point_f64(p: &PointF64) -> PointF64 {
+pub fn normalize_point_f64(p: &PointF64) -> PointF64 {
     let norm = p.norm();
     PointF64::new(p.x / norm, p.y / norm)
 }
 
-pub(crate) fn normalize_vec_f64(v: &[f64]) -> Vec<f64> {
+pub fn normalize_vec_f64(v: &[f64]) -> Vec<f64> {
     let norm = v.iter().fold(0.0, |acc, element| acc + element * element).sqrt();
     v.iter().map(|element| element / norm).collect()
 }
 
-pub(crate) fn euclid_dist_f64(p1: &PointF64, p2: &PointF64) -> f64 {
+pub fn euclid_dist_f64(p1: &PointF64, p2: &PointF64) -> f64 {
     (*p1-*p2).norm()
 }
 
-pub(crate) fn euclid_dist_vec_f64(v1: &[f64], v2: &[f64]) -> f64 {
+pub fn euclid_dist_vec_f64(v1: &[f64], v2: &[f64]) -> f64 {
     if v1.len() != v2.len() {
         panic!("Lengths of vectors do not agree.");
     }
@@ -33,7 +33,7 @@ pub(crate) fn euclid_dist_vec_f64(v1: &[f64], v2: &[f64]) -> f64 {
 /// Returns true iff the traversal p1->p2->p3 is in clockwise order and not collinear.
 ///
 /// Assumes origin in top-left corner.
-pub(crate) fn clockwise_points_f64(p1: &PointF64, p2: &PointF64, p3: &PointF64) -> bool {
+pub fn clockwise_points_f64(p1: &PointF64, p2: &PointF64, p3: &PointF64) -> bool {
     let cross_product_z_component = |a: PointF64, b: PointF64| { a.x * b.y - a.y * b.x };
 
     let p1p2 = *p2 - *p1;
@@ -46,7 +46,7 @@ pub(crate) fn clockwise_points_f64(p1: &PointF64, p2: &PointF64, p3: &PointF64) 
 }
 
 /// Returns the minimum number of bits needed to store n elements
-pub(crate) fn num_bits_to_store(n: usize) -> usize {
+pub fn num_bits_to_store(n: usize) -> usize {
     // Special cases
     if n == 0 {
         return 0; // 0 bits are needed to store 0 elements
@@ -57,12 +57,12 @@ pub(crate) fn num_bits_to_store(n: usize) -> usize {
     num_significant_bits(n)
 }
 
-pub(crate) fn num_significant_bits(n: usize) -> usize {
+pub fn num_significant_bits(n: usize) -> usize {
     (0_usize.leading_zeros() - n.leading_zeros()) as usize
 }
 
 /// Converts a usize into BitVec using the specified number of bits
-pub(crate) fn into_bitvec(mut n: usize, len: usize) -> BitVec {
+pub fn into_bitvec(mut n: usize, len: usize) -> BitVec {
     if len < num_significant_bits(n) {
         panic!(format!("Not enough bits to store {}", n));
     }

@@ -3,9 +3,7 @@ use std::collections::HashMap;
 use bit_vec::BitVec;
 use visioncortex::{BinaryImage, Sampler};
 
-use crate::{acute32::{Symbol, Acute32SymcodeConfig, Trace, image_diff_area}};
-
-use super::{GlyphLabel, GlyphTrace};
+use super::{Acute32SymcodeConfig, GlyphLabel, GlyphTrace, Symbol, Trace, image_diff_area};
 
 #[derive(Debug)]
 pub struct Acute32Library {

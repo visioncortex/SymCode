@@ -96,7 +96,7 @@ impl Acute32Recognizer {
     pub fn read_glyphs_from_raw_frame(image: ColorImage, image_to_object: PerspectiveTransform, glyph_library: &Acute32Library, symcode_config: &crate::acute32::Acute32SymcodeConfig) -> Vec<GlyphLabel> {
         let rectified_image = Self::rectify_image(image, image_to_object, symcode_config);
         if symcode_config.debugger.render_binary_image_to_canvas(&rectified_image).is_err() {
-            crate::util::console_log_util("Cannot render rectified code image to debug canvas.");
+            log::error!("Cannot render rectified code image to debug canvas.");
         }
         let cluster_rects: Vec<BoundingRect> = rectified_image.to_clusters(true).clusters.into_iter()
             .filter_map(|cluster| {
@@ -144,7 +144,7 @@ impl Acute32Recognizer {
         // Processing starts
         let glyph_library = input.glyph_library.borrow();
         let glyphs = Self::read_glyphs_from_raw_frame(input.raw_frame, input.image_to_object, glyph_library, params);
-        //crate::util::console_log_util(&format!("Recognized glyphs: {:?}", glyphs));
+        //log::error!(&format!("Recognized glyphs: {:?}", glyphs));
         Ok(glyphs)
     }
 }
