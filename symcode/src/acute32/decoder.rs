@@ -3,12 +3,12 @@ use crate::interfaces::Decoder;
 use super::{Acute32SymcodeConfig, GlyphLabel};
 
 pub struct Acute32Decoder<'a> {
-    params: &'a Acute32SymcodeConfig,
+    config: &'a Acute32SymcodeConfig,
 }
 
 impl<'a> Acute32Decoder<'a> {
-    pub fn new(params: &'a Acute32SymcodeConfig) -> Acute32Decoder<'a> {
-        Self { params }
+    pub fn new(config: &'a Acute32SymcodeConfig) -> Acute32Decoder<'a> {
+        Self { config }
     }
 }
 

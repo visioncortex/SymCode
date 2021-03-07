@@ -34,23 +34,23 @@ impl<'a> Acute32<'a> {
         Self { config }
     }
 
-	pub fn get_finder(&'a self) -> Acute32FinderCandidate<'a> {
+	pub fn get_finder(&self) -> Acute32FinderCandidate {
 		Acute32FinderCandidate::new(self.config)
 	}
 
-	pub fn get_fitter(&'a self) -> Acute32TransformFitter<'a> {
+	pub fn get_fitter(&self) -> Acute32TransformFitter {
 		Acute32TransformFitter::new(self.config)
 	}
 
-	pub fn get_reader(&'a self) -> Acute32Recognizer<'a> {
+	pub fn get_reader(&self) -> Acute32Recognizer {
 		Acute32Recognizer::new(self.config)
 	}
 
-	pub fn get_decoder(&'a self) -> Acute32Decoder {
+	pub fn get_decoder(&self) -> Acute32Decoder {
 		Acute32Decoder::new(self.config)
 	}
 
-	pub fn get_encoder(&'a self) -> Acute32Encoder {
+	pub fn get_encoder(&self) -> Acute32Encoder {
 		Acute32Encoder::new(self.config)
 	}
 }

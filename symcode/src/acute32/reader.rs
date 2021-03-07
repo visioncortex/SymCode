@@ -3,13 +3,13 @@ use crate::interfaces::Reader;
 use super::{Acute32Library, Acute32SymcodeConfig, GlyphLabel, is_black_rgb};
 
 pub struct Acute32Recognizer<'a> {
-    params: &'a Acute32SymcodeConfig,
+    config: &'a Acute32SymcodeConfig,
 }
 
 impl<'a> Acute32Recognizer<'a> {
 
-    pub fn new(params: &'a Acute32SymcodeConfig) -> Acute32Recognizer<'a> {
-        Self { params }
+    pub fn new(config: &'a Acute32SymcodeConfig) -> Acute32Recognizer<'a> {
+        Self { config }
     }
 
     pub fn rectify_image(raw_image: ColorImage, image_to_object: PerspectiveTransform, symcode_config: &Acute32SymcodeConfig) -> BinaryImage {
@@ -89,7 +89,7 @@ impl<'a> Acute32Recognizer<'a> {
         image.crop_with_rect(rect)
     }
 
-    /// Finds the most similar glyph in the library based on given params
+    /// Finds the most similar glyph in the library based on given config
     pub fn find_most_similar_glyph(image: BinaryImage, glyph_library: &Acute32Library, symcode_config: &Acute32SymcodeConfig) -> GlyphLabel {
         glyph_library.find_most_similar_glyph(
             image,
@@ -142,8 +142,8 @@ impl Reader for Acute32Recognizer<'_> {
     type Symbol = GlyphLabel;
 
     fn read(&self, raw_frame: ColorImage, image_to_object: PerspectiveTransform) -> Result<Vec<GlyphLabel>, &'static str> {
-        let glyph_library = self.params.symbol_library.as_ref();
-        let glyphs = Self::read_glyphs_from_raw_frame(raw_frame, image_to_object, glyph_library, self.params);
+        let glyph_library = self.config.symbol_library.as_ref();
+        let glyphs = Self::read_glyphs_from_raw_frame(raw_frame, image_to_object, glyph_library, self.config);
         //log::error!(&format!("Recognized glyphs: {:?}", glyphs));
         Ok(glyphs)
     }

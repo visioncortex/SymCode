@@ -5,13 +5,13 @@ use crate::interfaces::Fitter;
 use super::{Acute32SymcodeConfig, valid_pointf64_on_image};
 
 pub struct Acute32TransformFitter<'a> {
-    params: &'a Acute32SymcodeConfig,
+    config: &'a Acute32SymcodeConfig,
 }
 
 impl<'a> Acute32TransformFitter<'a> {
 
-    pub fn new(params: &'a Acute32SymcodeConfig) -> Acute32TransformFitter<'a> {
-        Self { params }
+    pub fn new(config: &'a Acute32SymcodeConfig) -> Acute32TransformFitter<'a> {
+        Self { config }
     }
 
     /// Use the top of each finder in object space as check points
@@ -167,6 +167,6 @@ impl Fitter for Acute32TransformFitter<'_> {
     fn fit(
         &self, finder_positions_image: Vec<BoundingRect>, raw_image_width: usize, raw_image_height: usize
     ) -> Result<PerspectiveTransform, &str> {
-        Self::fit_transform(raw_image_width, raw_image_height, finder_positions_image, &self.params)
+        Self::fit_transform(raw_image_width, raw_image_height, finder_positions_image, &self.config)
     }
 }

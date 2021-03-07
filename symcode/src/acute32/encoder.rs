@@ -5,12 +5,12 @@ use crate::interfaces::{Decoder as DecoderInterface, Encoder as EncoderInterface
 use super::{Acute32SymcodeConfig, Acute32Decoder, GlyphLabel};
 
 pub struct Acute32Encoder<'a> {
-    params: &'a Acute32SymcodeConfig,
+    config: &'a Acute32SymcodeConfig,
 }
 
 impl<'a> Acute32Encoder<'a> {
-    pub fn new(params: &'a Acute32SymcodeConfig) -> Acute32Encoder<'a> {
-        Self { params }
+    pub fn new(config: &'a Acute32SymcodeConfig) -> Acute32Encoder<'a> {
+        Self { config }
     }
 }
 
@@ -52,7 +52,7 @@ impl EncoderInterface for Acute32Encoder<'_> {
         }
 
         // Sanity check
-        match Acute32Decoder::new(self.params).decode(result.clone()) {
+        match Acute32Decoder::new(self.config).decode(result.clone()) {
             Ok(decoded_payload) => if payload != decoded_payload {return Err("Encoder error: sanity check failed.")},
             Err(e) => return Err(e),
         }
@@ -68,7 +68,8 @@ mod tests {
 
     #[test]
     fn encoder_symcode_from_bitvec() {
-        let encoder = Acute32Encoder::default(); 
+        let config = Acute32SymcodeConfig::default();
+        let encoder = Acute32Encoder::new(&config);
         let mut bits = BitVec::from_bytes(&[0b01001010, 0b00000001, 0b10000011, 0b01000100]); // Will be 32 bits
         bits.truncate(30); // Only wants the first 30 bits (last two 0's are dummy)
         let symcode = encoder.encode(bits, 5).unwrap();
