@@ -1,9 +1,7 @@
 import { Acute32SymcodeMain } from "symcode";
 import { loadAlphabet } from "./load";
 
-const scanButton = document.getElementById('scan');
 const wrapper = document.getElementById('coupon_wrapper');
-const camera = document.getElementById('camera');
 
 const frameCanvas = document.getElementById('frame');
 const frameCtx = frameCanvas.getContext('2d');
@@ -28,24 +26,9 @@ function handleSuccess(msg) {
     console.log("%c" + msg, SUCCESS_COLOR);
 }
 
-function scanImageFromSource(source) {
-    img.onload = function () {
-        ctx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
-        ctx.drawImage(img, 0, 0);
-        scan()
-            .then((result) => {
-                console.log("Recognition result: " + result.code);
-            })
-            .catch((e) => {
-                handleError(e);
-            });
-    };
-    img.src = source instanceof File ? URL.createObjectURL(source) : source;
-}
-
 // Returns true if a Symcode is recognized and decoded
 function scan() {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         try {
             let startTime = new Date();
             const code = scanner.scan_from_canvas_id("frame");
@@ -53,10 +36,19 @@ function scan() {
             handleSuccess("Scanning finishes in " + time + " ms.");
             resolve({code, time});
         } catch (e) {
-            throw e;
+            reject(e);
         }
     });
 }
+
+function reset() {
+    wrapper.classList.add("hidden");
+    finishScanning = true;
+}
+
+//#region Camera Input
+const scanButton = document.getElementById('scan');
+const camera = document.getElementById('camera');
 
 // Flag to control termination of scanning
 let finishScanning = false;
@@ -116,26 +108,59 @@ function drawFrame(sx, sy) {
         .then((result) => {
             console.log("Recognition result: " + result.code);
             stopCamera();
-            return;
         })
         .catch((e) => {
             handleError(e);
             if (!finishScanning) {
                 sleep(1/fps)
                     .then(() => drawFrame(sx, sy))
+            } else {
+                stopCamera();
             }
-        });
+        })
 }
 
 function stopCamera() {
     const stream = camera.srcObject;
-    stream.getTracks().forEach(function(track) {
-        track.stop();
-    });
-    camera.srcObject = null;
+    if (stream) {
+        stream.getTracks().forEach(function(track) {
+            track.stop();
+        });
+        camera.srcObject = null;
+    }
 }
 
 function sleep(s) {
     const ms = s*1000;
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+//#endregion
+
+//#region Upload
+
+const uploadButton = document.getElementById('upload');
+const imageInput = document.getElementById('imageInput');
+uploadButton.onclick = () => imageInput.click();
+imageInput.onchange = function(e) {
+    wrapper.classList.remove("hidden");
+    scanImageFromSource(this.files[0]);
+};
+
+function scanImageFromSource(source) {
+    let img = new Image();
+    img.onload = function () {
+        frameCtx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
+        frameCtx.drawImage(img, 0, 0, frameCanvas.width, frameCanvas.height);
+        scan()
+            .then((result) => {
+                console.log("Recognition result: " + result.code);
+            })
+            .catch((e) => {
+                handleError(e);
+            });
+    };
+    img.src = source instanceof File ? URL.createObjectURL(source) : source;
+}
+
+//#endregion
