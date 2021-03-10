@@ -42,16 +42,13 @@ function scan() {
     });
 }
 
-function reset() {
-    wrapper.classList.add("hidden");
-    finishScanning = true;
-}
-
 //#region Camera Input
 
 const scanButton = document.getElementById('scan');
 const camera = document.getElementById('camera');
 const showFps = document.getElementById('fps');
+const reticleCanvas = document.getElementById('reticle');
+const reticleCtx = reticleCanvas.getContext('2d');
 
 // Flag to control termination of scanning
 let finishScanning = false;
@@ -98,9 +95,20 @@ function startStreaming(videoWidth, videoHeight) {
     const sx = (videoWidth - inputFrameSize.width) / 2;
     const sy = (videoHeight - inputFrameSize.height) / 2;
 
+    reticleCtx.clearRect(0, 0, reticleCanvas.width, reticleCanvas.height);
+    drawReticle(reticleCanvas, reticleCtx);
+
     finishScanning = false;
     lastScanTime = new Date();
     drawFrame(sx, sy);
+}
+
+function drawReticle(canvas, ctx) {
+    const horiQ1 = canvas.width*0.25;
+    const vertQ1 = canvas.height*0.25;
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "white";
+    ctx.strokeRect(horiQ1, vertQ1, canvas.width/2, canvas.height/2);
 }
 
 function drawFrame(sx, sy) {
@@ -108,6 +116,7 @@ function drawFrame(sx, sy) {
     frameCtx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
     frameCtx.drawImage(camera, sx, sy, inputFrameSize.width, inputFrameSize.height,
         0, 0, frameCanvas.width, frameCanvas.height);
+    
     scan()
         .then((result) => {
             console.log("Recognition result: " + result.code);
@@ -136,6 +145,7 @@ function stopCamera() {
         });
         camera.srcObject = null;
     }
+    reticleCtx.clearRect(0, 0, reticleCanvas.width, reticleCanvas.height);
 }
 
 function sleep(s, callback) {
