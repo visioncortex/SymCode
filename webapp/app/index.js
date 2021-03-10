@@ -105,7 +105,7 @@ function drawFrame(sx, sy) {
     [frameCanvas.width, frameCanvas.height] = originalFrameSize;
     frameCtx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
     frameCtx.drawImage(camera, sx, sy, inputFrameSize.width, inputFrameSize.height,
-                                        0, 0, frameCanvas.width, frameCanvas.height);
+        0, 0, frameCanvas.width, frameCanvas.height);
     scan()
         .then((result) => {
             console.log("Recognition result: " + result.code);
@@ -114,8 +114,7 @@ function drawFrame(sx, sy) {
         .catch((e) => {
             handleError(e);
             if (!finishScanning) {
-                sleep(1/fps)
-                    .then(() => drawFrame(sx, sy))
+                sleep(1/fps, () => drawFrame(sx, sy));
             } else {
                 stopCamera();
             }
@@ -132,9 +131,9 @@ function stopCamera() {
     }
 }
 
-function sleep(s) {
+function sleep(s, callback) {
     const ms = s*1000;
-    return new Promise(resolve => setTimeout(resolve, ms));
+    setTimeout(callback, ms);
 }
 
 //#endregion
@@ -145,8 +144,16 @@ const uploadButton = document.getElementById('upload');
 const imageInput = document.getElementById('imageInput');
 uploadButton.onclick = () => imageInput.click();
 imageInput.onchange = function(e) {
-    wrapper.classList.remove("hidden");
-    scanImageFromSource(this.files[0]);
+    const imgSrc = this.files[0];
+    finishScanning = true;
+    // Wait for camera to stop
+    sleep(
+        1/fps,
+        () => {
+            wrapper.classList.remove("hidden");
+            scanImageFromSource(imgSrc);
+        }
+    );
 };
 
 function scanImageFromSource(source) {
@@ -159,9 +166,7 @@ function scanImageFromSource(source) {
             .then((result) => {
                 console.log("Recognition result: " + result.code);
             })
-            .catch((e) => {
-                handleError(e);
-            });
+            .catch(handleError);
     };
     img.src = source instanceof File ? URL.createObjectURL(source) : source;
 }
