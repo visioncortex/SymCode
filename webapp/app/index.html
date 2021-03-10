@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet">
+    <link href="https://unpkg.com/ionicons@4.2.2/dist/css/ionicons.min.css" rel="stylesheet"/>
+    <link href="./style.css" rel="stylesheet">
+    <meta property="og:title" content="Symcode">
+    <meta name="twitter:title" content="Symcode">
+    <title>Symcode</title>
+  </head>
+  <body>
+    <div id="coupon_container" class="coupon_container">
+      <div class="head"></div>
+      <div id="coupon_wrapper" class="hidden">
+        <div class="coupon">
+          <video id="camera" autoplay playsinline data-chrome-better-html5-video-type></video>
+          <canvas id="frame"></canvas>
+          <canvas id="loadBuffer"></canvas>
+          <div id="thumbnail" class="disable"></div>
+        </div>
+        <div id="datainfo-viewspace" class="hidden">
+          <div id="data-info">Hello</div>
+        </div>
+        <div class="message">
+          <div id="fps"></div>
+          <a id="upload" class="btn disable">Upload</a>
+          <a id="scan" class="btn initial"><i class="icon ion-md-qr-scanner"></i></a>
+          <a id="open" class="btn disable"><i class="icon ion-md-arrow-round-forward"></i></a>
+          <a id="capture" class="btn disable">Capture</a>
+        </div>
+      </div>
+    </div>  
+  </body>
+  <script src="./bootstrap.js"></script>
+</html>

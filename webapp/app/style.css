@@ -1,0 +1,290 @@
+body {
+    background: #FEFEFE;
+    margin: 0;
+}
+* {
+    font-family: 'Comfortaa', sans-serif;
+}
+.coupon_container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 350px;
+    height: 350px;
+    margin: 0;
+    transform: translate(-50%, -50%);
+    transition: top 0.25s ease, width 0.5s cubic-bezier(0.5, 20, 0.5, 0);
+}
+.coupon_container.success {
+    width: 401px;
+    top: 40%;
+}
+#coupon_wrapper {
+    border-radius: 8.75%;
+    box-shadow: 0 4px 10px 0px rgba(12, 12, 13, 0.25);
+    transition-property: box-shadow;
+    transition-duration: 0.5s;
+}
+#coupon_wrapper.hidden {
+    box-shadow: none;
+}
+.coupon {
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 0;
+    border: none;
+    padding-bottom: 100%;
+    border-radius: 8.75%;
+    text-align: center;
+    background: #FFF;
+    overflow: hidden;
+    -webkit-mask-image: -webkit-radial-gradient(white, black); /* fix iOS rounded corner */
+    transition-property: padding-bottom border-radius;
+    transition-duration: 0.25s;
+    transition-timing-function: cubic-bezier(0.5, 0, 0.5, 1.25);
+}
+.hidden .coupon {
+    padding-bottom: 0%;
+    border-radius: 0%;
+}
+.head {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 17.5%;
+    margin-bottom: 5%;
+    font-size: 16px;
+    text-align: center;
+    background-image: url(//qoopon.me/static/qoopon_logo.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    user-select: none;
+}
+.message {
+    position: relative;
+    width: 100%;
+    margin: 9% 0;
+    text-align: center;
+    font-size: 16px;
+}
+.coupon > div {
+    display: inline-block;
+}
+.title {
+    top: 57%;
+    height: 23%;
+}
+.title, .summary {
+    position: absolute;
+    width: 90%;
+    left: 5%;
+}
+.summary {
+    top: 82%;
+    height: 15%;
+}
+.text {
+    text-align: left;
+    position: absolute;
+    transition-property: font-size;
+    transition-duration: 0.1s;
+}
+.title .text {
+    bottom: 0;
+}
+.summary .text {
+    top: 0;
+}
+.logo img {
+    height: 80px;
+}
+@media only screen and (max-width: 640px)
+{
+    .coupon_container {
+        width: 80%;
+        height: 0;
+        padding-bottom: 112%;
+    }
+    .coupon_container.success {
+        width: 80.1%;
+    }
+    .message {
+        font-size: 12px;
+    }
+}
+@media only screen and (max-width: 480px)
+{
+    .logo img {
+        height: 60px;
+    }
+}
+@media only screen and (max-width: 320px) {
+    .title .text {
+        font-size: 18px;
+    }
+    .summary .text {
+        font-size: 10px;
+    }
+}
+@media only screen and (min-width: 321px) and (max-width: 640px) {
+    .title .text {
+        font-size: 26px;
+    }
+    .summary .text {
+        font-size: 12px;
+    }
+}
+@media only screen and (min-width: 641px) {
+    .title .text {
+        font-size: 36px;
+    }
+    .summary .text {
+        font-size: 16px;
+    }
+}
+.logo {
+    position: absolute;
+    width: 100%;
+    right: 0;
+    bottom: 0;
+}
+#frame {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+#camera {
+    width: 300px;
+    height: 300px;
+    display: none;
+}
+#loadBuffer {
+    display: none;
+}
+#logger {
+    text-align: right;
+    font-size: 10px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+.btn {
+    color: #fff;
+    font-size: 20px;
+    background-color: #4ec1c4;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 50px;
+    margin: 0 5px;
+    text-align: center;
+    vertical-align: middle;
+    display: inline;
+    box-shadow: 0 4px 10px 0px rgba(12, 12, 13, 0.2);
+}
+#scan:not(.initial) {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.btn:hover {
+    background-color: #7ddfe1;
+}
+.btn.yellow {
+    background-color: #f29c5e;
+}
+.btn.hidden {
+    opacity: 0;
+}
+#capture {
+    margin-top: 10px;
+}
+.disable {
+    display: none;
+}
+
+#thumbnail {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0%;
+    height: 0%;
+    transition-property: left top width height;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-out;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 15px;
+}
+#thumbnail.show {
+    left: 10%;
+    top: 10%;
+    width: 80%;
+    height: 80%;
+}
+
+#datainfo-viewspace {
+    position: relative;
+    width: 100%;
+    margin-top: 6%;
+    margin-bottom: 8%;
+    text-align: center;
+    transition-property: margin-top height;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-out;
+}
+#datainfo-viewspace.hidden {
+    margin-top: 0;
+    height: 0;
+}
+#data-info {
+    display: inline-block;
+    font-size: 16px;
+    text-align: center;
+    border: 2px solid transparent;
+    font-weight: bold;
+    color: #555;
+    background-color: #fff;
+    -webkit-backdrop-filter: blur(5px);
+    box-shadow: 0 4px 10px 0px rgba(12, 12, 13, 0.2);
+    border-radius: 100px;
+    width: 100%;
+    line-height: 30px;
+    opacity: 1;
+    transition: opacity 0.5s ease-in;
+}
+.hidden #data-info {
+    opacity: 0;
+}
+.success #camera {
+    transition: opacity 1s ease-out;
+    opacity: 0;
+}
+.success #frame {
+    display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #333;
+    }
+    #logger, #fps {
+        color: #aaa;
+    }
+}
+
+.wallet img {
+    height: 50px;
+}
+.wallet {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    transition: opacity 0.25s linear;
+}
+.wallet.hidden {
+    opacity: 0;
+}
