@@ -48,11 +48,14 @@ function reset() {
 }
 
 //#region Camera Input
+
 const scanButton = document.getElementById('scan');
 const camera = document.getElementById('camera');
+const showFps = document.getElementById('fps');
 
 // Flag to control termination of scanning
 let finishScanning = false;
+let lastScanTime = new Date();
 
 const inputFrameSize = {
     width: 720,
@@ -92,12 +95,11 @@ function getCameraVideoDimensions() {
 }
 
 function startStreaming(videoWidth, videoHeight) {
-    console.log("Start streaming");
-    console.log(videoWidth + " " + videoHeight);
     const sx = (videoWidth - inputFrameSize.width) / 2;
     const sy = (videoHeight - inputFrameSize.height) / 2;
 
     finishScanning = false;
+    lastScanTime = new Date();
     drawFrame(sx, sy);
 }
 
@@ -112,6 +114,11 @@ function drawFrame(sx, sy) {
             stopCamera();
         })
         .catch((e) => {
+            const currScanTime = new Date();
+            const scanDuration = (currScanTime - lastScanTime) / 1000; // scanning duration in seconds
+            showFps.innerHTML = Math.round(1/scanDuration);
+            lastScanTime = currScanTime;
+
             handleError(e);
             if (!finishScanning) {
                 sleep(1/fps, () => drawFrame(sx, sy));
