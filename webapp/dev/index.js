@@ -329,7 +329,7 @@ function drawFrame(sx, sy) {
                                         0, 0, frameCanvas.width, frameCanvas.height);
     scan()
         .then((result) => {
-            console.log("Recognition result: " + result);
+            console.log("Recognition result: " + result.code);
             stopCamera();
             return;
         })
