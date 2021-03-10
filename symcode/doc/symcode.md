@@ -172,7 +172,7 @@ If you are looking to design your own alphabet, trace collisions should really b
 
 ![Acute32 complete alphabet](img/alphabet2.png)
 
-In Acute32 (above), many traces collide under the current setting. Our solution is to simply define the traces with more comparisons. Apart from the three basic comparisons explained in the previous section, we also compare every pair of the four quadrants (each quadrant is compared to every other quadrant exactly once), requiring **an extra of *4 choose 2* = 6 comparisons**.
+In Acute32 (above), many traces collide under the current setting. Our solution is to simply define the traces with more comparisons. Apart from the three basic comparisons explained in the previous section (*V,H,D*), we also compare every pair of the four quadrants (each quadrant is compared to every other quadrant exactly once), requiring **an extra of *4 choose 2* = 6 comparisons** (*ab, cd, ac*, ...). The last comparison *efgh* is explained in the note below.
 
 ![Acute32 trace counts](img/trace_counts_balanced.png)
 
