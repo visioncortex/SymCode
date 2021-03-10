@@ -167,6 +167,12 @@ body {
     z-index: 2;
     opacity: 0.5;
 }
+#debug {
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    display: none;
+}
 #camera {
     width: 300px;
     height: 300px;
