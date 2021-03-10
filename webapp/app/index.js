@@ -5,6 +5,7 @@ const wrapper = document.getElementById('coupon_wrapper');
 
 const frameCanvas = document.getElementById('frame');
 const frameCtx = frameCanvas.getContext('2d');
+const originalFrameSize = [frameCanvas.width, frameCanvas.height];
 
 const scanner = Acute32SymcodeMain.new();
 
@@ -101,6 +102,7 @@ function startStreaming(videoWidth, videoHeight) {
 }
 
 function drawFrame(sx, sy) {
+    [frameCanvas.width, frameCanvas.height] = originalFrameSize;
     frameCtx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
     frameCtx.drawImage(camera, sx, sy, inputFrameSize.width, inputFrameSize.height,
                                         0, 0, frameCanvas.width, frameCanvas.height);
@@ -150,6 +152,7 @@ imageInput.onchange = function(e) {
 function scanImageFromSource(source) {
     let img = new Image();
     img.onload = function () {
+        [frameCanvas.width, frameCanvas.height] = [img.naturalWidth, img.naturalHeight];
         frameCtx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
         frameCtx.drawImage(img, 0, 0, frameCanvas.width, frameCanvas.height);
         scan()
