@@ -7,13 +7,18 @@ const frameCanvas = document.getElementById('frame');
 const frameCtx = frameCanvas.getContext('2d');
 const originalFrameSize = [frameCanvas.width, frameCanvas.height];
 
-const scanner = Acute32SymcodeMain.new();
+let scanner;
+loadAlphabet().then(() => scanner = getNewScanner());
+
+function getNewScanner() {
+    let sc = Acute32SymcodeMain.new();
+    sc.load_alphabet_from_canvas_id('loadBuffer');
+    return sc;
+}
 
 export function loadingCompletes() {
     console.log("Template loading completes.");
 }
-
-document.addEventListener('load', loadAlphabet(scanner));
 
 const ERROR_COLOR = "color: #ff5050;";
 
@@ -29,17 +34,15 @@ function handleSuccess(msg) {
 
 // Returns true if a Symcode is recognized and decoded
 function scan() {
-    return new Promise((resolve, reject) => {
-        try {
-            let startTime = new Date();
-            const code = scanner.scan_from_canvas_id("frame");
-            const time = (new Date() - startTime);
-            handleSuccess("Scanning finishes in " + time + " ms.");
-            resolve({code, time});
-        } catch (e) {
-            reject(e);
-        }
-    });
+    try {
+        let startTime = new Date();
+        const code = scanner.scan_from_canvas_id("frame");
+        const time = (new Date() - startTime);
+        handleSuccess("Scanning finishes in " + time + " ms.");
+        return {code, time};
+    } catch (e) {
+        throw e;
+    }
 }
 
 //#region Camera Input
@@ -53,6 +56,8 @@ const reticleCtx = reticleCanvas.getContext('2d');
 // Flag to control termination of scanning
 let finishScanning = false;
 let lastScanTime = new Date();
+let scanningCount = 0;
+let scanningInterval;
 
 const inputFrameSize = {
     width: 720,
@@ -72,6 +77,7 @@ scanButton.onclick = () => {
             camera.srcObject = stream;
             getCameraVideoDimensions()
                 .then(({width, height}) => {
+                    console.log("About to call startStreaming()");
                     startStreaming(width, height);
                 });
         })
@@ -100,7 +106,29 @@ function startStreaming(videoWidth, videoHeight) {
 
     finishScanning = false;
     lastScanTime = new Date();
-    drawFrame(sx, sy);
+    scanningCount = 0;
+    console.log("Start streaming loop");
+    function loop() {
+        if ((scanningCount++) % 1000 == 0) {
+            scanner.free();
+            scanner = getNewScanner();
+        }
+        try {
+            let result = drawFrame(sx, sy);
+            console.log("Recognition result: " + result.code);
+            clearInterval(scanningInterval);
+            stopCamera();
+            finishScanning = true;
+        } catch (e) {
+            const currScanTime = new Date();
+            const scanDuration = (currScanTime - lastScanTime) / 1000; // scanning duration in seconds
+            showFps.innerHTML = Math.round(1/scanDuration);
+            lastScanTime = currScanTime;
+
+            handleError(e);
+        }
+    }
+    scanningInterval = setInterval(loop, 10);
 }
 
 function drawReticle(canvas, ctx) {
@@ -117,24 +145,7 @@ function drawFrame(sx, sy) {
     frameCtx.drawImage(camera, sx, sy, inputFrameSize.width, inputFrameSize.height,
         0, 0, frameCanvas.width, frameCanvas.height);
     
-    scan()
-        .then((result) => {
-            console.log("Recognition result: " + result.code);
-            stopCamera();
-        })
-        .catch((e) => {
-            const currScanTime = new Date();
-            const scanDuration = (currScanTime - lastScanTime) / 1000; // scanning duration in seconds
-            showFps.innerHTML = Math.round(1/scanDuration);
-            lastScanTime = currScanTime;
-
-            handleError(e);
-            if (!finishScanning) {
-                sleep(1/fps, () => drawFrame(sx, sy));
-            } else {
-                stopCamera();
-            }
-        })
+    return scan();
 }
 
 function stopCamera() {
@@ -144,8 +155,8 @@ function stopCamera() {
             track.stop();
         });
         camera.srcObject = null;
+        reticleCtx.clearRect(0, 0, reticleCanvas.width, reticleCanvas.height);
     }
-    reticleCtx.clearRect(0, 0, reticleCanvas.width, reticleCanvas.height);
 }
 
 function sleep(s, callback) {
