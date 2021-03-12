@@ -124,13 +124,15 @@ function startStreaming(videoWidth, videoHeight) {
             lastScanTime = currScanTime;
 
             handleError(e);
-            if (scanningCount >= 2000) {
+            if (scanningCount >= 5000) {
+                wrapper.classList.add("hidden");
                 finishScanning = true;
             } else if (!finishScanning) {
                 sleep(1/fps, loop);
             }
         } finally {
             if (finishScanning) {
+                showFps.innerHTML = '';
                 stopCamera();
             }
         }
