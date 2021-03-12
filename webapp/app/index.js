@@ -69,9 +69,10 @@ const mediaConstraints = {
 };
 
 function adjustCameraPosition(vWidth, vHeight) {
-    let container = document.getElementsByClassName('coupon_container')[0];
-    let cWidth = container.offsetWidth;
-    let cHeight = container.offsetHeight;
+    let containerRect = document.getElementsByClassName('coupon_container')[0].getBoundingClientRect();
+    console.log(containerRect);
+    let cWidth = containerRect.width;
+    let cHeight = containerRect.height;
     camera.style.left = (-(vWidth - cWidth) / 2) + 'px';
     camera.style.top = (-(vHeight - cHeight) / 2) + 'px';
 }
