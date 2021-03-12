@@ -57,7 +57,6 @@ const reticleCtx = reticleCanvas.getContext('2d');
 let finishScanning = false;
 let lastScanTime = new Date();
 let scanningCount = 0;
-let scanningInterval;
 
 const inputFrameSize = {
     width: 720,
@@ -110,14 +109,13 @@ function startStreaming(videoWidth, videoHeight) {
     console.log("Start streaming loop");
     function loop() {
         if ((scanningCount++) % 1000 == 0) {
+            console.log("Reallocating scanner...");
             scanner.free();
             scanner = getNewScanner();
         }
         try {
             let result = drawFrame(sx, sy);
             console.log("Recognition result: " + result.code);
-            clearInterval(scanningInterval);
-            stopCamera();
             finishScanning = true;
         } catch (e) {
             const currScanTime = new Date();
@@ -126,9 +124,18 @@ function startStreaming(videoWidth, videoHeight) {
             lastScanTime = currScanTime;
 
             handleError(e);
+            if (scanningCount >= 2000) {
+                finishScanning = true;
+            } else if (!finishScanning) {
+                sleep(1/fps, loop);
+            }
+        } finally {
+            if (finishScanning) {
+                stopCamera();
+            }
         }
     }
-    scanningInterval = setInterval(loop, 10);
+    sleep(1/fps, loop);
 }
 
 function drawReticle(canvas, ctx) {
@@ -190,11 +197,12 @@ function scanImageFromSource(source) {
         [frameCanvas.width, frameCanvas.height] = [img.naturalWidth, img.naturalHeight];
         frameCtx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
         frameCtx.drawImage(img, 0, 0, frameCanvas.width, frameCanvas.height);
-        scan()
-            .then((result) => {
-                console.log("Recognition result: " + result.code);
-            })
-            .catch(handleError);
+        try {
+            let result = scan();
+            console.log("Recognition result: " + result.code);
+        } catch (e) {
+            handleError(e);
+        }
     };
     img.src = source instanceof File ? URL.createObjectURL(source) : source;
 }
