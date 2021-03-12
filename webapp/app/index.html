@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://unpkg.com/ionicons@4.2.2/dist/css/ionicons.min.css" rel="stylesheet"/>
     <link href="./style.css" rel="stylesheet">
     <meta property="og:title" content="Symcode">
@@ -17,9 +17,8 @@
       <div class="head"></div>
       <div id="coupon_wrapper" class="hidden">
         <div class="coupon">
-          <video id="camera" autoplay></video>
+          <video id="camera" autoplay playsinline></video>
           <canvas id="frame"></canvas>
-          <canvas id="reticle"></canvas>
           <canvas id="loadBuffer"></canvas>
           <div id="thumbnail" class="disable"></div>
         </div>

@@ -50,8 +50,6 @@ function scan() {
 const scanButton = document.getElementById('scan');
 const camera = document.getElementById('camera');
 const showFps = document.getElementById('fps');
-const reticleCanvas = document.getElementById('reticle');
-const reticleCtx = reticleCanvas.getContext('2d');
 
 // Flag to control termination of scanning
 let finishScanning = false;
@@ -62,11 +60,20 @@ const inputFrameSize = {
     width: 720,
     height: 720,
 };
+frameCanvas.style.width = inputFrameSize.width + 'px';
+frameCanvas.style.height = inputFrameSize.height + 'px';
 const fps = 60;
 
 const mediaConstraints = {
-    video: { width: {min: 720}, height: {min: 720} },
+    video: { width: {ideal: 720}, height: {ideal: 720}, facingMode: "environment" },
 };
+
+function adjustCameraPosition(vWidth, vHeight) {
+    let cWidth = 350;
+    let cHeight = 350;
+    camera.style.left = (-(vWidth - cWidth) / 2) + 'px';
+    camera.style.top = (-(vHeight - cHeight) / 2) + 'px';
+}
 
 scanButton.onclick = () => {
     wrapper.classList.remove("hidden");
@@ -76,7 +83,7 @@ scanButton.onclick = () => {
             camera.srcObject = stream;
             getCameraVideoDimensions()
                 .then(({width, height}) => {
-                    console.log("About to call startStreaming()");
+                    adjustCameraPosition(width, height);
                     startStreaming(width, height);
                 });
         })
@@ -100,17 +107,13 @@ function startStreaming(videoWidth, videoHeight) {
     const sx = (videoWidth - inputFrameSize.width) / 2;
     const sy = (videoHeight - inputFrameSize.height) / 2;
 
-    reticleCtx.clearRect(0, 0, reticleCanvas.width, reticleCanvas.height);
-    drawReticle(reticleCanvas, reticleCtx);
-
     finishScanning = false;
     lastScanTime = new Date();
     scanningCount = 0;
-    console.log("Start streaming loop");
     function loop() {
         if ((scanningCount++) % 1000 == 0) {
             console.log("Reallocating scanner...");
-            scanner.free();
+            if (scanner) scanner.free();
             scanner = getNewScanner();
         }
         try {
@@ -124,7 +127,8 @@ function startStreaming(videoWidth, videoHeight) {
             lastScanTime = currScanTime;
 
             handleError(e);
-            if (scanningCount >= 5000) {
+            if (scanningCount >= 3000) {
+                console.log("Too many scanning ticks! Terminating...");
                 wrapper.classList.add("hidden");
                 finishScanning = true;
             } else if (!finishScanning) {
@@ -138,14 +142,6 @@ function startStreaming(videoWidth, videoHeight) {
         }
     }
     sleep(1/fps, loop);
-}
-
-function drawReticle(canvas, ctx) {
-    const horiQ1 = canvas.width*0.25;
-    const vertQ1 = canvas.height*0.25;
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "white";
-    ctx.strokeRect(horiQ1, vertQ1, canvas.width/2, canvas.height/2);
 }
 
 function drawFrame(sx, sy) {
@@ -164,7 +160,6 @@ function stopCamera() {
             track.stop();
         });
         camera.srcObject = null;
-        reticleCtx.clearRect(0, 0, reticleCanvas.width, reticleCanvas.height);
     }
 }
 
