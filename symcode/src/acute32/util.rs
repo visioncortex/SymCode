@@ -9,7 +9,7 @@ pub(crate) fn is_black_rgb(color: &Color) -> bool {
     let g = color.g as u32;
     let b = color.b as u32;
 
-    r*r + g*g + b*b < 3*128*128
+    r*r + g*g + b*b < 3*63*63
 }
 
 pub(crate) fn valid_pointi32_on_image(point: PointI32, image_width: usize, image_height: usize) -> bool {
