@@ -1,4 +1,4 @@
-import { loadingCompletes } from "./index";
+import { loadingCompletes } from "./app";
 
 export const loadBuffer = document.getElementById('loadBuffer');
 const loadBufferCtx = loadBuffer.getContext('2d');
