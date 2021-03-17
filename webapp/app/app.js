@@ -13,7 +13,7 @@ export function main() {
     const originalFrameSize = [frameCanvas.width, frameCanvas.height];
 
     let scanner;
-    loadAlphabet().then(() => scanner = getNewScanner());
+    loadAlphabet('loadBuffer').then(() => scanner = getNewScanner());
 
     function getNewScanner() {
         let sc = Acute32SymcodeMain.new();

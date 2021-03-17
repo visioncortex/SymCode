@@ -1,10 +1,10 @@
 import { loadingCompletes } from "./app";
 
-export const loadBuffer = document.getElementById('loadBuffer');
-const loadBufferCtx = loadBuffer.getContext('2d');
-const img = new Image();
+export function loadAlphabet(loadBufferId) {
+    const loadBuffer = document.getElementById(loadBufferId);
+    const loadBufferCtx = loadBuffer.getContext('2d');
+    const img = new Image();
 
-export function loadAlphabet() {
     return new Promise((resolve) => {
         const path = "assets/alphabet/alphabet2.png";
         img.src = path;
