@@ -6,7 +6,7 @@ export function loadAlphabet(loadBufferId) {
     const img = new Image();
 
     return new Promise((resolve) => {
-        const path = "assets/alphabet/alphabet2.png";
+        const path = "/alphabet.png";
         img.src = path;
         img.onload = function () {
             loadBuffer.width = img.naturalWidth;
