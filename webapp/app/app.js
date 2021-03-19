@@ -40,7 +40,9 @@ export function main() {
                 url: 'https://symcode.visioncortex.org/api/symcode?code=' + code,
                 type: 'get',
                 success: function(result) {
+                    document.getElementById("datainfo-viewspace").classList.remove('hidden');
                     if (!result.success) {
+                        document.getElementById('data-info').innerHTML = "No Record Found";
                         console.log("Fetch URL failed!");
                         return;
                     }
@@ -51,7 +53,6 @@ export function main() {
                         linkUrl = "https://" + linkUrl;
                     }
                     document.getElementById('data-info').innerHTML = `<a href="${linkUrl}">${result.symcode.title}</a>`;
-                    document.getElementById("datainfo-viewspace").classList.remove('hidden');
                 }
             });
         } catch (e) {
@@ -86,6 +87,11 @@ export function main() {
     let finishScanning = false;
     let lastScanTime = new Date();
     let scanningCount = 0;
+
+    const inputFrameSize = {
+        width: 720,
+        height: 720,
+    };
 
     const fps = 60;
 
