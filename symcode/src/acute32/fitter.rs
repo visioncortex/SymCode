@@ -104,7 +104,10 @@ impl<'a> Acute32TransformFitter<'a> {
 
         for &point in points_to_test.iter() {
             let point_in_image_space = image_to_object.transform_inverse(point);
-            
+            let point_in_image_space = PointF64::new(
+                point_in_image_space.x.round(),
+                point_in_image_space.y.round(),
+            );
             if !valid_pointf64_on_image(point_in_image_space, image_width, image_height) {
                 return true;
             }
