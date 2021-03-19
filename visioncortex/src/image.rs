@@ -324,7 +324,8 @@ impl ColorImage {
         self.pixels[index + 3] = color.a;
     }
 
-    pub fn to_binary_image(&self, f: fn(Color) -> bool) -> BinaryImage {
+    pub fn to_binary_image<F>(&self, f: F) -> BinaryImage
+        where F: Fn(Color) -> bool {
         let mut image = BinaryImage::new_w_h(self.width, self.height);
         for y in 0..self.height {
             for x in 0..self.width {
