@@ -68,6 +68,8 @@ export function main() {
             fetchUrlWithCode(code);
             scanner.generate_symcode_to_canvas('frame', parseInt(code, 2));
             frameCanvas.style.display = 'block';
+            frameCtx.filter = 'blur(1px)';
+            frameCtx.drawImage(frameCanvas, 0, 0);
             return {code, time};
         } catch (e) {
             throw e;
