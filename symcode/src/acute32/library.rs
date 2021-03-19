@@ -72,7 +72,7 @@ impl Acute32Library {
 
     /// Takes the binary image of the template and the usize representation of the label
     pub fn add_template(&mut self, image: BinaryImage, symcode_config: &Acute32SymcodeConfig) {
-        let image = Sampler::resample_image(&image, symcode_config.symbol_width, symcode_config.symbol_height);
+        //let image = Sampler::resample_image(&image, symcode_config.symbol_width, symcode_config.symbol_height);
         let label = GlyphLabel::from_usize_representation(self.templates.len());
         //console_log_util(&format!("{:?}\n{}", label, image.to_string()));
         self.templates.push(Symbol::from_image_label(image, label, symcode_config.stat_tolerance));
