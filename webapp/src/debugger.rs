@@ -31,6 +31,10 @@ impl DebuggerInterface for Debugger {
 	    ctx.line_to(x1, y1);
 	    ctx.stroke();
 	}
+
+	fn log(&self, msg: &str) {
+        crate::util::console_log_util(msg)
+    }
 }
 
 pub fn render_color_image_to_canvas(canvas: &Canvas, image: &ColorImage) -> Result<(), &'static str> {

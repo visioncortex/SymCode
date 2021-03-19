@@ -23,6 +23,8 @@ pub trait Debugger {
     fn render_bounding_rect_to_canvas(&self, rect: &BoundingRect) {
         self.render_bounding_rect_to_canvas_with_color(rect, Color::new(255, 0, 0));
     }
+
+    fn log(&self, msg: &str);
 }
 
 #[derive(Default)]
@@ -35,4 +37,6 @@ impl Debugger for DummyDebugger {
     fn render_binary_image_to_canvas(&self, _image: &BinaryImage) -> Result<(), &'static str> { Ok(()) }
 
     fn render_bounding_rect_to_canvas_with_color(&self, _rect: &BoundingRect, _color: Color) {  }
+
+    fn log(&self, msg: &str) {  }
 }
