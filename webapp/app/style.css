@@ -21,8 +21,6 @@ body {
 }
 #coupon_wrapper {
     border-radius: 8.75%;
-    box-shadow: 0 4px 10px 0px rgba(12, 12, 13, 0.25);
-    transition-property: box-shadow;
     transition-duration: 0.5s;
 }
 #coupon_wrapper.hidden {
@@ -36,11 +34,12 @@ body {
     height: 0;
     border: none;
     padding-bottom: 100%;
-    border-radius: 8.75%;
+    border-radius: 2.5%;
     text-align: center;
     background: #FFF;
     overflow: hidden;
     -webkit-mask-image: -webkit-radial-gradient(white, black); /* fix iOS rounded corner */
+    box-shadow: 0 4px 10px 0px rgba(12, 12, 13, 0.25);
     transition-property: padding-bottom border-radius;
     transition-duration: 0.25s;
     transition-timing-function: cubic-bezier(0.5, 0, 0.5, 1.25);
@@ -155,6 +154,8 @@ body {
     position: absolute;
     left: 0;
     top: 0;
+    width: 100%;
+    height: 100%;
     display: none;
 }
 #debug {
@@ -180,7 +181,7 @@ body {
     font-size: 20px;
     background-color: #4ec1c4;
     border: none;
-    border-radius: 25px;
+    border-radius: 5px;
     padding: 10px 50px;
     margin: 0 5px;
     text-align: center;
@@ -266,10 +267,6 @@ body {
     transition: opacity 1s ease-out;
     opacity: 0;
 }
-.success #frame {
-    display: none;
-}
-
 @media (prefers-color-scheme: dark) {
     body {
         background-color: #333;

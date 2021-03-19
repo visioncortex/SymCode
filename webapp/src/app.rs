@@ -77,7 +77,7 @@ impl Acute32SymcodeMain {
         let debug_code_string = format!("{:?}", symcode);
 
         let decoded_bit_string = self.decode(symcode)?;
-        Ok(format!("{}\n{:?}", debug_code_string, decoded_bit_string))
+        Ok(format!("{:?}", decoded_bit_string))
     }
 
     // Payload should be encodable in 20 bits max

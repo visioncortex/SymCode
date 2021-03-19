@@ -33,13 +33,41 @@ export function main() {
         console.log("%c" + msg, SUCCESS_COLOR);
     }
 
-    // Returns true if a Symcode is recognized and decoded
+    function fetchUrlWithCode(code) {
+        console.log(`Trying to fetch URL with code: ${code}`);
+        try {
+            $.ajax({
+                url: 'https://symcode.visioncortex.org/api/symcode?code=' + code,
+                type: 'get',
+                success: function(result) {
+                    if (!result.success) {
+                        console.log("Fetch URL failed!");
+                        return;
+                    }
+                    console.log("Fetched:", result.symcode);
+                    console.log("writing payload to 'data-info'...");
+                    let linkUrl = result.symcode.payload;
+                    if (!linkUrl.startsWith("https://")) {
+                        linkUrl = "https://" + linkUrl;
+                    }
+                    document.getElementById('data-info').innerHTML = `<a href="${linkUrl}">${result.symcode.title}</a>`;
+                    document.getElementById("datainfo-viewspace").classList.remove('hidden');
+                }
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     function scan() {
         try {
             let startTime = new Date();
             const code = scanner.scan_from_canvas_id("frame");
             const time = (new Date() - startTime);
             handleSuccess("Scanning finishes in " + time + " ms.");
+            fetchUrlWithCode(code);
+            scanner.generate_symcode_to_canvas('frame', parseInt(code, 2));
+            frameCanvas.style.display = 'block';
             return {code, time};
         } catch (e) {
             throw e;
@@ -57,12 +85,6 @@ export function main() {
     let lastScanTime = new Date();
     let scanningCount = 0;
 
-    const inputFrameSize = {
-        width: 720,
-        height: 720,
-    };
-    frameCanvas.style.width = inputFrameSize.width + 'px';
-    frameCanvas.style.height = inputFrameSize.height + 'px';
     const fps = 60;
 
     const mediaConstraints = {
