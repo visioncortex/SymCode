@@ -100,7 +100,7 @@ export function main() {
     let lastScanTime = new Date();
     let scanningCount = 0;
 
-    const inputFrameSize = 150;
+    const inputFrameSize = 256;
     const padding = 10;
 
     const fps = 60;
@@ -191,7 +191,7 @@ export function main() {
 
     function drawFrame(sx, sy, cw, ch, padding) {
         [frameCanvas.width, frameCanvas.height] = [inputFrameSize, inputFrameSize];
-        frameCtx.fillStyle = "#000000";
+        frameCtx.fillStyle = "#ffffff";
         frameCtx.fillRect(0, 0, frameCanvas.width, frameCanvas.height);
         frameCtx.drawImage(camera, sx, sy, cw, ch,
             padding, padding, frameCanvas.width - 2*padding, frameCanvas.height - 2*padding);
