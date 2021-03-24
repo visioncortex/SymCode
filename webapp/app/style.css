@@ -92,11 +92,13 @@ body {
 }
 @media only screen and (max-width: 640px)
 {
+    /*
     .coupon_container {
         width: 80%;
         height: 0;
         padding-bottom: 112%;
     }
+    */
     .coupon_container.success {
         width: 80.1%;
     }
