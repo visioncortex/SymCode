@@ -71,7 +71,6 @@ export function main() {
 
     function scan() {
         try {
-            frameCanvas.style.display = 'none';
             let startTime = new Date();
             const code = scanner.scan_from_canvas_id("frame");
             document.getElementById('errmsg').innerHTML = '';
@@ -100,8 +99,8 @@ export function main() {
     let lastScanTime = new Date();
     let scanningCount = 0;
 
-    const inputFrameSize = 256;
-    const padding = 10;
+    const inputFrameSize = 160;
+    const padding = 0;
 
     const fps = 60;
 
@@ -121,6 +120,7 @@ export function main() {
     }
 
     scanButton.onclick = () => {
+        frameCanvas.style.display = 'none';
         document.getElementById('errmsg').innerHTML = '';
         wrapper.classList.remove("hidden");
         navigator.mediaDevices
@@ -150,9 +150,6 @@ export function main() {
     }
 
     function startStreaming({cWidth, cHeight, cLeft, cTop}) {
-        //const sx = (videoWidth - inputFrameSize.width) / 2;
-        //const sy = (videoHeight - inputFrameSize.height) / 2;
-
         finishScanning = false;
         lastScanTime = new Date();
         scanningCount = 0;
@@ -195,9 +192,6 @@ export function main() {
         frameCtx.fillRect(0, 0, frameCanvas.width, frameCanvas.height);
         frameCtx.drawImage(camera, sx, sy, cw, ch,
             padding, padding, frameCanvas.width - 2*padding, frameCanvas.height - 2*padding);
-            //(frameCanvas.width - cw) / 2, (frameCanvas.height - ch) / 2, cw, ch);
-            //0, 0, cw, ch);
-
         return scan();
     }
 
@@ -225,6 +219,7 @@ export function main() {
     const imageInput = document.getElementById('imageInput');
     uploadButton.onclick = () => imageInput.click();
     imageInput.onchange = function(e) {
+        frameCanvas.style.display = 'none';
         document.getElementById('errmsg').innerHTML = '';
         const imgSrc = this.files[0];
         finishScanning = true;
