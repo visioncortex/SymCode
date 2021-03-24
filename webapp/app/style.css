@@ -8,7 +8,7 @@ body {
 .coupon_container {
     position: absolute;
     left: 50%;
-    top: 50%;
+    top: 35%;
     width: 350px;
     height: 350px;
     margin: 0;
@@ -19,13 +19,6 @@ body {
     width: 401px;
     top: 40%;
 }
-#coupon_wrapper {
-    border-radius: 8.75%;
-    transition-duration: 0.5s;
-}
-#coupon_wrapper.hidden {
-    box-shadow: none;
-}
 .coupon {
     position: relative;
     left: 0;
@@ -34,29 +27,26 @@ body {
     height: 0;
     border: none;
     padding-bottom: 100%;
-    border-radius: 2.5%;
     text-align: center;
     background: #FFF;
     overflow: hidden;
-    -webkit-mask-image: -webkit-radial-gradient(white, black); /* fix iOS rounded corner */
     box-shadow: 0 4px 10px 0px rgba(12, 12, 13, 0.25);
-    transition-property: padding-bottom border-radius;
+    transition-property: padding-bottom;
     transition-duration: 0.25s;
     transition-timing-function: cubic-bezier(0.5, 0, 0.5, 1.25);
 }
 .hidden .coupon {
     padding-bottom: 0%;
-    border-radius: 0%;
 }
 .head {
     position: relative;
-    width: 100%;
-    height: 0;
+    max-width: 100vw;
+    height: 100px;
     padding-bottom: 17.5%;
     margin-bottom: 5%;
     font-size: 16px;
     text-align: center;
-    background-image: url(//qoopon.me/static/qoopon_logo.svg);
+    background-image: url(/visioncortex-logo.svg);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -154,8 +144,6 @@ body {
     position: absolute;
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
     display: none;
 }
 #debug {
@@ -178,23 +166,26 @@ body {
 }
 .btn {
     color: #fff;
+    background-color: #00275D;
     font-size: 20px;
-    background-color: #4ec1c4;
     border: none;
-    border-radius: 5px;
     padding: 10px 50px;
     margin: 0 5px;
     text-align: center;
     vertical-align: middle;
     display: inline;
     box-shadow: 0 4px 10px 0px rgba(12, 12, 13, 0.2);
+    cursor: pointer;
+}
+.btn-primary {
+    border: 1px solid #CC972E;
 }
 #scan:not(.initial) {
     padding-left: 15px;
     padding-right: 15px;
 }
 .btn:hover {
-    background-color: #7ddfe1;
+    background-color: #0088f7;
 }
 .btn.yellow {
     background-color: #f29c5e;
@@ -221,7 +212,6 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    border-radius: 15px;
 }
 #thumbnail.show {
     left: 10%;
@@ -254,7 +244,6 @@ body {
     background-color: #fff;
     -webkit-backdrop-filter: blur(5px);
     box-shadow: 0 4px 10px 0px rgba(12, 12, 13, 0.2);
-    border-radius: 100px;
     width: 100%;
     line-height: 30px;
     opacity: 1;
@@ -267,9 +256,16 @@ body {
     transition: opacity 1s ease-out;
     opacity: 0;
 }
+.success #frame {
+    display: none;
+}
+
 @media (prefers-color-scheme: dark) {
     body {
-        background-color: #333;
+        background-color: #1D2330;
+    }
+    .head {
+        background-image: url(/visioncortex-logo-light.svg);
     }
     #logger, #fps {
         color: #aaa;
@@ -287,4 +283,7 @@ body {
 }
 .wallet.hidden {
     opacity: 0;
+}
+#errmsg {
+    color: red;
 }

@@ -6,6 +6,15 @@ export function loadingCompletes() {
 }
 
 export function main() {
+    const params = new URLSearchParams(document.location.search);
+    if (params.get('debug') === "true") {
+        document.getElementById('debug').style.display = 'block';
+        document.getElementById('errmsg').style.display = 'block';
+    } else {
+        document.getElementById('debug').style.display = 'none';
+        document.getElementById('errmsg').style.display = 'none';
+    }
+
     const wrapper = document.getElementById('coupon_wrapper');
 
     const frameCanvas = document.getElementById('frame');
@@ -65,6 +74,7 @@ export function main() {
             frameCanvas.style.display = 'none';
             let startTime = new Date();
             const code = scanner.scan_from_canvas_id("frame");
+            document.getElementById('errmsg').innerHTML = '';
             const time = (new Date() - startTime);
             handleSuccess("Scanning finishes in " + time + " ms.");
             fetchUrlWithCode(code);
@@ -74,6 +84,7 @@ export function main() {
             frameCtx.drawImage(frameCanvas, 0, 0);
             return {code, time};
         } catch (e) {
+            document.getElementById('errmsg').innerHTML = e;
             throw e;
         }
     }
@@ -100,7 +111,6 @@ export function main() {
 
     function adjustCameraPosition(vWidth, vHeight) {
         const containerRect = document.getElementsByClassName('coupon_container')[0].getBoundingClientRect();
-        console.log(containerRect);
         const cWidth = containerRect.width;
         const cHeight = containerRect.height;
         const cLeft = (vWidth - cWidth) / 2;
@@ -111,6 +121,7 @@ export function main() {
     }
 
     scanButton.onclick = () => {
+        document.getElementById('errmsg').innerHTML = '';
         wrapper.classList.remove("hidden");
         navigator.mediaDevices
             .getUserMedia(mediaConstraints)
@@ -214,6 +225,7 @@ export function main() {
     const imageInput = document.getElementById('imageInput');
     uploadButton.onclick = () => imageInput.click();
     imageInput.onchange = function(e) {
+        document.getElementById('errmsg').innerHTML = '';
         const imgSrc = this.files[0];
         finishScanning = true;
         // Wait for camera to stop

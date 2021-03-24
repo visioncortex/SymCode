@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://unpkg.com/ionicons@4.2.2/dist/css/ionicons.min.css" rel="stylesheet"/>
-    <link href="./style.css" rel="stylesheet">
+    <link href="/style.css?v=31" rel="stylesheet">
     <meta property="og:title" content="Symcode">
     <meta name="twitter:title" content="Symcode">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -19,7 +19,7 @@
       <div id="coupon_wrapper" class="hidden">
         <div class="coupon">
           <video id="camera" autoplay playsinline></video>
-          <canvas id="frame"></canvas>
+          <canvas id="frame" style="width: 100%;"></canvas>
           <canvas id="loadBuffer"></canvas>
           <div id="thumbnail" class="disable"></div>
         </div>
@@ -28,9 +28,12 @@
         </div>
         <div class="message">
           <div id="fps"></div>
+          <div id="errmsg"></div>
+        </div>
+        <div class="message">
           <input type="file" style="display: none;" id="imageInput" accept="image/*">
           <a id="upload" class="btn"><i class="icon ion-md-cloud-upload"></i></a>
-          <a id="scan" class="btn initial"><i class="icon ion-md-camera"></i></a>
+          <a id="scan" class="btn btn-primary initial"><i class="icon ion-md-camera"></i></a>
           <a id="open" class="btn disable"><i class="icon ion-md-arrow-round-forward"></i></a>
           <a id="capture" class="btn disable">Capture</a>
         </div>
