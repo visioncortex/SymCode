@@ -13,10 +13,11 @@ pub(crate) fn binarize_image_util(color_image: &ColorImage) -> BinaryImage {
 
 fn threshold_for(image: &ColorImage) -> u32 {
     let mut stat = SampleStatBuilder::new();
-    for y in (0..image.height).step_by(8) {
+    for y in 0..image.height {
         for x in 0..image.width {
             let c = image.get_pixel(x, y);
-            stat.add((c.r as u32 + c.g as u32 + c.b as u32) as i32);
+            let c_sum = (c.r as u32 + c.g as u32 + c.b as u32) as i32;
+            stat.add(c_sum);
         }
     }
     stat.build();
