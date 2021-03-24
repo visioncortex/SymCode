@@ -48,10 +48,11 @@ export function main() {
                     console.log("Fetched:", result.symcode);
                     console.log("writing payload to 'data-info'...");
                     let linkUrl = result.symcode.payload;
-                    if (!linkUrl.startsWith("https://")) {
-                        linkUrl = "https://" + linkUrl;
+                    if (linkUrl.startsWith("http")) {
+                        document.getElementById('data-info').innerHTML = `<a href="${linkUrl}">${result.symcode.title}</a>`;
+                    } else {
+                        document.getElementById('data-info').innerHTML = result.symcode.title;
                     }
-                    document.getElementById('data-info').innerHTML = `<a href="${linkUrl}">${result.symcode.title}</a>`;
                 }
             });
         } catch (e) {
