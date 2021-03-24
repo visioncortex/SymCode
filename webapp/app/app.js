@@ -10,7 +10,6 @@ export function main() {
 
     const frameCanvas = document.getElementById('frame');
     const frameCtx = frameCanvas.getContext('2d');
-    const originalFrameSize = [frameCanvas.width, frameCanvas.height];
 
     let scanner;
     loadAlphabet('loadBuffer').then(() => scanner = getNewScanner());
@@ -40,12 +39,12 @@ export function main() {
                 url: 'https://symcode.visioncortex.org/api/symcode?code=' + code,
                 type: 'get',
                 success: function(result) {
-                    document.getElementById("datainfo-viewspace").classList.remove('hidden');
                     if (!result.success) {
-                        document.getElementById('data-info').innerHTML = "No Record Found";
+                        document.getElementById("datainfo-viewspace").classList.add('hidden');
                         console.log("Fetch URL failed!");
                         return;
                     }
+                    document.getElementById("datainfo-viewspace").classList.remove('hidden');
                     console.log("Fetched:", result.symcode);
                     console.log("writing payload to 'data-info'...");
                     let linkUrl = result.symcode.payload;
@@ -62,6 +61,7 @@ export function main() {
 
     function scan() {
         try {
+            frameCanvas.style.display = 'none';
             let startTime = new Date();
             const code = scanner.scan_from_canvas_id("frame");
             const time = (new Date() - startTime);
@@ -88,10 +88,8 @@ export function main() {
     let lastScanTime = new Date();
     let scanningCount = 0;
 
-    const inputFrameSize = {
-        width: 720,
-        height: 720,
-    };
+    const inputFrameSize = 150;
+    const padding = 10;
 
     const fps = 60;
 
@@ -100,12 +98,15 @@ export function main() {
     };
 
     function adjustCameraPosition(vWidth, vHeight) {
-        let containerRect = document.getElementsByClassName('coupon_container')[0].getBoundingClientRect();
+        const containerRect = document.getElementsByClassName('coupon_container')[0].getBoundingClientRect();
         console.log(containerRect);
-        let cWidth = containerRect.width;
-        let cHeight = containerRect.height;
-        camera.style.left = (-(vWidth - cWidth) / 2) + 'px';
-        camera.style.top = (-(vHeight - cHeight) / 2) + 'px';
+        const cWidth = containerRect.width;
+        const cHeight = containerRect.height;
+        const cLeft = (vWidth - cWidth) / 2;
+        const cTop = (vHeight - cHeight) / 2;
+        camera.style.left = -cLeft + 'px';
+        camera.style.top = -cTop + 'px';
+        return {cWidth, cHeight, cLeft, cTop};
     }
 
     scanButton.onclick = () => {
@@ -116,8 +117,8 @@ export function main() {
                 camera.srcObject = stream;
                 getCameraVideoDimensions()
                     .then(({width, height}) => {
-                        adjustCameraPosition(width, height);
-                        startStreaming(width, height);
+                        const containerDimensions = adjustCameraPosition(width, height);
+                        startStreaming(containerDimensions);
                     });
             })
             .catch(handleError);
@@ -129,16 +130,16 @@ export function main() {
                 let width = this.videoWidth;
                 let height = this.videoHeight;
                 resolve({
-                    width: width,
-                    height: height,
+                    width,
+                    height,
                 });
             }, false);
         });
     }
 
-    function startStreaming(videoWidth, videoHeight) {
-        const sx = (videoWidth - inputFrameSize.width) / 2;
-        const sy = (videoHeight - inputFrameSize.height) / 2;
+    function startStreaming({cWidth, cHeight, cLeft, cTop}) {
+        //const sx = (videoWidth - inputFrameSize.width) / 2;
+        //const sy = (videoHeight - inputFrameSize.height) / 2;
 
         finishScanning = false;
         lastScanTime = new Date();
@@ -150,7 +151,7 @@ export function main() {
                 scanner = getNewScanner();
             }
             try {
-                let result = drawFrame(sx, sy);
+                let result = drawFrame(cLeft, cTop, cWidth, cHeight, padding);
                 console.log("Recognition result: " + result.code);
                 finishScanning = true;
             } catch (e) {
@@ -169,7 +170,6 @@ export function main() {
                 }
             } finally {
                 if (finishScanning) {
-                    showFps.innerHTML = '';
                     stopCamera();
                 }
             }
@@ -177,11 +177,14 @@ export function main() {
         sleep(1/fps, loop);
     }
 
-    function drawFrame(sx, sy) {
-        [frameCanvas.width, frameCanvas.height] = originalFrameSize;
-        frameCtx.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
-        frameCtx.drawImage(camera, sx, sy, inputFrameSize.width, inputFrameSize.height,
-            0, 0, frameCanvas.width, frameCanvas.height);
+    function drawFrame(sx, sy, cw, ch, padding) {
+        [frameCanvas.width, frameCanvas.height] = [inputFrameSize, inputFrameSize];
+        frameCtx.fillStyle = "#000000";
+        frameCtx.fillRect(0, 0, frameCanvas.width, frameCanvas.height);
+        frameCtx.drawImage(camera, sx, sy, cw, ch,
+            padding, padding, frameCanvas.width - 2*padding, frameCanvas.height - 2*padding);
+            //(frameCanvas.width - cw) / 2, (frameCanvas.height - ch) / 2, cw, ch);
+            //0, 0, cw, ch);
 
         return scan();
     }
@@ -189,6 +192,7 @@ export function main() {
     function stopCamera() {
         const stream = camera.srcObject;
         if (stream) {
+            showFps.innerHTML = '';
             stream.getTracks().forEach(function(track) {
                 track.stop();
             });
