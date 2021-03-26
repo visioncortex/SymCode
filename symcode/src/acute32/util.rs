@@ -11,8 +11,7 @@ pub(crate) fn local_adaptive_threshold(color_image: &ColorImage, patch_size: usi
     for y in 0..result.height {
         for x in 0..result.width {
             let top_left = PointI32::new(std::cmp::max(0, (x - half_patch_size) as i32), std::cmp::max(0, (y - half_patch_size) as i32));
-            let bot_right = PointI32::new(std::cmp::min(result.width as i32 - 1, (x + half_patch_size) as i32), std::cmp::min(result.height as i32 - 1, (y + half_patch_size) as i32));
-            let threshold = std::cmp::max(0, sat.get_region_mean_top_left_bot_right(top_left, bot_right) as i32 - offset) as u8;
+            let threshold = std::cmp::max(0, sat.get_region_mean_x_y_w_h(top_left.x as usize, top_left.y as usize, patch_size, patch_size) as i32 - offset) as u8;
 
             let c = color_image.get_pixel(x, y);
             let c_mean = ((c.r as u32 + c.g as u32 + c.b as u32) / 3) as u8;

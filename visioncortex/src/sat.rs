@@ -1,5 +1,6 @@
 use crate::{ColorImage, PointI32};
 
+/// A data structure to efficiently compute areas of regions in an image (repeatedly).
 pub struct SummedAreaTable {
     pub sums: Vec<u32>,
     pub width: usize,
@@ -7,6 +8,10 @@ pub struct SummedAreaTable {
 }
 
 impl SummedAreaTable {
+    /// Creates an SAT of the same size of image, where each entry (x,y) is the sum of pixel
+    /// values of the block of pixels with bottom right corner at (x,y) in image.
+    ///
+    /// This construction takes 1 pass through the pixels in image.
     pub fn from_color_image(image: &ColorImage) -> Self {
         let (width, height) = (image.width, image.height);
 
@@ -43,8 +48,13 @@ impl SummedAreaTable {
         }
     }
 
-    pub fn get_sum(&self, x: i32, y: i32) -> u32 {
-        if x >= 0 && y >= 0 {
+    /// Returns the entry in the SAT.
+    ///
+    /// If the input point is out of boundary, this function returns 0.
+    ///
+    /// This is only to facilitate the implementation of other functions; avoid calling this function directly.
+    pub fn get_bot_right_sum(&self, x: i32, y: i32) -> u32 {
+        if x >= 0 && y >= 0 && x < self.width as i32 && y < self.height as i32 {
             self.sums[(y * self.width as i32 + x) as usize]
         } else {
             0
@@ -55,35 +65,36 @@ impl SummedAreaTable {
         top_left.x <= bot_right.x && top_left.y <= bot_right.y
     }
 
+    /// Computes the sum of pixel values in the specified region in O(1) time.
     pub fn get_region_sum_top_left_bot_right(&self, top_left: PointI32, bot_right: PointI32) -> u32 {
         if !Self::correct_top_left_bot_right(&top_left, &bot_right) {
             panic!("Top left and bottom right points are invalid.")
         }
-        let left_region = self.get_sum(top_left.x-1, bot_right.y);
-        let up_region = self.get_sum(bot_right.x, top_left.y-1);
-        let overlap = self.get_sum(top_left.x-1, top_left.y-1);
-        let total = self.get_sum(bot_right.x, bot_right.y);
+        let left_region = self.get_bot_right_sum(top_left.x-1, bot_right.y);
+        let up_region = self.get_bot_right_sum(bot_right.x, top_left.y-1);
+        let overlap = self.get_bot_right_sum(top_left.x-1, top_left.y-1);
+        let total = self.get_bot_right_sum(bot_right.x, bot_right.y);
 
         total + overlap - left_region - up_region
     }
 
+    /// Computes the sum of pixel values in the specified region in O(1) time.
     pub fn get_region_sum_x_y_w_h(&self, x: usize, y: usize, w: usize, h: usize) -> u32 {
         let top_left = PointI32::new(x as i32, y as i32);
         let bot_right = PointI32::new((x+w-1) as i32, (y+h-1) as i32);
         self.get_region_sum_top_left_bot_right(top_left, bot_right)
     }
 
+    /// Computes the mean of pixel values in the specified region in O(1) time.
     pub fn get_region_mean_top_left_bot_right(&self, top_left: PointI32, bot_right: PointI32) -> f64 {
-        let num_pixels = (bot_right.x-top_left.x+1) * (bot_right.y-top_left.y+1);
-        let sum = self.get_region_sum_top_left_bot_right(top_left, bot_right);
-
-        sum as f64 / num_pixels as f64
+        let w = bot_right.x - top_left.x + 1;
+        let h = bot_right.y - top_left.y + 1;
+        self.get_region_mean_x_y_w_h(top_left.x as usize, top_left.y as usize, w as usize, h as usize)
     }
 
+    /// Computes the mean of pixel values in the specified region in O(1) time.
     pub fn get_region_mean_x_y_w_h(&self, x: usize, y: usize, w: usize, h: usize) -> f64 {
-        let top_left = PointI32::new(x as i32, y as i32);
-        let bot_right = PointI32::new((x+w-1) as i32, (y+h-1) as i32);
-        self.get_region_mean_top_left_bot_right(top_left, bot_right)
+        self.get_region_sum_x_y_w_h(x, y, w, h) as f64 / (w*h) as f64
     }
 }
 
@@ -114,15 +125,15 @@ mod tests {
         ];
         let image = create_color_image_helper(6, 6, pixels);
         let sat = SummedAreaTable::from_color_image(&image);
-        assert_eq!(sat.get_sum(0, 0), 31);
-        assert_eq!(sat.get_sum(1, 1), 71);
-        assert_eq!(sat.get_sum(1, 2), 101);
-        assert_eq!(sat.get_sum(5, 0), 111);
-        assert_eq!(sat.get_sum(0, 5), 111);
-        assert_eq!(sat.get_sum(5, 5), 666);
-        assert_eq!(sat.get_sum(4, 4), 450);
-        assert_eq!(sat.get_sum(1, 4), 186);
-        assert_eq!(sat.get_sum(4, 2), 254);
+        assert_eq!(sat.get_bot_right_sum(0, 0), 31);
+        assert_eq!(sat.get_bot_right_sum(1, 1), 71);
+        assert_eq!(sat.get_bot_right_sum(1, 2), 101);
+        assert_eq!(sat.get_bot_right_sum(5, 0), 111);
+        assert_eq!(sat.get_bot_right_sum(0, 5), 111);
+        assert_eq!(sat.get_bot_right_sum(5, 5), 666);
+        assert_eq!(sat.get_bot_right_sum(4, 4), 450);
+        assert_eq!(sat.get_bot_right_sum(1, 4), 186);
+        assert_eq!(sat.get_bot_right_sum(4, 2), 254);
     }
 
 
