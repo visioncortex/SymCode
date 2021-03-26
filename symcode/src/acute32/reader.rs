@@ -1,6 +1,6 @@
-use visioncortex::{BinaryImage, BoundingRect, ColorImage, PointF64, PointI32, PerspectiveTransform};
+use visioncortex::{BinaryImage, BoundingRect, ColorImage, PerspectiveTransform, PointF64, PointI32};
 use crate::interfaces::Reader;
-use super::{Acute32Library, Acute32SymcodeConfig, GlyphLabel, is_black_rgb};
+use super::{Acute32Library, Acute32SymcodeConfig, GlyphLabel, util::{global_adaptive_threshold, local_adaptive_threshold}};
 
 pub struct Acute32Recognizer<'a> {
     config: &'a Acute32SymcodeConfig,
@@ -15,7 +15,7 @@ impl<'a> Acute32Recognizer<'a> {
     pub fn rectify_image(raw_image: ColorImage, image_to_object: PerspectiveTransform, symcode_config: &Acute32SymcodeConfig) -> BinaryImage {
         let width = symcode_config.code_width;
         let height = symcode_config.code_height;
-        let mut rectified_image = BinaryImage::new_w_h(width, height);
+        let mut rectified_image = ColorImage::new_w_h(width, height);
         for y in symcode_config.quiet_zone_width..(height - symcode_config.quiet_zone_width) {
             for x in symcode_config.quiet_zone_width..(width - symcode_config.quiet_zone_width) {
                 let sample_point = image_to_object.transform_inverse(PointF64::new(x as f64, y as f64)).to_point_f32();
@@ -23,10 +23,10 @@ impl<'a> Acute32Recognizer<'a> {
                     Some(color) => color,
                     None => visioncortex::Color::color(&visioncortex::ColorName::White),
                 };
-                rectified_image.set_pixel(x, y, is_black_rgb(&interpolated_color));
+                rectified_image.set_pixel(x, y, &interpolated_color);
             }
         }
-        rectified_image
+        global_adaptive_threshold(&rectified_image)
     }
 
     /// Validates the size of a cluster in rectified image

@@ -1,7 +1,8 @@
-use visioncortex::{BinaryImage, Color, ColorImage, PointF64, PointI32, SampleStatBuilder, SummedAreaTable};
+use visioncortex::{BinaryImage, ColorImage, PointF64, PointI32, SampleStatBuilder, SummedAreaTable};
 
 // Local adaptive thresholding by finding patch mean around each pixel
-pub(crate) fn binarize_image_util(color_image: &ColorImage, patch_size: usize, offset: i32) -> BinaryImage {
+pub(crate) fn local_adaptive_threshold(color_image: &ColorImage, patch_size: usize, offset_percentage: f64) -> BinaryImage {
+    let offset = offset_for(color_image, offset_percentage);
     let sat = SummedAreaTable::from_color_image(color_image);
 
     let mut result = BinaryImage::new_w_h(color_image.width, color_image.height);
@@ -22,12 +23,43 @@ pub(crate) fn binarize_image_util(color_image: &ColorImage, patch_size: usize, o
     result
 }
 
-pub(crate) fn is_black_rgb(color: &Color) -> bool {
-    let r = color.r as u32;
-    let g = color.g as u32;
-    let b = color.b as u32;
+// Calculate threshold offset which is a percentage of the dynamic range
+fn offset_for(image: &ColorImage, percentage: f64) -> i32 {
+    let mut stat = SampleStatBuilder::new();
+    for y in 0..image.height {
+        for x in 0..image.width {
+            let c = image.get_pixel(x, y);
+            let c_sum = (c.r as u32 + c.g as u32 + c.b as u32) as i32;
+            stat.add(c_sum);
+        }
+    }
+    stat.build();
+    let dynamic_range = (stat.percentile(90) - stat.percentile(10)) / 3;
+    (dynamic_range as f64 * percentage) as i32
+}
 
-    r + g + b < 3*128
+pub(crate) fn global_adaptive_threshold(color_image: &ColorImage) -> BinaryImage {
+    let threshold = threshold_for(color_image);
+    color_image.to_binary_image(move |c| {
+        let r = c.r as u32;
+        let g = c.g as u32;
+        let b = c.b as u32;
+
+        r + g + b < 3*threshold
+    })
+}
+
+fn threshold_for(image: &ColorImage) -> u32 {
+    let mut stat = SampleStatBuilder::new();
+    for y in 0..image.height {
+        for x in 0..image.width {
+            let c = image.get_pixel(x, y);
+            let c_sum = (c.r as u32 + c.g as u32 + c.b as u32) as i32;
+            stat.add(c_sum);
+        }
+    }
+    stat.build();
+    (stat.percentile(10) + stat.percentile(90)) as u32 / 6
 }
 
 pub(crate) fn valid_pointi32_on_image(point: PointI32, image_width: usize, image_height: usize) -> bool {
