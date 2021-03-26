@@ -12,6 +12,7 @@ mod field;
 mod image;
 mod point;
 mod sampler;
+mod sat;
 mod statistic;
 mod transform;
 
@@ -29,5 +30,6 @@ pub use field::*;
 pub use image::*;
 pub use point::*;
 pub use sampler::*;
+pub use sat::*;
 pub use statistic::*;
 pub use transform::*;
