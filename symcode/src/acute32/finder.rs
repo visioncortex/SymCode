@@ -85,7 +85,7 @@ impl<'a> FinderInterface for Acute32FinderCandidate<'a> {
         // Get the reference to the input raw frame
         let raw_frame = input;
         // Binarize
-        let binary_raw_frame = binarize_image_util(raw_frame);
+        let binary_raw_frame = binarize_image_util(raw_frame, 40, 50);
         config.debugger.render_binary_image_to_canvas(&binary_raw_frame)?;
 
         // Processing starts
