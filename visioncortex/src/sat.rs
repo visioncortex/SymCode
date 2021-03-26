@@ -1,6 +1,6 @@
 use crate::{ColorImage, PointI32};
 
-/// A data structure to efficiently compute areas of regions in an image (repeatedly).
+/// A data structure to efficiently compute summed pixel values over regions in an image (repeatedly).
 pub struct SummedAreaTable {
     pub sums: Vec<u32>,
     pub width: usize,
@@ -135,7 +135,6 @@ mod tests {
         assert_eq!(sat.get_bot_right_sum(1, 4), 186);
         assert_eq!(sat.get_bot_right_sum(4, 2), 254);
     }
-
 
     #[test]
     fn sat_region_sum() {
