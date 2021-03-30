@@ -1,6 +1,7 @@
 use bit_vec::BitVec;
 use visioncortex::ColorImage;
 
+/// The scanning pipeline
 pub trait SymcodeScanner {
 
     type SymcodeRepresentation;

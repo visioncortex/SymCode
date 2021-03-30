@@ -1,5 +1,6 @@
 use visioncortex::{BinaryImage, BoundingRect, Color, ColorImage, PointI32};
 
+/// For use in development to help visualizing the pipeline stages
 pub trait Debugger {
 
     fn render_color_image_to_canvas(&self, image: &ColorImage) -> Result<(), &'static str>;

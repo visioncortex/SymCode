@@ -7,12 +7,12 @@ use a lookup table, and is most suitable for checking small amounts of data.
 
 The Zoo is collected from and verified against https://crccalc.com/
 
-CRC5
+## CRC5
 ```
 crc5()
 ```
 
-CRC8
+## CRC8
 ```
 crc8()
 crc8_cdma2000()
@@ -26,7 +26,7 @@ crc8_rohc()
 crc8_wcdma()
 ```
 
-CRC16
+## CRC16
 ```
 crc16_ccitt_false()
 crc16_arc()
@@ -53,7 +53,7 @@ crc16_x_25()
 crc16_xmodem()
 ```
 
-CRC32
+## CRC32
 ```
 crc32()
 crc32_bzip2()
@@ -117,23 +117,19 @@ flipped and the byte stream becomes longer.
 
 # CRC Parametrization Explained
 
-From http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html#ch7
+> From http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html#ch7
 
 Following standard parameters are used to define a CRC algorithm instance:
 
-Name: Well, a CRC instance has to be identified somehow, so each public defined CRC parameter set 
-has a name like e.g. CRC-16/CCITT.
+Name: a name which is used to identify in literature e.g. CRC-8/CDMA2000, CRC-16/CCITT.
 
 Width (in bits): Defines the width of the result CRC value (n bits). Simultaneously, also the 
 width of the generator polynomial is defined (n+1 bits). Most common used widths are 8, 16 and 32 
-bit. But thereotically all widths beginning from 1 are possible. In practice, even quite big (80 
-bit) or uneven (5 bit or 31 bit) widths are used.
+bit. In practice, even quite big (80 bit) or uneven (5 bit or 31 bit) widths are used.
 
-Polynomial: Used generator polynomial value. Note that different respresentations exist, see 
-chapter 7.2.
+Polynomial: Used generator polynomial value. There are different ways to represent a generator polynomial in hexadecimal, but the most common is to discard the most significant bit as it is always 1.
 
-Initial Value: The value used to initialize the CRC value / register. In the examples above, 
-always zero is used, but it could be any value.
+Initial Value: The value used to initialize the CRC value.
 
 Input reflected: If this value is TRUE, each input byte is reflected before being used in the 
 calculation. Reflected means that the bits of the input byte are used in reverse order. So this 
@@ -148,6 +144,6 @@ bits.
 Final XOR value: The Final XOR value is xored to the final CRC value before being returned. This 
 is done after the 'Result reflected' step. Obviously a Final XOR value of 0 has no impact.
 
-Check value [Optional]: This value is not required but often specified to help to validate the 
+Check value (Optional): This value is not required but often specified to help validating an 
 implementation. This is the CRC value of input string "123456789" or as byte array: 
 [0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39].

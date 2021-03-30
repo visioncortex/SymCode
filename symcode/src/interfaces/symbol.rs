@@ -1,5 +1,6 @@
 use visioncortex::BinaryImage;
 
+/// Definition of a symbol
 pub trait Symbol {
 
     type Label;
