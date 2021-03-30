@@ -74,7 +74,10 @@ impl Acute32SymcodeMain {
         };
 
         let symcode = self.scan(raw_frame)?;
-        let debug_code_string = format!("{:?}", symcode);
+
+        if false {
+            let _debug_code_string = format!("{:?}", symcode);
+        }
 
         let decoded_bit_string = self.decode(symcode)?;
         Ok(format!("{:?}", decoded_bit_string))

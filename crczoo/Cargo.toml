@@ -1,12 +1,12 @@
 [package]
 name = "crczoo"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Chris Tsang <tyt2y7@gmail.com>"]
 edition = "2018"
 description = "CRC Zoo: A collection of Cyclic Redundancy Check (CRC) algorithms"
 license = "MIT OR Apache-2.0"
 homepage = "http://www.visioncortex.org/"
-repository = "https://github.com/visioncortex/crczoo/"
+repository = "https://github.com/visioncortex/symcode/"
 categories = ["algorithms"]
 keywords = ["crc", "crc5", "crc8", "crc16", "crc32"]
 

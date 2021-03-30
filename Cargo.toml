@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-	"crczoo",
+    "crczoo",
     "symcode",
     "visioncortex",
     "webapp"

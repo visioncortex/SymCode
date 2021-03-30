@@ -1,6 +1,6 @@
 use visioncortex::{BinaryImage, BoundingRect, ColorImage, PerspectiveTransform, PointF64, PointI32};
 use crate::interfaces::Reader;
-use super::{Acute32Library, Acute32SymcodeConfig, GlyphLabel, util::{global_adaptive_threshold, local_adaptive_threshold}};
+use super::{Acute32Library, Acute32SymcodeConfig, GlyphLabel, util::global_adaptive_threshold};
 
 pub struct Acute32Recognizer<'a> {
     config: &'a Acute32SymcodeConfig,

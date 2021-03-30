@@ -39,5 +39,5 @@ impl Debugger for DummyDebugger {
 
     fn render_bounding_rect_to_canvas_with_color(&self, _rect: &BoundingRect, _color: Color) {  }
 
-    fn log(&self, msg: &str) {  }
+    fn log(&self, msg: &str) { log::info!("{}", msg); }
 }

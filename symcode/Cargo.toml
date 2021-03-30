@@ -15,9 +15,9 @@ crate-type = ["rlib"]
 
 [dependencies]
 bit-vec = "0.6.3"
-crczoo = { path = "../crczoo" }
+crczoo = "0.1" # { path = "../crczoo" }
 log = "0.4"
 num-derive = "0.3"
 num-traits = "0.2"
 permutator = "0.4.0"
-visioncortex = { path = "../visioncortex" }
+visioncortex = "0.5" # { path = "../visioncortex" }
