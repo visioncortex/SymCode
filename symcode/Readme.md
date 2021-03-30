@@ -56,4 +56,4 @@ The `/interfaces` module defines the abstract concepts of different stages in a 
 
 1. `SymcodeGenerator` To generate a Symcode image for a given Symcode representation
 
-1. `Debugger` For use in development to help visualizing the pipeline stages
+1. `Debugger` For use during development to help visualizing the pipeline stages
