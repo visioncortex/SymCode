@@ -3,15 +3,12 @@ name = "symcode"
 version = "0.1.0"
 authors = ["Chris Tsang <tyt2y7@gmail.com>", "Sanford Pun <punsanford@gmail.com>"]
 edition = "2018"
-description = "Symbolic Barcode"
+description = "Symbolic Barcode - Programming Library"
 license = "MIT OR Apache-2.0"
 homepage = "http://www.visioncortex.org/"
 repository = "https://github.com/visioncortex/symcode/"
 categories = ["computer-vision"]
 keywords = ["computer-vision"]
-exclude = [
-    "docs/*",
-]
 
 [lib]
 crate-type = ["rlib"]

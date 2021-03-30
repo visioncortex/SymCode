@@ -1,10 +1,17 @@
 [package]
 name = "symcode-webapp"
 version = "0.1.0"
-authors = ["shpun"]
+authors = ["Chris Tsang <tyt2y7@gmail.com>", "Sanford Pun <punsanford@gmail.com>"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "Symbolic Barcode - Web App"
+license = "MIT OR Apache-2.0"
+homepage = "http://www.visioncortex.org/"
+repository = "https://github.com/visioncortex/symcode/"
+categories = ["computer-vision"]
+keywords = ["computer-vision"]
+exclude = [
+    "/app/", "/dev/", "/pkg/",
+]
 
 [lib]
 crate-type = ["cdylib"]

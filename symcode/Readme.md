@@ -1,7 +1,7 @@
 <div align="center">
 
-  <img src="docs/images/visioncortex-banner.png">
-  <h1>SymCode</h1>
+  <img src="https://github.com/visioncortex/symcode/raw/master/docs/images/visioncortex-banner.png">
+  <h1>SymCode Library</h1>
 
   <p>
     <strong>The Symbolic Barcode for Humans and Machines</strong>
