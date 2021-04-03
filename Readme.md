@@ -12,7 +12,7 @@
     <span> | </span>
     <a href="https://symcode.visioncortex.org/">Demo</a>
     <span> | </span>
-    <a href="https://github.com/visioncortex/acute32">Acute32</a>
+    <a href="https://crates.io/crates/symcode">Crate</a>
   </h3>
   <sub>Built with 🦀 by <a href="//www.visioncortex.org/">The Vision Cortex Research Group</a></sub>
 </div>
@@ -34,6 +34,11 @@ SymCode also has standard barcode features, like finders, timers and error codin
 .
 
 <img src="docs/images/symcode cover.jpg">
+
+## How to use it?
+
+If you only want to integrate SymCode into your Javascript project, you can simply use the wasm 
+binaries provided at [`acute32`](https://github.com/visioncortex/acute32).
 
 ## About Us
 This project is a glimpse of the ongoing research and development by the Vision Cortex Research Group.
