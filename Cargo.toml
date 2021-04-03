@@ -3,6 +3,5 @@
 members = [
     "crczoo",
     "symcode",
-    "visioncortex",
     "webapp"
 ]
