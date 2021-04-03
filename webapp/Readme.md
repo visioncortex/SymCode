@@ -22,12 +22,13 @@
 Since `symcode` is a pure rust programming library, this crate glues everything together and leverage 
 the browser's capability for image and video processing.
 
-The `app` directory is the source of the demo web app.
-
-The `dev` directory is the test bench for development.
-
 If you only want to integrate SymCode into your Javascript project, you can simply use the wasm 
 binaries provided at [`acute32`](https://github.com/visioncortex/acute32).
 
-Note that only the `src` directory is covered under open source license, other contents are 
-considered proprietary.
+# Build
+
+First install the rust wasm toolchain.
+
+```sh
+wasm-pack build
+```
