@@ -95,11 +95,12 @@ impl<'a> Acute32TransformFitter<'a> {
     ///
     /// Those are points that cannot be sampled.
     fn transform_to_image_out_of_bound(image_width: usize, image_height: usize, image_to_object: &PerspectiveTransform, symcode_config: &Acute32SymcodeConfig) -> bool {
-        let w = (symcode_config.code_width-1) as f64;
-        let h = (symcode_config.code_height-1) as f64;
+        let pad = symcode_config.glyph_anchors[0];
+        let w = symcode_config.code_width as f64;
+        let h = symcode_config.code_height as f64;
         let points_to_test = [
-            PointF64::new(0.0, 0.0), PointF64::new(w, 0.0),
-            PointF64::new(0.0, h), PointF64::new(w, h),
+            PointF64::new(pad.x, pad.y), PointF64::new(w - pad.x, pad.y),
+            PointF64::new(pad.x, h - pad.y), PointF64::new(w - pad.x, h - pad.y),
         ];
 
         for &point in points_to_test.iter() {
