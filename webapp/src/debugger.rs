@@ -38,8 +38,8 @@ impl DebuggerInterface for Debugger {
 }
 
 pub fn render_color_image_to_canvas(canvas: &Canvas, image: &ColorImage) -> Result<(), &'static str> {
-    let mut data = image.pixels.clone();
-    let data = ImageData::new_with_u8_clamped_array_and_sh(Clamped(&mut data), image.width as u32, image.height as u32).unwrap();
+    let data = image.pixels.clone();
+    let data = ImageData::new_with_u8_clamped_array_and_sh(Clamped(&data), image.width as u32, image.height as u32).unwrap();
     let ctx = canvas.get_rendering_context_2d();
     canvas.set_width(image.width);
     canvas.set_height(image.height);
