@@ -85,7 +85,9 @@ impl<'a> FinderInterface for Acute32FinderCandidate<'a> {
         // Get the reference to the input raw frame
         let raw_frame = input;
         // Binarize
-        let binary_raw_frame = local_adaptive_threshold(raw_frame, 40, 0.2);
+        let binary_raw_frame = local_adaptive_threshold(
+            raw_frame, std::cmp::min(input.width, input.height) / 4, 0.2
+        );
         config.debugger.render_binary_image_to_canvas(&binary_raw_frame)?;
 
         // Processing starts

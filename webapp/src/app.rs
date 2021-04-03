@@ -5,7 +5,7 @@ use wasm_bindgen::prelude::*;
 
 use symcode::acute32::{Acute32, Acute32SymcodeConfig, AlphabetReader, AlphabetReaderParams, GlyphLabel};
 use symcode::interfaces::{Decoder, Finder, FinderElement, Fitter, Reader, Encoder, SymcodeScanner, SymcodeGenerator};
-use symcode::math::{into_bitvec, num_bits_to_store, num_significant_bits};
+use symcode::math::{into_bitvec, num_bits_to_store};
 use crate::{canvas::Canvas, util::console_log_util};
 use crate::debugger::{Debugger, render_binary_image_to_canvas};
 use super::helper::is_black_hsv;
@@ -23,6 +23,8 @@ impl Default for Acute32SymcodeMain {
 }
 
 impl Acute32SymcodeMain {
+    const PAYLOAD_BITS: usize = 20;
+
     pub fn from_config(config: Acute32SymcodeConfig, seed: u64) -> Self {
         Self {
             config,
@@ -33,6 +35,7 @@ impl Acute32SymcodeMain {
 
 #[wasm_bindgen]
 impl Acute32SymcodeMain {
+
     pub fn new() -> Self {
         let mut config = Acute32SymcodeConfig::default();
         if let Some(debug_canvas) = Canvas::new_from_id("debug") {
@@ -43,7 +46,7 @@ impl Acute32SymcodeMain {
 
     pub fn seed_rng(&mut self, seed: u64) {
         self.rng = StdRng::seed_from_u64(seed);
-    } 
+    }
 
     /// Takes the id of the canvas element storing the alphabet.
     pub fn load_alphabet_from_canvas_id(&mut self, canvas_id: &str) {
@@ -83,11 +86,16 @@ impl Acute32SymcodeMain {
         Ok(format!("{:?}", decoded_bit_string))
     }
 
-    // Payload should be encodable in 20 bits max
-    pub fn generate_symcode_to_canvas(&self, canvas_id: &str, payload: usize) -> Result<String, JsValue> {
-        if num_significant_bits(payload) > 20 {
+    pub fn generate_symcode_to_canvas(&self, canvas_id: &str, payload: &str) -> Result<String, JsValue> {
+        if payload.len() > Self::PAYLOAD_BITS {
             return Err("Payload has too many bits!".into());
         }
+
+        let result = usize::from_str_radix(payload, 2);
+        if result.is_err() {
+            return Err("Failed to parse payload as binary number".into());
+        }
+        let payload = result.unwrap();
 
         let canvas = if let Some(canvas) = Canvas::new_from_id(canvas_id) {
             canvas
@@ -120,7 +128,7 @@ impl Acute32SymcodeMain {
     }
 
     fn generate_symcode_with_payload(&self, payload: usize) -> Result<(BinaryImage, String), &str> {
-        let payload = into_bitvec(payload, 20);
+        let payload = into_bitvec(payload, Self::PAYLOAD_BITS);
         let payload_bit_string = format!("{:?}", payload);
 
         let num_symbols = self.config.num_glyphs_in_code();
