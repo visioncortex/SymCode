@@ -12,7 +12,7 @@
     <span> | </span>
     <a href="https://symcode.visioncortex.org/">Demo</a>
     <span> | </span>
-    <a href="https://github.com/visioncortex/acute32">Acute32</a>
+    <a href="https://github.com/visioncortex/acute32">Usage</a>
   </h3>
   <sub>Built with 🦀 by <a href="//www.visioncortex.org/">The Vision Cortex Research Group</a></sub>
 </div>
