@@ -21,40 +21,49 @@ pub fn calculate_crc32(data: &[u8], poly: u32, init: u32, ref_in: bool, ref_out:
     crc ^ xor_out
 }
 
+pub const CRC32_POLY: u32 = 0x04C11DB7;
 pub fn crc32(data: &[u8]) -> u32 {
-    calculate_crc32(data, 0x04C11DB7, 0xFFFFFFFF, true, true, 0xFFFFFFFF)
+    calculate_crc32(data, CRC32_POLY, 0xFFFFFFFF, true, true, 0xFFFFFFFF)
 }
 
+pub const BZIP2_POLY: u32 = 0x04C11DB7;
 pub fn crc32_bzip2(data: &[u8]) -> u32 {
-    calculate_crc32(data, 0x04C11DB7, 0xFFFFFFFF, false, false, 0xFFFFFFFF)
+    calculate_crc32(data, BZIP2_POLY, 0xFFFFFFFF, false, false, 0xFFFFFFFF)
 }
 
+pub const CRC32C_POLY: u32 = 0x1EDC6F41;
 pub fn crc32c(data: &[u8]) -> u32 {
-    calculate_crc32(data, 0x1EDC6F41, 0xFFFFFFFF, true, true, 0xFFFFFFFF)
+    calculate_crc32(data, CRC32C_POLY, 0xFFFFFFFF, true, true, 0xFFFFFFFF)
 }
 
+pub const CRC32D_POLY: u32 = 0xA833982B;
 pub fn crc32d(data: &[u8]) -> u32 {
-    calculate_crc32(data, 0xA833982B, 0xFFFFFFFF, true, true, 0xFFFFFFFF)
+    calculate_crc32(data, CRC32D_POLY, 0xFFFFFFFF, true, true, 0xFFFFFFFF)
 }
 
+pub const MPEG2_POLY: u32 = 0x04C11DB7;
 pub fn crc32_mpeg2(data: &[u8]) -> u32 {
-    calculate_crc32(data, 0x04C11DB7, 0xFFFFFFFF, false, false, 0x00000000)
+    calculate_crc32(data, MPEG2_POLY, 0xFFFFFFFF, false, false, 0x00000000)
 }
 
+pub const POSIX_POLY: u32 = 0x04C11DB7;
 pub fn crc32_posix(data: &[u8]) -> u32 {
-    calculate_crc32(data, 0x04C11DB7, 0x00000000, false, false, 0xFFFFFFFF)
+    calculate_crc32(data, POSIX_POLY, 0x00000000, false, false, 0xFFFFFFFF)
 }
 
+pub const CRC32Q_POLY: u32 = 0x814141AB;
 pub fn crc32q(data: &[u8]) -> u32 {
-    calculate_crc32(data, 0x814141AB, 0x00000000, false, false, 0x00000000)
+    calculate_crc32(data, CRC32Q_POLY, 0x00000000, false, false, 0x00000000)
 }
 
+pub const JAMCRC_POLY: u32 = 0x04C11DB7;
 pub fn crc32_jamcrc(data: &[u8]) -> u32 {
-    calculate_crc32(data, 0x04C11DB7, 0xFFFFFFFF, true, true, 0x00000000)
+    calculate_crc32(data, JAMCRC_POLY, 0xFFFFFFFF, true, true, 0x00000000)
 }
 
+pub const XFER_POLY: u32 = 0x000000AF;
 pub fn crc32_xfer(data: &[u8]) -> u32 {
-    calculate_crc32(data, 0x000000AF, 0x00000000, false, false, 0x00000000)
+    calculate_crc32(data, XFER_POLY, 0x00000000, false, false, 0x00000000)
 }
 
 #[cfg(test)]
