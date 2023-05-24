@@ -1,6 +1,6 @@
 [package]
 name = "crczoo"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Chris Tsang <tyt2y7@gmail.com>"]
 edition = "2018"
 description = "CRC Zoo: A collection of Cyclic Redundancy Check (CRC) algorithms"
