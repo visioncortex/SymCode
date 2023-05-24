@@ -21,119 +21,119 @@ pub fn calculate_crc16(data: &[u8], poly: u16, init: u16, ref_in: bool, ref_out:
     crc ^ xor_out
 }
 
-pub const CCITT_FALSE_POLY: u16 = 0x1021;
+pub const CRC16_CCITT_FALSE_POLY: u16 = 0x1021;
 pub fn crc16_ccitt_false(data: &[u8]) -> u16 {
-    calculate_crc16(data, CCITT_FALSE_POLY, 0xFFFF, false, false, 0x0000)
+    calculate_crc16(data, CRC16_CCITT_FALSE_POLY, 0xFFFF, false, false, 0x0000)
 }
 
-pub const ARC_POLY: u16 = 0x8005;
+pub const CRC16_ARC_POLY: u16 = 0x8005;
 pub fn crc16_arc(data: &[u8]) -> u16 {
-    calculate_crc16(data, ARC_POLY, 0x0000, true, true, 0x0000)
+    calculate_crc16(data, CRC16_ARC_POLY, 0x0000, true, true, 0x0000)
 }
 
-pub const AUG_CCITT_POLY: u16 = 0x1021;
+pub const CRC16_AUG_CCITT_POLY: u16 = 0x1021;
 pub fn crc16_aug_ccitt(data: &[u8]) -> u16 {
-    calculate_crc16(data, AUG_CCITT_POLY, 0x1D0F, false, false, 0x0000)
+    calculate_crc16(data, CRC16_AUG_CCITT_POLY, 0x1D0F, false, false, 0x0000)
 }
 
-pub const BUYPASS_POLY: u16 = 0x8005;
+pub const CRC16_BUYPASS_POLY: u16 = 0x8005;
 pub fn crc16_buypass(data: &[u8]) -> u16 {
-    calculate_crc16(data, BUYPASS_POLY, 0x0000, false, false, 0x0000)
+    calculate_crc16(data, CRC16_BUYPASS_POLY, 0x0000, false, false, 0x0000)
 }
 
-pub const CDMA2000_POLY: u16 = 0xC867;
+pub const CRC16_CDMA2000_POLY: u16 = 0xC867;
 pub fn crc16_cdma2000(data: &[u8]) -> u16 {
-    calculate_crc16(data, CDMA2000_POLY, 0xFFFF, false, false, 0x0000)
+    calculate_crc16(data, CRC16_CDMA2000_POLY, 0xFFFF, false, false, 0x0000)
 }
 
-pub const DDS_110_POLY: u16 = 0x8005;
+pub const CRC16_DDS_110_POLY: u16 = 0x8005;
 pub fn crc16_dds_110(data: &[u8]) -> u16 {
-    calculate_crc16(data, DDS_110_POLY, 0x800D, false, false, 0x0000)
+    calculate_crc16(data, CRC16_DDS_110_POLY, 0x800D, false, false, 0x0000)
 }
 
-pub const DECT_R_POLY: u16 = 0x0589;
+pub const CRC16_DECT_R_POLY: u16 = 0x0589;
 pub fn crc16_dect_r(data: &[u8]) -> u16 {
-    calculate_crc16(data, DECT_R_POLY, 0x0000, false, false, 0x0001)
+    calculate_crc16(data, CRC16_DECT_R_POLY, 0x0000, false, false, 0x0001)
 }
 
-pub const DECT_X_POLY: u16 = 0x0589;
+pub const CRC16_DECT_X_POLY: u16 = 0x0589;
 pub fn crc16_dect_x(data: &[u8]) -> u16 {
-    calculate_crc16(data, DECT_X_POLY, 0x0000, false, false, 0x0000)
+    calculate_crc16(data, CRC16_DECT_X_POLY, 0x0000, false, false, 0x0000)
 }
 
-pub const DNP_POLY: u16 = 0x3D65;
+pub const CRC16_DNP_POLY: u16 = 0x3D65;
 pub fn crc16_dnp(data: &[u8]) -> u16 {
-    calculate_crc16(data, DNP_POLY, 0x0000, true, true, 0xFFFF)
+    calculate_crc16(data, CRC16_DNP_POLY, 0x0000, true, true, 0xFFFF)
 }
 
-pub const EN_13757_POLY: u16 = 0x3D65;
+pub const CRC16_EN_13757_POLY: u16 = 0x3D65;
 pub fn crc16_en_13757(data: &[u8]) -> u16 {
-    calculate_crc16(data, EN_13757_POLY, 0x0000, false, false, 0xFFFF)
+    calculate_crc16(data, CRC16_EN_13757_POLY, 0x0000, false, false, 0xFFFF)
 }
 
-pub const GENIBUS_POLY: u16 = 0x1021;
+pub const CRC16_GENIBUS_POLY: u16 = 0x1021;
 pub fn crc16_genibus(data: &[u8]) -> u16 {
-    calculate_crc16(data, GENIBUS_POLY, 0xFFFF, false, false, 0xFFFF)
+    calculate_crc16(data, CRC16_GENIBUS_POLY, 0xFFFF, false, false, 0xFFFF)
 }
 
-pub const MAXIM_POLY: u16 = 0x8005;
+pub const CRC16_MAXIM_POLY: u16 = 0x8005;
 pub fn crc16_maxim(data: &[u8]) -> u16 {
-    calculate_crc16(data, MAXIM_POLY, 0x0000, true, true, 0xFFFF)
+    calculate_crc16(data, CRC16_MAXIM_POLY, 0x0000, true, true, 0xFFFF)
 }
 
-pub const MCRF4XX_POLY: u16 = 0x1021;
+pub const CRC16_MCRF4XX_POLY: u16 = 0x1021;
 pub fn crc16_mcrf4xx(data: &[u8]) -> u16 {
-    calculate_crc16(data, MCRF4XX_POLY, 0xFFFF, true, true, 0x0000)
+    calculate_crc16(data, CRC16_MCRF4XX_POLY, 0xFFFF, true, true, 0x0000)
 }
 
-pub const RIELLO_POLY: u16 = 0x1021;
+pub const CRC16_RIELLO_POLY: u16 = 0x1021;
 pub fn crc16_riello(data: &[u8]) -> u16 {
-    calculate_crc16(data, RIELLO_POLY, 0xB2AA, true, true, 0x0000)
+    calculate_crc16(data, CRC16_RIELLO_POLY, 0xB2AA, true, true, 0x0000)
 }
 
-pub const T10_DIF_POLY: u16 = 0x8BB7;
+pub const CRC16_T10_DIF_POLY: u16 = 0x8BB7;
 pub fn crc16_t10_dif(data: &[u8]) -> u16 {
-    calculate_crc16(data, T10_DIF_POLY, 0x0000, false, false, 0x0000)
+    calculate_crc16(data, CRC16_T10_DIF_POLY, 0x0000, false, false, 0x0000)
 }
 
-pub const TELEDISK_POLY: u16 = 0xA097;
+pub const CRC16_TELEDISK_POLY: u16 = 0xA097;
 pub fn crc16_teledisk(data: &[u8]) -> u16 {
-    calculate_crc16(data, TELEDISK_POLY, 0x0000, false, false, 0x0000)
+    calculate_crc16(data, CRC16_TELEDISK_POLY, 0x0000, false, false, 0x0000)
 }
 
-pub const TMS37157_POLY: u16 = 0x1021;
+pub const CRC16_TMS37157_POLY: u16 = 0x1021;
 pub fn crc16_tms37157(data: &[u8]) -> u16 {
-    calculate_crc16(data, TMS37157_POLY, 0x89EC, true, true, 0x0000)
+    calculate_crc16(data, CRC16_TMS37157_POLY, 0x89EC, true, true, 0x0000)
 }
 
-pub const USB_POLY: u16 = 0x8005;
+pub const CRC16_USB_POLY: u16 = 0x8005;
 pub fn crc16_usb(data: &[u8]) -> u16 {
-    calculate_crc16(data, USB_POLY, 0xFFFF, true, true, 0xFFFF)
+    calculate_crc16(data, CRC16_USB_POLY, 0xFFFF, true, true, 0xFFFF)
 }
 
-pub const A_POLY: u16 = 0x1021;
+pub const CRC16_A_POLY: u16 = 0x1021;
 pub fn crc16_a(data: &[u8]) -> u16 {
-    calculate_crc16(data, A_POLY, 0xC6C6, true, true, 0x0000)
+    calculate_crc16(data, CRC16_A_POLY, 0xC6C6, true, true, 0x0000)
 }
 
-pub const KERMIT_POLY: u16 = 0x1021;
+pub const CRC16_KERMIT_POLY: u16 = 0x1021;
 pub fn crc16_kermit(data: &[u8]) -> u16 {
-    calculate_crc16(data, KERMIT_POLY, 0x0000, true, true, 0x0000)
+    calculate_crc16(data, CRC16_KERMIT_POLY, 0x0000, true, true, 0x0000)
 }
 
-pub const MODBUS_POLY: u16 = 0x8005;
+pub const CRC16_MODBUS_POLY: u16 = 0x8005;
 pub fn crc16_modbus(data: &[u8]) -> u16 {
-    calculate_crc16(data, MODBUS_POLY, 0xFFFF, true, true, 0x0000)
+    calculate_crc16(data, CRC16_MODBUS_POLY, 0xFFFF, true, true, 0x0000)
 }
 
-pub const X_25_POLY: u16 = 0x1021;
+pub const CRC16_X_25_POLY: u16 = 0x1021;
 pub fn crc16_x_25(data: &[u8]) -> u16 {
-    calculate_crc16(data, X_25_POLY, 0xFFFF, true, true, 0xFFFF)
+    calculate_crc16(data, CRC16_X_25_POLY, 0xFFFF, true, true, 0xFFFF)
 }
 
-pub const XMODEM_POLY: u16 = 0x1021;
+pub const CRC16_XMODEM_POLY: u16 = 0x1021;
 pub fn crc16_xmodem(data: &[u8]) -> u16 {
-    calculate_crc16(data, XMODEM_POLY, 0x0000, false, false, 0x0000)
+    calculate_crc16(data, CRC16_XMODEM_POLY, 0x0000, false, false, 0x0000)
 }
 
 #[cfg(test)]

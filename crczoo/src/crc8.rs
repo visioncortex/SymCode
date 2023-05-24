@@ -26,49 +26,49 @@ pub fn crc8(data: &[u8]) -> u8 {
     calculate_crc8(data, CRC8_POLY, 0x00, false, false, 0x00)
 }
 
-pub const CDMA2000_POLY: u8 = 0x9B;
+pub const CRC8_CDMA2000_POLY: u8 = 0x9B;
 pub fn crc8_cdma2000(data: &[u8]) -> u8 {
-    calculate_crc8(data, CDMA2000_POLY, 0xFF, false, false, 0x00)
+    calculate_crc8(data, CRC8_CDMA2000_POLY, 0xFF, false, false, 0x00)
 }
 
-pub const DARC_POLY: u8 = 0x39;
+pub const CRC8_DARC_POLY: u8 = 0x39;
 pub fn crc8_darc(data: &[u8]) -> u8 {
-    calculate_crc8(data, DARC_POLY, 0x00, true, true, 0x00)
+    calculate_crc8(data, CRC8_DARC_POLY, 0x00, true, true, 0x00)
 }
 
-pub const DVB_S2_POLY: u8 = 0xD5;
+pub const CRC8_DVB_S2_POLY: u8 = 0xD5;
 pub fn crc8_dvb_s2(data: &[u8]) -> u8 {
-    calculate_crc8(data, DVB_S2_POLY, 0x00, false, false, 0x00)
+    calculate_crc8(data, CRC8_DVB_S2_POLY, 0x00, false, false, 0x00)
 }
 
-pub const EBU_POLY: u8 = 0x1D;
+pub const CRC8_EBU_POLY: u8 = 0x1D;
 pub fn crc8_ebu(data: &[u8]) -> u8 {
-    calculate_crc8(data, EBU_POLY, 0xFF, true, true, 0x00)
+    calculate_crc8(data, CRC8_EBU_POLY, 0xFF, true, true, 0x00)
 }
 
-pub const I_CODE_POLY: u8 = 0x1D;
+pub const CRC8_I_CODE_POLY: u8 = 0x1D;
 pub fn crc8_i_code(data: &[u8]) -> u8 {
-    calculate_crc8(data, I_CODE_POLY, 0xFD, false, false, 0x00)
+    calculate_crc8(data, CRC8_I_CODE_POLY, 0xFD, false, false, 0x00)
 }
 
-pub const ITU_POLY: u8 = 0x07;
+pub const CRC8_ITU_POLY: u8 = 0x07;
 pub fn crc8_itu(data: &[u8]) -> u8 {
-    calculate_crc8(data, ITU_POLY, 0x00, false, false, 0x55)
+    calculate_crc8(data, CRC8_ITU_POLY, 0x00, false, false, 0x55)
 }
 
-pub const MAXIM_POLY: u8 = 0x31;
+pub const CRC8_MAXIM_POLY: u8 = 0x31;
 pub fn crc8_maxim(data: &[u8]) -> u8 {
-    calculate_crc8(data, MAXIM_POLY, 0x00, true, true, 0x00)
+    calculate_crc8(data, CRC8_MAXIM_POLY, 0x00, true, true, 0x00)
 }
 
-pub const ROHC_POLY: u8 = 0x07;
+pub const CRC8_ROHC_POLY: u8 = 0x07;
 pub fn crc8_rohc(data: &[u8]) -> u8 {
-    calculate_crc8(data, ROHC_POLY, 0xFF, true, true, 0x00)
+    calculate_crc8(data, CRC8_ROHC_POLY, 0xFF, true, true, 0x00)
 }
 
-pub const WCDMA_POLY: u8 = 0x9B;
+pub const CRC8_WCDMA_POLY: u8 = 0x9B;
 pub fn crc8_wcdma(data: &[u8]) -> u8 {
-    calculate_crc8(data, WCDMA_POLY, 0x00, true, true, 0x00)
+    calculate_crc8(data, CRC8_WCDMA_POLY, 0x00, true, true, 0x00)
 }
 
 #[cfg(test)]

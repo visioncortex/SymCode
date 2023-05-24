@@ -22,8 +22,9 @@ pub fn calculate_crc5(data: &[u8], poly: u8, init: u8, ref_in: bool, ref_out: bo
     crc ^ xor_out
 }
 
+pub const CRC5_POLY: u8 = 0x5;
 pub fn crc5(data: &[u8]) -> u8 {
-    calculate_crc5(data, 0x5, 0x1f, true, true, 0x1f)
+    calculate_crc5(data, CRC5_POLY, 0x1f, true, true, 0x1f)
 }
 
 #[cfg(test)]
